@@ -42,4 +42,7 @@ io.on("connection", (socket) => {
         delete gameState.players[socket.id]
         console.log(socket.id + " disconnected")
     })
+    socket.on('test', () => {
+        console.log(socket.id + " sent a test message");
+    })
 })

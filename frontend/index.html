@@ -8,8 +8,9 @@
     <script src="https://cdn.socket.io/4.2.0/socket.io.min.js"
         integrity="sha384-PiBR5S00EtOj2Lto9Uu81cmoyZqR57XcOna1oAuVuIEjzj0wpqDVfD0JA9eXlRsj"
         crossorigin="anonymous"></script>
-    <script src="client.js"></script>
-    <script src="game.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="client.js" defer></script>
+    <!-- <script src="game.js"></script> -->
     <title>Document</title>
 </head>
 <style>
@@ -24,8 +25,11 @@
 </style>
 
 <body>
-    <p id="counter">0</p>
-    <canvas id="canvas" width="400px" height="400px" onmousemove="updateMousePos(event)"></canvas>
+    <div id="app">
+        <button @click="press">Press mee</button>
+    </div>
+    <!-- <p id="counter">0</p>
+    <canvas id="canvas" width="400px" height="400px" onmousemove="updateMousePos(event)"></canvas> -->
 </body>
 
 </html>
