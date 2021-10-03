@@ -17,7 +17,7 @@
 
 // // Initialize Firebase
 // const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
+// const analytics = getAnalytics(app);/
 
 const io = require("socket.io")(3000, {
     cors: {
@@ -26,23 +26,24 @@ const io = require("socket.io")(3000, {
 })
 
 gameState = {
-    players: {}
-}
+};
 
 io.on("connection", (socket) => {
-    console.log(socket.id + " connected")
-    gameState.players[socket.id] = { x: 0, y: 0 }
-    socket.on('post', (state) => {
-        gameState.players[socket.id] = state;
-    })
-    socket.on('get', () => {
-        socket.emit('return', gameState)
-    })
+    console.log(socket.id + " connected");
+    
+    socket.on('broadcastLocalState', (state) => {
+    });
+
+    socket.on('getState', () => {
+        socket.emit('getStateResponse', gameState)
+    });
+
     socket.on('disconnect', () => {
-        delete gameState.players[socket.id]
         console.log(socket.id + " disconnected")
-    })
+    });
+
+    // Debug
     socket.on('test', () => {
         console.log(socket.id + " sent a test message");
-    })
-})
+    });
+});

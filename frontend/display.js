@@ -1,6 +1,3 @@
-let display;
-document.addEventListener('DOMContentLoaded', () => { display = new Display() })
-
 class Display {
     colours = {
         white: "#FFFFFF",

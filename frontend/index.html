@@ -4,32 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" href="#">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Socket IO -->
     <script src="https://cdn.socket.io/4.2.0/socket.io.min.js"
         integrity="sha384-PiBR5S00EtOj2Lto9Uu81cmoyZqR57XcOna1oAuVuIEjzj0wpqDVfD0JA9eXlRsj"
         crossorigin="anonymous"></script>
+
+    <!-- Vue -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <!-- <script src="display.js"></script> -->
     <script src="client.js" defer></script>
-    <!-- <script src="game.js"></script> -->
+
+    <!-- Bootstrap -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script> -->
+
+    <!-- Tailwind -->
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- CSS Override -->
+    <link href="style.css" rel="stylesheet">
+
     <title>Document</title>
 </head>
-<style>
-    canvas {
-        padding-left: 0;
-        padding-right: 0;
-        margin-left: auto;
-        margin-right: auto;
-        display: block;
-        border: 1px solid #000000;
-    }
-</style>
 
 <body>
-    <div id="app">
-        <button @click="press">Press mee</button>
+    <div id="app" class="bg-gray-800 w-screen h-screen">
+        <p class="text-gray-300 text-xs">{{id}}</p>
+        <div class="mx-20">
+            <div id="ui" class="filter drop-shadow-lg flex flex-col mx-32">
+                <div class="grid gap-1" style="width: 300px; height:300px; grid-template-rows: repeat(12, minmax(0,1fr)); grid-template-columns: repeat(12, minmax(0,1fr));">
+                    <div v-for="n in 144" @mouseenter="grid.highlighted=n" @mouseleave="grid.highlighted=-1" @click="grid.selected=n" :class="{ highlighted: grid.highlighted==n, selected: grid.selected == n }" class="cell bg-gray-700 p-1 text-center"></div>
+                </div>
+                <!-- <canvas id="canvas" class="mx-auto" width="500px" height="500px"></canvas> -->
+                <button class="bg-blue-600 rounded-2 text-white fw-bold p-4 mt-6" @click="count++">Press me</button>
+                <p id="counter" class="p-2 bg-gray-700 rounded-2 text-center text-white">{{count}}</p>
+                <button class="bg-red-600 rounded-2 text-white fw-bold p-4 mt-6" @click="count+=10">Press me x10</button>
+                <p id="counter" class="p-2 bg-gray-700 rounded-2 text-center text-white">{{count}}</p>
+                <button class="bg-green-600 rounded-2 text-white fw-bold p-4 mt-6" @click="count+=100">Press me x100</button>
+                <p id="counter" class="p-2 bg-gray-700 rounded-2 text-center text-white">{{count}}</p>
+                <button class="bg-yellow-600 rounded-2 text-white fw-bold p-4 mt-6" @click="count+=1000">Press me x1000</button>
+                <p id="counter" class="p-2 bg-gray-700 rounded-2 text-center text-white">{{count}}</p>
+            </div>
+        </div>
     </div>
-    <!-- <p id="counter">0</p>
-    <canvas id="canvas" width="400px" height="400px" onmousemove="updateMousePos(event)"></canvas> -->
 </body>
 
 </html>

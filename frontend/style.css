@@ -1,0 +1,12 @@
+/* .cell:hover {
+    background-color: #6B7280;
+} */
+
+.cell.highlighted {
+    background-color: #6B7280;
+}
+
+
+.cell.selected {
+    background-color: #D1D5DB;
+}
