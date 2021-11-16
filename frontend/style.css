@@ -4,9 +4,11 @@
 
 .cell.highlighted {
     background-color: #6B7280;
+    cursor:pointer;
 }
 
 
 .cell.selected {
     background-color: #D1D5DB;
+    cursor:default;
 }

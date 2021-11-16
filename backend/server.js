@@ -26,23 +26,25 @@ const io = require("socket.io")(3000, {
 })
 
 gameState = {
+    users: {}
 };
 
 io.on("connection", (socket) => {
     console.log(socket.id + " connected");
     
     socket.on('broadcastLocalState', (state) => {
+        gameState.users[socket.id] = state
     });
 
-    socket.on('getState', () => {
-        socket.emit('getStateResponse', gameState)
+    socket.on('getGlobalState', () => {
+        socket.emit('broadcastGlobalState', gameState)
     });
 
     socket.on('disconnect', () => {
         console.log(socket.id + " disconnected")
     });
 
-    // Debug
+    // Debug test
     socket.on('test', () => {
         console.log(socket.id + " sent a test message");
     });
