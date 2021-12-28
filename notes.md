@@ -1,14 +1,13 @@
 # Project notes
 
-### Bots
-- Click a button to produce a single bot
-- Consume n bots to make a bot factory
-- Consume n bots to make a research lab
+Oy vey
+
+hello king
 
 
 
-### Upgrades
-Costs research points
-- Speed (ability to reproduce)
-- Combat (ability to defend / attack other bots)
-- Mining (ability to harvest resources)
+### Game
+- Snake but with guns
+- Each piece gives your snake a different ability (colour)
+- Shoot snake makes tail fall off
+- Can use for your own snake
