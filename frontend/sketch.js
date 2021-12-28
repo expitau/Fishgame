@@ -60,7 +60,7 @@
 //     }
 // }
 
-const socket = io(`http://192.168.2.33:3000`);
+const socket = io(`http://localhost:3000`);
 
 function hashColour(str) {
     var hash = 0;

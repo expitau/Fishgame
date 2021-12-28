@@ -7,7 +7,7 @@ services:
     ports:
       - 8080:80
     environment:
-      - serverIP=192.168.2.33
+      - serverIP=localhost
     volumes:
       - ./frontend:/usr/share/nginx/html
   backend:
