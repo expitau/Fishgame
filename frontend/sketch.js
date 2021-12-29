@@ -1,65 +1,3 @@
-// class Display {
-//     colours = {
-//         white: "#FFFFFF",
-//         black: "#000000"
-//     }
-
-//     addEventListener(e, f){
-//         this.canvas.addEventListener(e, f);
-//     }
-
-//     constructor() {
-//         this.canvas = document.getElementById('canvas');
-//         this.context = canvas.getContext("2d");
-//         this.width = canvas.width;
-//         this.height = canvas.height;
-//         this.top = canvas.getBoundingClientRect().top;
-//         this.left = canvas.getBoundingClientRect().left;
-//     }
-
-//     hashColour(str) {
-//         var hash = 0;
-//         if (str.length === 0) return hash;
-//         for (var i = 0; i < str.length; i++) {
-//             hash = str.charCodeAt(i) + ((hash << 5) - hash);
-//             hash = hash & hash;
-//         }
-//         var color = '#';
-//         for (var i = 0; i < 3; i++) {
-//             var value = (hash >> (i * 8)) & 255;
-//             color += ('00' + value.toString(16)).substr(-2);
-//         }
-//         return color;
-//     }
-
-//     fill(c1, c2, c3) {
-//         if (typeof c1 === "string") {
-//             this.context.fillStyle = c1;
-//         } else if (typeof c1 === "number" && typeof c2 === "undefined" && typeof c3 === "undefined") {
-//             this.context.fillStyle = "rgb(" + c1 + ", " + c1 + ", " + c1 + ")";
-//         } else if (typeof c1 === "number") {
-//             this.context.fillStyle = "rgb(" + c1 + ", " + c3 + ", " + c3 + ")";
-//         } else {
-//             this.context.fillStyle = "#000000"
-//         }
-//     }
-
-//     rect(x, y, w, h) {
-//         this.context.fillRect(x, y, w, h)
-//     }
-
-//     circle(x, y, r) {
-//         this.context.beginPath()
-//         this.context.arc(x, y, r, 0, Math.PI * 2)
-//         this.context.fill()
-//     }
-
-//     background(c) {
-//         this.fill(c)
-//         this.context.fillRect(0, 0, canvas.width, canvas.height)
-//     }
-// }
-
 const socket = io(`http://localhost:3000`);
 
 function hashColour(str) {
@@ -82,15 +20,22 @@ globalState = {
 }
 
 localState = {
-    x: 0,
-    y: 0
+    leftKey: false,
+    rightKey: false
 }
-id = null
+id = null;
 
+/** Canvas Control **/
 function setup() {
-    createCanvas(400, 400)
+    createCanvas(windowWidth, windowHeight)
 }
 
+// Dynamically change the size of the canvas on window resize
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+ }
+
+/** Socket Connection **/
 socket.on('connect', () => {
     console.log("You have connected as " + socket.id)
     id = socket.id;
@@ -100,21 +45,58 @@ socket.on('broadcastGlobalState', (state) => {
     globalState = state;
 })
 
+/** Draw Function **/
 function draw() {
-    socket.emit('getGlobalState')
-    if (mouseX >= 0 && mouseX <= 400)
-        localState.x = mouseX;
-    if (mouseY >= 0 && mouseY <= 400)
-        localState.y = mouseY;
-    render()
-    socket.emit('broadcastLocalState', localState)
+    globalStateUpdate();
+    if(globalState.users[id] !== undefined){
+        render();
+    }
 }
 
+/** Input Handling **/
+let keys = [];
+function keyPressed() {
+    keys[keyCode] = true;
+}
+function keyReleased() {
+    keys[keyCode] = false;
+}
+
+/** Update **/
+function globalStateUpdate() {
+    socket.emit('getGlobalState');
+
+    localState.leftKey = (keys[37] || keys[65]); // left arrow or A key is pressed
+    localState.rightKey = (keys[39] || keys[68]); // right or D key is pressed
+    
+    socket.emit('broadcastLocalState', localState);
+}
+
+/** Local Rendering **/
 function render() {
-    background(200)
+    // Display World
+    background('#222');
+    
+    push();
+    translate(windowWidth/2 + globalState.users[id].cameraX, windowHeight/2 + globalState.users[id].cameraY);
+
+    //World Outline
+    stroke(255, 255, 255);
+    strokeWeight(5);
+    noFill();
+    rect(0, 0, 800, 800);
+
+    //Loop through players
     for (const [userId, user] of Object.entries(globalState.users)) {
-        fill(hashColour(userId))
-        ellipse(user.x, user.y, 10, 10);
-        text(userId, user.x + 10, user.y - 5);
+        // Display player
+        push();
+        translate(user.x, user.y)
+        rotate(radians(user.r));
+        stroke(hashColour(userId));
+        rect(-25, -25, 50, 50);
+        point(-15,-18);
+        point(15,-18);
+        pop();
     }
+    pop(); 
 }
