@@ -6,8 +6,6 @@ services:
     image: nginx:alpine
     ports:
       - 8080:80
-    environment:
-      - serverIP=localhost
     volumes:
       - ./frontend:/usr/share/nginx/html
   backend:

@@ -1,5 +1,3 @@
-const socket = io(`http://localhost:3000`);
-
 function hashColour(str) {
     var hash = 0;
     if (str.length === 0) return hash;
@@ -15,43 +13,39 @@ function hashColour(str) {
     return color;
 }
 
-globalState = {
-    users: {}
-}
-
-localState = {
-    leftKey: false,
-    rightKey: false
-}
-id = null;
-
-/** Canvas Control **/
-function setup() {
-    createCanvas(windowWidth, windowHeight)
-}
-
-// Dynamically change the size of the canvas on window resize
-function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
- }
-
-/** Socket Connection **/
-socket.on('connect', () => {
-    console.log("You have connected as " + socket.id)
-    id = socket.id;
-})
-
-socket.on('broadcastGlobalState', (state) => {
-    globalState = state;
-})
-
 /** Draw Function **/
 function draw() {
-    globalStateUpdate();
-    if(globalState.users[id] !== undefined){
-        render();
+    if(globalState.playerData[id] == undefined) return globalStateUpdate();
+    
+    // Display World
+    background('#222');
+    
+    push();
+    translate(windowWidth/2 + globalState.playerData[id].cameraX, windowHeight/2 + globalState.playerData[id].cameraY);
+    
+    //World Outline
+    stroke(255, 255, 255);
+    strokeWeight(5);
+    noFill();
+    rect(0, 0, 800, 800);
+    
+    //Loop through players
+    for (const [userId, user] of Object.entries(globalState.playerData)) {
+        // Display player
+        push();
+        translate(user.x, user.y)
+        rotate(radians(user.r));
+        stroke(hashColour(userId));
+        rect(-25, -25, 50, 50);
+        point(-15,-18);
+        point(15,-18);
+        pop();
     }
+    pop(); 
+    
+    globalStateUpdate()
 }
+
 
 /** Input Handling **/
 let keys = [];
@@ -70,33 +64,4 @@ function globalStateUpdate() {
     localState.rightKey = (keys[39] || keys[68]); // right or D key is pressed
     
     socket.emit('broadcastLocalState', localState);
-}
-
-/** Local Rendering **/
-function render() {
-    // Display World
-    background('#222');
-    
-    push();
-    translate(windowWidth/2 + globalState.users[id].cameraX, windowHeight/2 + globalState.users[id].cameraY);
-
-    //World Outline
-    stroke(255, 255, 255);
-    strokeWeight(5);
-    noFill();
-    rect(0, 0, 800, 800);
-
-    //Loop through players
-    for (const [userId, user] of Object.entries(globalState.users)) {
-        // Display player
-        push();
-        translate(user.x, user.y)
-        rotate(radians(user.r));
-        stroke(hashColour(userId));
-        rect(-25, -25, 50, 50);
-        point(-15,-18);
-        point(15,-18);
-        pop();
-    }
-    pop(); 
 }
