@@ -1,16 +1,27 @@
 const socket = io(env.server);
 
-let globalState = {
-    playerData: {}
-}
+let globalState = {}
 
-let localState = {
-    leftKey: false,
-    rightKey: false
-}
+let inputs = {}
 
 let id = null;
 
+function setInput(keyCode, value){
+
+    let key;
+    if (keyCode == 37 || keyCode == 65){
+        key = "left"
+    }
+    if (keyCode == 39 || keyCode == 68){
+        key = "right"
+    }
+
+    if (typeof key === 'undefined')
+        return
+    
+    inputs[key] = value;
+    socket.emit("keyEntered", inputs)
+}
 
 /** Socket Connection **/
 socket.on('connect', () => {

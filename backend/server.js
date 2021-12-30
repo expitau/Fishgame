@@ -6,26 +6,25 @@ const io = require("socket.io")(3000, {
 
 gameState = {
     playerData: {},
-    playerInputs: {},
     map: {
         width: 800,
         height: 800
     }
 };
 
+playerInputs = {}
+
 io.on("connection", (socket) => {
     console.log(socket.id + " connected");
+    playerInputs[socket.id] = {}
     
-    socket.on('broadcastLocalState', (inputState) => {
-        gameState.playerInputs[socket.id] = inputState
-    });
-
-    socket.on('getGlobalState', () => {
-        socket.emit('broadcastGlobalState', gameState)
+    socket.on('keyEntered', (inputs) => {
+        playerInputs[socket.id] = {left: inputs.left ?? false, right: inputs.right ?? false}
     });
 
     socket.on('disconnect', () => {
         console.log(socket.id + " disconnected")
+        delete playerInputs[socket.id]
     });
 
     // Debug test
@@ -43,34 +42,34 @@ function update() {
         return;  // Skip the frame
     }
     
-    for(id of Object.keys(gameState.playerInputs)){
+    for(id of Object.keys(playerInputs)){
         updatePlayer(id, deltaTime)
     }
 
     lastUpdate = Date.now()
+    
+    io.emit('broadcastGlobalState', gameState)
 }
 
 // Updates gameState.playerData from gamestate.playerInputs
 function updatePlayer (id, dt){
     let playerState = gameState.playerData[id];
-    let inputState = gameState.playerInputs[id];
+    let inputState = playerInputs[id];
 
-    if(playerState == null){
-        playerState = {
-            cameraX: 0,
-            cameraY: 0,
-            x: 500,
-            y: 500,
-            r: 0,
-        };
-    }
+    playerState ??= {
+        cameraX: 0,
+        cameraY: 0,
+        x: 500,
+        y: 500,
+        r: 0,
+    };
 
     let speed = 70 * dt / 1000;
     
-    if(inputState.rightKey){
+    if(inputState.right){
         playerState.r += 2 * speed;
     }
-    if(inputState.leftKey){
+    if(inputState.left){
         playerState.r -= 2 * speed;
     }
     

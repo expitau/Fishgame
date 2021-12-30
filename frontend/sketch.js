@@ -15,7 +15,7 @@ function hashColour(str) {
 
 /** Draw Function **/
 function draw() {
-    if(globalState.playerData[id] == undefined) return globalStateUpdate();
+    if(id == undefined || globalState.playerData == undefined || globalState.playerData[id] == undefined) return;
     
     // Display World
     background('#222');
@@ -43,25 +43,14 @@ function draw() {
     }
     pop(); 
     
-    globalStateUpdate()
+    // globalStateUpdate()
 }
 
 
 /** Input Handling **/
-let keys = [];
 function keyPressed() {
-    keys[keyCode] = true;
+    setInput(keyCode, true)
 }
 function keyReleased() {
-    keys[keyCode] = false;
-}
-
-/** Update **/
-function globalStateUpdate() {
-    socket.emit('getGlobalState');
-
-    localState.leftKey = (keys[37] || keys[65]); // left arrow or A key is pressed
-    localState.rightKey = (keys[39] || keys[68]); // right or D key is pressed
-    
-    socket.emit('broadcastLocalState', localState);
+    setInput(keyCode, false)
 }
