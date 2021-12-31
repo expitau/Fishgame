@@ -1,11 +1,14 @@
+let Player = require('./player')
+
 const io = require("socket.io")(3000, {
     cors: {
         origin: "*",
     }
 })
 
+players = {};
+
 gameState = {
-    playerData: {},
     map: {
         width: 800,
         height: 800
@@ -16,15 +19,15 @@ playerInputs = {}
 
 io.on("connection", (socket) => {
     console.log(socket.id + " connected");
-    playerInputs[socket.id] = {}
+    players[socket.id] ??= new Player(socket.id); // Create new player if does not already exist
     
-    socket.on('keyEntered', (inputs) => {
-        playerInputs[socket.id] = {left: inputs.left ?? false, right: inputs.right ?? false}
+    socket.on('keyEntered', (keyCode, value) => {
+        players[socket.id].updateInput(keyCode, value) // Update the input of the player
     });
 
     socket.on('disconnect', () => {
         console.log(socket.id + " disconnected")
-        delete playerInputs[socket.id]
+        delete players[socket.id]
     });
 
     // Debug test
@@ -42,13 +45,18 @@ function update() {
         return;  // Skip the frame
     }
     
-    for(id of Object.keys(playerInputs)){
-        updatePlayer(id, deltaTime)
+    for([id, player] of Object.entries(players)){
+        player.tick(deltaTime)
     }
 
     lastUpdate = Date.now()
     
-    io.emit('broadcastGlobalState', gameState)
+    io.emit('broadcastGlobalState', 
+    {
+        players: Object.fromEntries(Object.entries(players, ([id, player]) => [id, player.getClientProps()])),
+        map: gameState.map
+    }
+    )
 }
 
 // Updates gameState.playerData from gamestate.playerInputs
@@ -56,35 +64,9 @@ function updatePlayer (id, dt){
     let playerState = gameState.playerData[id];
     let inputState = playerInputs[id];
 
-    playerState ??= {
-        cameraX: 0,
-        cameraY: 0,
-        x: 500,
-        y: 500,
-        r: 0,
-    };
+    playerState ??= new Player();
 
-    let speed = 70 * dt / 1000;
     
-    if(inputState.right){
-        playerState.r += 2 * speed;
-    }
-    if(inputState.left){
-        playerState.r -= 2 * speed;
-    }
-    
-    playerState.x += Math.sin(degToRad(playerState.r)) * speed;
-    playerState.y -= Math.cos(degToRad(playerState.r)) * speed;
-    
-    playerState.x = Math.min(Math.max(playerState.x, 0), gameState.map.width);
-    playerState.y = Math.min(Math.max(playerState.y, 0), gameState.map.height);
-    
-    playerState.cameraX = -playerState.x;
-    playerState.cameraY = -playerState.y;
     
     gameState.playerData[id] = playerState
-}
-
-function degToRad(r){
-    return r *(Math.PI / 180);
 }

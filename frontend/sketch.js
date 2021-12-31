@@ -15,13 +15,15 @@ function hashColour(str) {
 
 /** Draw Function **/
 function draw() {
-    if(id == undefined || globalState.playerData == undefined || globalState.playerData[id] == undefined) return;
-    
+    if(id == undefined || globalState.players == undefined || globalState.players[id] == undefined){
+        console.log("returned")
+        return;   
+    }
     // Display World
     background('#222');
     
     push();
-    translate(windowWidth/2 + globalState.playerData[id].cameraX, windowHeight/2 + globalState.playerData[id].cameraY);
+    translate(windowWidth/2 + globalState.players[id].cameraX, windowHeight/2 + globalState.players[id].cameraY);
     
     //World Outline
     stroke(255, 255, 255);
@@ -30,7 +32,7 @@ function draw() {
     rect(0, 0, 800, 800);
     
     //Loop through players
-    for (const [userId, user] of Object.entries(globalState.playerData)) {
+    for (const [userId, user] of Object.entries(globalState.players)) {
         // Display player
         push();
         translate(user.x, user.y)
@@ -49,8 +51,8 @@ function draw() {
 
 /** Input Handling **/
 function keyPressed() {
-    setInput(keyCode, true)
+    socket.emit("keyEntered", keyCode, true)
 }
 function keyReleased() {
-    setInput(keyCode, false)
+    socket.emit("keyEntered", keyCode, false)
 }
