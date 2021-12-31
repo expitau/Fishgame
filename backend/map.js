@@ -3,16 +3,17 @@ module.exports = class Map {
         this.width = w;
         this.height = h;
         this.tilesize = 50;
-        this.tilemap = generateMap(this.width, this.height)
+        this.threshold = 0.6 // ∈ [0,1], higher means more tiles, lower means less tiles
+        this.tilemap = generateMap(this.width, this.height, this.threshold)
     }
 }
 
-function generateMap(w, h) {
+function generateMap(w, h, threshold) {
     tilemap = []
     for (let i = 0; i < h; i++) {
         row = []
         for (let j = 0; j < w; j++) {
-            row.push(Math.random() < 0.6)
+            row.push(Math.random() < threshold)
         }
         tilemap.push(row)
     }
