@@ -1,14 +1,3 @@
-/* .cell:hover {
-    background-color: #6B7280;
-} */
-
-.cell.highlighted {
-    background-color: #6B7280;
-    cursor:pointer;
-}
-
-
-.cell.selected {
-    background-color: #D1D5DB;
-    cursor:default;
+body {
+    margin: 0px;
 }

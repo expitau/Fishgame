@@ -1,4 +1,5 @@
 let Player = require('./player')
+let Map = require('./map')
 
 const io = require("socket.io")(3000, {
     cors: {
@@ -9,10 +10,7 @@ const io = require("socket.io")(3000, {
 players = {};
 
 gameState = {
-    map: {
-        width: 800,
-        height: 800
-    }
+    map: new Map(30,30)
 };
 
 playerInputs = {}
@@ -57,16 +55,4 @@ function update() {
         map: gameState.map
     }
     )
-}
-
-// Updates gameState.playerData from gamestate.playerInputs
-function updatePlayer (id, dt){
-    let playerState = gameState.playerData[id];
-    let inputState = playerInputs[id];
-
-    playerState ??= new Player();
-
-    
-    
-    gameState.playerData[id] = playerState
 }

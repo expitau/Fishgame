@@ -43,8 +43,8 @@ module.exports = class Player{
         this.x += Math.sin(degToRad(this.r)) * speed;
         this.y -= Math.cos(degToRad(this.r)) * speed;
         
-        this.x = Math.min(Math.max(this.x, 0), gameState.map.width);
-        this.y = Math.min(Math.max(this.y, 0), gameState.map.height);
+        this.x = Math.min(Math.max(this.x, 0), gameState.map.width * gameState.map.tilesize);
+        this.y = Math.min(Math.max(this.y, 0), gameState.map.height * gameState.map.tilesize);
         
         this.cameraX = -this.x;
         this.cameraY = -this.y;

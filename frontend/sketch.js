@@ -16,7 +16,6 @@ function hashColour(str) {
 /** Draw Function **/
 function draw() {
     if(id == undefined || globalState.players == undefined || globalState.players[id] == undefined){
-        console.log("returned")
         return;   
     }
     // Display World
@@ -29,7 +28,20 @@ function draw() {
     stroke(255, 255, 255);
     strokeWeight(5);
     noFill();
-    rect(0, 0, 800, 800);
+    // rect(0, 0, globalState.map.width * globalState.map.tilesize, globalState.map.height * globalState.map.tilesize);
+    strokeWeight(0);
+    for(const [i,row] of globalState.map.tilemap.entries()){
+        for(const [j, cell] of row.entries()){
+            if (cell) {
+                fill('#555')
+            } else {
+                fill('#222')
+            }
+            rect(i * globalState.map.tilesize, j * globalState.map.tilesize, globalState.map.tilesize, globalState.map.tilesize)
+        }
+    }
+    strokeWeight(5);
+    noFill();
     
     //Loop through players
     for (const [userId, user] of Object.entries(globalState.players)) {
