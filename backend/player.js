@@ -40,11 +40,14 @@ module.exports = class Player{
             this.r -= 2 * speed;
         }
         
-        this.x += Math.sin(degToRad(this.r)) * speed;
-        this.y -= Math.cos(degToRad(this.r)) * speed;
-        
-        this.x = Math.min(Math.max(this.x, 0), gameState.map.width * gameState.map.tilesize);
-        this.y = Math.min(Math.max(this.y, 0), gameState.map.height * gameState.map.tilesize);
+        let newPosX = this.x + Math.sin(degToRad(this.r)) * speed;
+        let newPosY = this.y - Math.cos(degToRad(this.r)) * speed
+        if (gameState.map.isOnMap(newPosX, this.y)) {
+            this.x = newPosX;
+        } 
+        if (gameState.map.isOnMap(this.x, newPosY)) {
+            this.y = newPosY;
+        }
         
         this.cameraX = -this.x;
         this.cameraY = -this.y;

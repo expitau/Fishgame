@@ -6,6 +6,14 @@ module.exports = class Map {
         this.threshold = 0.6 // ∈ [0,1], higher means more tiles, lower means less tiles
         this.tilemap = generateMap(this.width, this.height, this.threshold)
     }
+
+    isOnMap(x, y) {
+        if (0 < x && x < this.width * this.tilesize && 0 < y && y < this.height * this.tilesize){
+            let tile = [Math.floor(x / this.tilesize), Math.floor(y / this.tilesize)]
+            return this.tilemap[tile[0]][tile[1]];
+        }
+        return false;
+    }
 }
 
 function generateMap(w, h, threshold) {
