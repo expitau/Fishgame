@@ -1,5 +1,9 @@
 let id;
 let players = {};
+let originX = 0;
+let originY = 0;
+let width = 800;
+let height = 600;
 
 // On initialize
 function OnInit() {
@@ -8,20 +12,40 @@ function OnInit() {
 
 // On frame
 function OnRender() {
-    background("#222")
+    // set origin point
+    originX = (windowWidth - width)/2;
+    originY = (windowHeight - height)/2;
+
+    // display canvas
+    push();
+    translate(originX, originY);
+    Canvas();
+    pop();
+
+    // mask non-canvas area
+    fill("#222");
+    noStroke();
+    rect(0,0, originX, windowHeight);
+    rect(0,0, windowWidth, originY);
+    rect(originX + width, 0, originX, windowHeight);
+    rect(0, originY + height, windowWidth, originY);
+}
+
+function Canvas() {
+    background("#111");
 
     for(const [id, player] of Object.entries(players)){
-        stroke('red')
-        strokeWeight(10)
-        point(player.physics.x, player.physics.y)
+        noStroke();
+        fill(255, 0, 0);
+        ellipse(player.physics.x, player.physics.y, 10, 10);
     }
 }
 
 // On input
 function OnInput(mouseX, mouseY) {
     socket.emit("clientUpdate", {
-        mouseX: mouseX,
-        mouseY: mouseY
+        mouseX: mouseX - originX,
+        mouseY: mouseY - originY
     })
 }
 

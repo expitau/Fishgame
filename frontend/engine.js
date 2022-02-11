@@ -23,7 +23,12 @@ socket.on('serverUpdate', (x) => {
 })
 
 function setup() {
-    createCanvas(windowWidth, windowHeight)
+    createCanvas(windowWidth, windowHeight);
+    pixelDensity(1);
+
+    for (let element of document.getElementsByClassName("p5Canvas")) {
+        element.addEventListener("contextmenu", (e) => e.preventDefault());
+    }
 }
 // Dynamically change the size of the canvas on window resize
 function windowResized() {
