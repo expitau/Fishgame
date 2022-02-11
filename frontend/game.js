@@ -3,22 +3,19 @@ let id, players = {},
     bwidth = 800, bheight = 600,
     width, height,
     aspectRatio = 3/4,
-    margins = 100,
-    palette;
+    margins = 100;
+
+let palette = {
+    background: '#bdadea',
+    outline:    '#2b3d41',
+    fill:       '#4c5f6b',
+    fish:       '#e57a44',
+    water:      '#9cf6f6',
+    frame:      '#222222'
+};
 
 // On initialize
 function OnInit() {
-    for (let element of document.getElementsByClassName("p5Canvas")) {
-        //element.addEventListener("contextmenu", (e) => e.preventDefault());
-    }
-    palette = {
-        background: '#bdadea',
-        outline:    '#2b3d41',
-        fill:       '#4c5f6b',
-        fish:       '#e57a44',
-        water:      '#9cf6f6',
-        frame:      '#222222'
-    };   
 }
 
 // On frame

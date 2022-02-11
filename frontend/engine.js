@@ -46,7 +46,9 @@ socket.on('serverUpdate', (res) => {
 function setup() {
     createCanvas(windowWidth, windowHeight);
     calculateVirtualScreen();
-    OnInit();
+    for (let element of document.getElementsByClassName("p5Canvas")) {
+        //element.addEventListener("contextmenu", (e) => e.preventDefault());
+    }   
 }
 // Dynamically change the size of the canvas on window resize
 function windowResized() {
