@@ -11,19 +11,19 @@ socket.on('connect', () => {
 let OnTick = () => {
     for (const [id, player] of Object.entries(players)) {
         // Update player
-        player.physics.x+=player.physics.vx;
+        player.physics.x += player.physics.vx;
         player.physics.y += player.physics.vy;
         if (player.physics.y >= 600){
             player.physics.y = 600;
-            player.physics.vy *= -0.8;
+            player.physics.vy *= -0.9;
         }
         if (player.physics.x >= 800){
             player.physics.x = 800
-            player.physics.vx *= -0.8
+            player.physics.vx *= -0.9
         }
         if (player.physics.x <= 0){
             player.physics.x = 0
-            player.physics.vx *= -0.8
+            player.physics.vx *= -0.9
         }
         
         player.physics.vy += 0.05;
@@ -47,7 +47,7 @@ function setup() {
     calculateVirtualScreen();
     for (let element of document.getElementsByClassName("p5Canvas")) {
         //element.addEventListener("contextmenu", (e) => e.preventDefault());
-    }   
+    }
 }
 // Dynamically change the size of the canvas on window resize
 function windowResized() {
@@ -55,12 +55,12 @@ function windowResized() {
     calculateVirtualScreen();
 }
 
-function calculateVirtualScreen(){
-    width = aspectRatio > (windowHeight - margins * 2) / (windowWidth - margins * 2) ? 
+function calculateVirtualScreen() {
+    width = aspectRatio > (windowHeight - margins * 2) / (windowWidth - margins * 2) ?
         (windowHeight - margins * 2) / aspectRatio : windowWidth - margins * 2;
     height = width * aspectRatio;
-    originX = (windowWidth - width)/2;
-    originY = (windowHeight - height)/2;
+    originX = (windowWidth - width) / 2;
+    originY = (windowHeight - height) / 2;
 }
 
 let lastUpdate = Date.now()
@@ -76,12 +76,12 @@ function ENGINE_DoPhysicsTick() {
         tickBuffer.doTickBuffer = false;
         lastUpdate = tickBuffer.res.lastUpdate;
     }
-    deltaTime += Date.now() - lastUpdate;
-    while (deltaTime > 16) {
-        deltaTime -= 16;
+    deltaTime = Math.round(Date.now() / 16) - Math.round(lastUpdate / 16);
+    while (deltaTime > 0) {
+        deltaTime -= 1;
+        OnTick(players);
+        lastUpdate = Date.now()
     }
-    OnTick(players);
-    lastUpdate = Date.now()
 }
 
 function mousePressed() {

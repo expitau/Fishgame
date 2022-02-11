@@ -36,11 +36,11 @@ io.on("connection", (socket) => {
 let lastUpdate = Date.now()
 let deltaTime = 0;
 setInterval(() => {
-    deltaTime += Date.now() - lastUpdate;
-    while (deltaTime > 16){
-        Physics.OnTick(players)
-        deltaTime -= 16;
+    deltaTime = Math.round(Date.now() / 16) - Math.round(lastUpdate / 16);
+    while (deltaTime > 0) {
+        deltaTime -= 1;
+        Physics.OnTick(players);
+        lastUpdate = Date.now()
     }
-    lastUpdate = Date.now()
 }, 16) // 62.5 times per second
-setInterval(() => {io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players})}, 100)
+setInterval(() => {io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players})}, 20)
