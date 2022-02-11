@@ -1,5 +1,6 @@
 let Player = require('./player')
 let Map = require('./map')
+let Physics = require('./physics')
 
 const io = require("socket.io")(3000, {
     cors: {
@@ -9,18 +10,15 @@ const io = require("socket.io")(3000, {
 
 players = {};
 
-gameState = {
-    map: new Map(30,30)
-};
-
-playerInputs = {}
-
 io.on("connection", (socket) => {
     console.log(socket.id + " connected");
     players[socket.id] ??= new Player(socket.id); // Create new player if does not already exist
+    let myobj = {players: players, map: Map}
+    socket.emit("init", myobj)
     
-    socket.on('keyEntered', (keyCode, value) => {
-        players[socket.id].updateInput(keyCode, value) // Update the input of the player
+    socket.on('clientUpdate', (playerInput) => {
+        players[socket.id].input = playerInput // Update the input of the player
+        Physics.OnInput(players[socket.id])
     });
 
     socket.on('disconnect', () => {
@@ -35,24 +33,14 @@ io.on("connection", (socket) => {
 });
 
 let lastUpdate = Date.now()
-setInterval(update, 16)
+let deltaTime = 0;
 
-function update() {
-    let deltaTime = Date.now() - lastUpdate;
-    if (deltaTime == 0){
-        return;  // Skip the frame
+setInterval(() => {
+    deltaTime += Date.now() - lastUpdate;
+    while (deltaTime > 16){
+        Physics.OnTick(players)
+        deltaTime -= 16;
     }
-    
-    for([id, player] of Object.entries(players)){
-        player.tick(deltaTime)
-    }
-
     lastUpdate = Date.now()
-    
-    io.emit('broadcastGlobalState', 
-    {
-        players: Object.fromEntries(Object.entries(players, ([id, player]) => [id, player.getClientProps()])),
-        map: gameState.map
-    }
-    )
-}
+}, 16) // 62.5 times per second
+setInterval(() => {io.emit("serverUpdate", players)}, 100)
