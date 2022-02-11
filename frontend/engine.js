@@ -24,15 +24,21 @@ socket.on('serverUpdate', (x) => {
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    pixelDensity(1);
-
-    for (let element of document.getElementsByClassName("p5Canvas")) {
-        element.addEventListener("contextmenu", (e) => e.preventDefault());
-    }
+    calculateVirtualScreen();
+    OnInit();
 }
 // Dynamically change the size of the canvas on window resize
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+    calculateVirtualScreen();
+}
+
+function calculateVirtualScreen(){
+    width = aspectRatio > (windowHeight - margins * 2) / (windowWidth - margins * 2) ? 
+        (windowHeight - margins * 2) / aspectRatio : windowWidth - margins * 2;
+    height = width * aspectRatio;
+    originX = (windowWidth - width)/2;
+    originY = (windowHeight - height)/2;
 }
 
 let lastUpdate = Date.now()

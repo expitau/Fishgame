@@ -1,29 +1,37 @@
-let id;
-let players = {};
-let originX = 0;
-let originY = 0;
-let width = 800;
-let height = 600;
+let id, players = {},
+    originX, originY, 
+    bwidth = 800, bheight = 600,
+    width, height,
+    aspectRatio = 3/4,
+    margins = 100,
+    palette;
 
 // On initialize
 function OnInit() {
-
+    for (let element of document.getElementsByClassName("p5Canvas")) {
+        //element.addEventListener("contextmenu", (e) => e.preventDefault());
+    }
+    palette = {
+        background: '#bdadea',
+        outline:    '#2b3d41',
+        fill:       '#4c5f6b',
+        fish:       '#e57a44',
+        water:      '#9cf6f6',
+        frame:      '#222222'
+    };   
 }
 
 // On frame
 function OnRender() {
-    // set origin point
-    originX = (windowWidth - width)/2;
-    originY = (windowHeight - height)/2;
-
     // display canvas
     push();
     translate(originX, originY);
+    scale(width / bwidth);
     Canvas();
     pop();
 
     // mask non-canvas area
-    fill("#222");
+    fill(palette.frame);
     noStroke();
     rect(0,0, originX, windowHeight);
     rect(0,0, windowWidth, originY);
@@ -32,20 +40,22 @@ function OnRender() {
 }
 
 function Canvas() {
-    background("#111");
+    background(palette.background);
 
+    // draw players
+    strokeWeight(3);
+    stroke(palette.outline);
+    fill(palette.fish);
     for(const [id, player] of Object.entries(players)){
-        noStroke();
-        fill(255, 0, 0);
-        ellipse(player.physics.x, player.physics.y, 10, 10);
+        ellipse(player.physics.x, player.physics.y, 20, 20);
     }
 }
 
 // On input
 function OnInput(mouseX, mouseY) {
     socket.emit("clientUpdate", {
-        mouseX: mouseX - originX,
-        mouseY: mouseY - originY
+        mouseX: (mouseX - originX) * (bwidth / width),
+        mouseY: (mouseY - originY) * (bwidth / width)
     })
 }
 
