@@ -8,11 +8,32 @@ socket.on('connect', () => {
     window.requestAnimationFrame(ENGINE_DoFrameTick)
 })
 
-let OnTick = () => {};
+let OnTick = () => {
+    for (const [id, player] of Object.entries(players)) {
+        // Update player
+        player.physics.x+=player.physics.vx;
+        player.physics.y += player.physics.vy;
+        if (player.physics.y >= 600){
+            player.physics.y = 600;
+            player.physics.vy *= -0.8;
+        }
+        if (player.physics.x >= 800){
+            player.physics.x = 800
+            player.physics.vx *= -0.8
+        }
+        if (player.physics.x <= 0){
+            player.physics.x = 0
+            player.physics.vx *= -0.8
+        }
+        
+        player.physics.vy += 0.05;
+        player.physics.vy *= 0.999;
+        player.physics.vx *= 0.995;
+    }
+};
 
 socket.on('init', (res) => {
     players = res.players;
-    eval(`OnTick = function ${res.OnTick}`);
 })
 
 let tickBuffer = { doTickBuffer: false }
