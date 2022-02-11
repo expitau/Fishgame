@@ -28,6 +28,6 @@ module.exports = class Physics{
         player.physics.x = player.input.mouseX;
         player.physics.y = player.input.mouseY;
         player.physics.vy = -2;
-        player.physics.vx = 3;
+        player.physics.vx = 10;
     }
 }
