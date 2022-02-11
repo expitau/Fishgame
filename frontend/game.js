@@ -42,7 +42,8 @@ function Canvas() {
     // draw players
     strokeWeight(3);
     stroke(palette.outline);
-    fill(palette.fish);
+    // fill(palette.fish);
+    fill(typeof id == 'undefined' ? 0 : hashColour(id))
     for(const [id, player] of Object.entries(players)){
         ellipse(player.physics.x, player.physics.y, 20, 20);
     }
