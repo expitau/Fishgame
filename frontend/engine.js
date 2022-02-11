@@ -11,15 +11,36 @@ socket.on('connect', () => {
 let OnTick = (players) => {
     for (const [id, player] of Object.entries(players)) {
         // Update player
-        player.physics.x+=1;
+        player.physics.x+=player.physics.vx;
+        player.physics.y += player.physics.vy;
+        if (player.physics.y >= 600){
+            player.physics.y = 600;
+            player.physics.vy *= -0.6;
+        }
+        
+        if (player.physics.x >= 800){
+            player.physics.x = 800
+            player.physics.vx *= -0.6
+        }
+        if (player.physics.x <= 0){
+            player.physics.x = 0
+            player.physics.vx *= -0.6
+        }
+        player.physics.vy += 0.05;
+        
+        player.physics.vy *= 0.999;
+        player.physics.vx *= 0.995;
     }
 }
+
 socket.on('init', (res) => {
     players = res.players;
 })
 
-socket.on('serverUpdate', (x) => {
-    players = x;
+let tickBuffer = { doTickBuffer: false }
+socket.on('serverUpdate', (res) => {
+    tickBuffer.res = res;
+    tickBuffer.doTickBuffer = true;
 })
 
 function setup() {
@@ -44,21 +65,26 @@ function calculateVirtualScreen(){
 }
 
 let lastUpdate = Date.now()
-function ENGINE_DoFrameTick(){
+function ENGINE_DoFrameTick() {
+    ENGINE_DoPhysicsTick(players)
     OnRender();
-    deltaTime += Date.now() - lastUpdate;
-    while (deltaTime > 16){
-        OnTick(players)
-        deltaTime -= 16;
-    }
-    lastUpdate = Date.now()
     window.requestAnimationFrame(ENGINE_DoFrameTick)
 }
 
-function ENGINE_DoPhysicsTick(){
+function ENGINE_DoPhysicsTick() {
+    if (tickBuffer.doTickBuffer) {
+        players = tickBuffer.res.players;
+        tickBuffer.doTickBuffer = false;
+        lastUpdate = tickBuffer.res.lastUpdate;
+    }
+    deltaTime += Date.now() - lastUpdate;
+    while (deltaTime > 16) {
+        deltaTime -= 16;
+    }
     OnTick(players);
+    lastUpdate = Date.now()
 }
 
-function mousePressed(){
+function mousePressed() {
     OnInput(mouseX, mouseY)
 }

@@ -17,6 +17,7 @@ io.on("connection", (socket) => {
     socket.emit("init", myobj)
     
     socket.on('clientUpdate', (playerInput) => {
+        console.log(playerInput)
         players[socket.id].input = playerInput // Update the input of the player
         Physics.OnInput(players[socket.id])
     });
@@ -34,7 +35,6 @@ io.on("connection", (socket) => {
 
 let lastUpdate = Date.now()
 let deltaTime = 0;
-
 setInterval(() => {
     deltaTime += Date.now() - lastUpdate;
     while (deltaTime > 16){
@@ -43,4 +43,4 @@ setInterval(() => {
     }
     lastUpdate = Date.now()
 }, 16) // 62.5 times per second
-setInterval(() => {io.emit("serverUpdate", players)}, 100)
+setInterval(() => {io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players})}, 100)
