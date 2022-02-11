@@ -13,7 +13,7 @@ players = {};
 io.on("connection", (socket) => {
     console.log(socket.id + " connected");
     players[socket.id] ??= new Player(socket.id); // Create new player if does not already exist
-    let myobj = {players: players, map: Map}
+    let myobj = {players: players, map: Map, OnTick: Physics.OnTick.toString()}
     socket.emit("init", myobj)
     
     socket.on('clientUpdate', (playerInput) => {

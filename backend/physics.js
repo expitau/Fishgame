@@ -7,15 +7,15 @@ module.exports = class Physics{
             player.physics.y += player.physics.vy;
             if (player.physics.y >= 600){
                 player.physics.y = 600;
-                player.physics.vy *= -0.6;
+                player.physics.vy *= -0.8;
             }
             if (player.physics.x >= 800){
                 player.physics.x = 800
-                player.physics.vx *= -0.6
+                player.physics.vx *= -0.8
             }
             if (player.physics.x <= 0){
                 player.physics.x = 0
-                player.physics.vx *= -0.6
+                player.physics.vx *= -0.8
             }
             
             player.physics.vy += 0.05;
