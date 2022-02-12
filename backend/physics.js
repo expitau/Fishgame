@@ -8,22 +8,13 @@ module.exports = class Physics{
 
             if (gameMap.getCurrentTile(newPosX, player.physics.y) !== "#") {
                 player.physics.x = newPosX;
-            } 
+            }else{
+                player.physics.vx *= -0.9
+            }
             if (gameMap.getCurrentTile(player.physics.x, newPosY) !== "#") {
                 player.physics.y = newPosY;
-            }
-
-            if (player.physics.y >= 600){
-                player.physics.y = 600;
+            }else{
                 player.physics.vy *= -0.9;
-            }
-            if (player.physics.x >= 800){
-                player.physics.x = 800
-                player.physics.vx *= -0.9
-            }
-            if (player.physics.x <= 0){
-                player.physics.x = 0
-                player.physics.vx *= -0.9
             }
             
             player.physics.vy += 0.05;
