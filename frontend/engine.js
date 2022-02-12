@@ -35,18 +35,24 @@ function windowResized() {
 }
 
 class ENGINE_Frame{
-    constructor(width = 800, height = 600, margin = 100){
+    constructor(width = 800, height = 600, marginRatio = 1/10){
         this.width = width;
         this.height = height;
-        this.margin = margin;
+        this.marginRatio = marginRatio;
         this.aspectRatio = height/width;
         this.calculateDimensions();
     }
 
     calculateDimensions() {
-        this.screenWidth = this.aspectRatio > (windowHeight - this.margin * 2) / (windowWidth - this.margin * 2) ?
-                (windowHeight - this.margin * 2) / this.aspectRatio : windowWidth - this.margin * 2;
-        this.screenHeight = this.screenWidth * this.aspectRatio;
+        if(this.aspectRatio > windowHeight / windowWidth){
+            this.margin = windowHeight * this.marginRatio;
+            this.screenHeight = windowHeight - this.margin * 2;
+            this.screenWidth = this.screenHeight / this.aspectRatio;
+        }else{
+            this.margin = windowWidth * this.marginRatio;
+            this.screenWidth = windowWidth - this.margin * 2;
+            this.screenHeight = this.screenWidth * this.aspectRatio;
+        }
         this.originX = (windowWidth - this.screenWidth) / 2;
         this.originY = (windowHeight - this.screenHeight) / 2;
     }
