@@ -1,5 +1,5 @@
 class PlayerPhysics {
-    constructor(spawnPoint = 0) {
+    constructor() {
         this.x = gameMap.spawnPoint[0];
         this.y = gameMap.spawnPoint[1];
         this.r = 0;

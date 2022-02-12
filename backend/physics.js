@@ -16,10 +16,17 @@ module.exports = class Physics{
             }else{
                 player.physics.vy *= -0.9;
             }
-            
+
             player.physics.vy += 0.06;
             player.physics.vy *= 0.999;
             player.physics.vx *= 0.995;
+
+            if (gameMap.getCurrentTile(player.physics.x, player.physics.y) === "M") {
+                player.physics.x = gameMap.spawnPoint[0];
+                player.physics.y = gameMap.spawnPoint[1]; 
+                player.physics.vy = 0;
+                player.physics.vx = 0;   
+            }
         }
     }
 
