@@ -32,7 +32,6 @@ function setup() {
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
     Frame.calculateDimensions()
-    calculateVirtualScreen();
 }
 
 class ENGINE_Frame{
@@ -40,20 +39,17 @@ class ENGINE_Frame{
         this.width = width;
         this.height = height;
         this.margin = margin;
-        this.aspectRatio = width / height
-        this.calculateDimensions()
+        this.aspectRatio = height/width;
+        this.calculateDimensions();
     }
 
     calculateDimensions() {
         this.screenWidth = this.aspectRatio > (windowHeight - this.margin * 2) / (windowWidth - this.margin * 2) ?
-            (windowHeight - this.margin * 2) / this.aspectRatio : windowWidth - this.margin * 2;
-        this.screenHeight = this.width * this.aspectRatio;
-        this.originX = (windowWidth - this.width) / 2;
-        this.originY = (windowHeight - this.height) / 2;
+                (windowHeight - this.margin * 2) / this.aspectRatio : windowWidth - this.margin * 2;
+        this.screenHeight = this.screenWidth * this.aspectRatio;
+        this.originX = (windowWidth - this.screenWidth) / 2;
+        this.originY = (windowHeight - this.screenHeight) / 2;
     }
-}
-
-function calculateVirtualScreen() {
 }
 
 let lastUpdate = Date.now()
