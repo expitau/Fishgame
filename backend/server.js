@@ -9,11 +9,15 @@ const io = require("socket.io")(3000, {
 })
 
 players = {};
+currentMap = new Map(0);
 
 io.on("connection", (socket) => {
     console.log(socket.id + " connected");
     players[socket.id] ??= new Player(socket.id); // Create new player if does not already exist
-    let myobj = {players: players, map: Map}
+    let myobj = {
+        players: players, 
+        map: currentMap
+    }
     socket.emit("init", myobj)
     
     socket.on('clientUpdate', (playerInput) => {
