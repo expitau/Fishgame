@@ -9,14 +9,14 @@ const io = require("socket.io")(3000, {
 })
 
 players = {};
-currentMap = new Map(0);
+gameMap = new Map(0);
 
 io.on("connection", (socket) => {
     console.log(socket.id + " connected");
     players[socket.id] ??= new Player(socket.id); // Create new player if does not already exist
     let myobj = {
         players: players, 
-        map: currentMap
+        gameMap: gameMap
     }
     socket.emit("init", myobj)
     

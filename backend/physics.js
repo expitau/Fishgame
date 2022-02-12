@@ -3,8 +3,16 @@ module.exports = class Physics{
     static OnTick (players) {
         for (const [id, player] of Object.entries(players)) {
             // Update player
-            player.physics.x += player.physics.vx;
-            player.physics.y += player.physics.vy;
+            let newPosX = player.physics.x + player.physics.vx;
+            let newPosY = player.physics.y + player.physics.vy;
+
+            if (gameMap.getCurrentTile(newPosX, player.physics.y) !== "#") {
+                player.physics.x = newPosX;
+            } 
+            if (gameMap.getCurrentTile(player.physics.x, newPosY) !== "#") {
+                player.physics.y = newPosY;
+            }
+
             if (player.physics.y >= 600){
                 player.physics.y = 600;
                 player.physics.vy *= -0.9;

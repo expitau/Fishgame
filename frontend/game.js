@@ -1,4 +1,4 @@
-let id, map, players = {},
+let id, gameMap, players = {},
     originX, originY, 
     bwidth = 800, bheight = 600,
     width, height,
@@ -43,16 +43,16 @@ function Canvas() {
     strokeWeight(3);
     stroke(palette.outline);
     fill(palette.fill);
-    for(var i = 0; i < map.width; i++){
-        for(var j = 0; j < map.height; j++){
-            if (map.tilemap[j].charAt(i) === "#") {
-                rect(i * map.tileSize, j * map.tileSize, map.tileSize, map.tileSize);
+    for(var i = 0; i < gameMap.width; i++){
+        for(var j = 0; j < gameMap.height; j++){
+            if (gameMap.maps[gameMap.currentMap][j].charAt(i) === "#") {
+                rect(i * gameMap.tileSize, j * gameMap.tileSize, gameMap.tileSize, gameMap.tileSize);
             }
-            if (map.tilemap[j].charAt(i) === "M") {
+            if (gameMap.maps[gameMap.currentMap][j].charAt(i) === "M") {
                 triangle(
-                    i * map.tileSize + map.tileSize * 0.5, j * map.tileSize, 
-                    i * map.tileSize, (j + 1) * map.tileSize,
-                    (i + 1) * map.tileSize, (j + 1) * map.tileSize
+                    i * gameMap.tileSize + gameMap.tileSize * 0.5, j * gameMap.tileSize, 
+                    i * gameMap.tileSize, (j + 1) * gameMap.tileSize,
+                    (i + 1) * gameMap.tileSize, (j + 1) * gameMap.tileSize
                 );
             }
         }

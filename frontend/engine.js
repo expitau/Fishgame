@@ -34,7 +34,7 @@ let OnTick = () => {
 
 socket.on('init', (res) => {
     players = res.players;
-    map = res.map;
+    gameMap = res.gameMap;
 })
 
 let tickBuffer = { doTickBuffer: false }

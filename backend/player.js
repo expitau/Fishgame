@@ -1,7 +1,7 @@
 class PlayerPhysics {
-    constructor(x = 0, y = 100) {
-        this.x = x;
-        this.y = y;
+    constructor(spawnPoint = 0) {
+        this.x = gameMap.spawnPoint[0];
+        this.y = gameMap.spawnPoint[1];
         this.r = 0;
         this.vx = 0;
         this.vy = 0;
