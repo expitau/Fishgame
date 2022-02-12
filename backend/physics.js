@@ -17,7 +17,7 @@ module.exports = class Physics{
                 player.physics.vy *= -0.9;
             }
             
-            player.physics.vy += 0.05;
+            player.physics.vy += 0.06;
             player.physics.vy *= 0.999;
             player.physics.vx *= 0.995;
         }

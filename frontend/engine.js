@@ -39,7 +39,7 @@ class ENGINE_Frame{
         this.width = width;
         this.height = height;
         this.marginRatio = marginRatio;
-        this.aspectRatio = height/width;
+        this.aspectRatio = height / width;
         this.calculateDimensions();
     }
 

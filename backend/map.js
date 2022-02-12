@@ -23,7 +23,7 @@ module.exports = class Map {
                 "                ",
                 "     ######     ",
                 "                ",
-                "  S          S  ",
+                "  S             ",
                 " ## ## ## ## ## ",
                 "                ",
                 "                ",
@@ -32,18 +32,17 @@ module.exports = class Map {
             ]
         ][mapId];
 
-        this.width = 16;
-        this.height = 12;
-        //this.width = this.tilemap.length;
-        //this.height = this.tilemap[0].length();
+
+        this.width = this.tilemap[0].length;
+        this.height = this.tilemap.length;
         this.tileSize = 50;
         this.spawnPoint = [100, 100];
-        //calculateSpawn();
+        this.calculateSpawn();
     }
 
     calculateSpawn(){
-        for(var i = 0; i < this.width; i++){
-            for(var j = 0; j < this.height; j++){
+        for(let i = 0; i < this.width; i++){
+            for(let j = 0; j < this.height; j++){
                 if (this.tilemap[j].charAt(i) === "S") {
                     this.spawnPoint = [(i + 0.5) * this.tileSize, (j + 0.5) * this.tileSize];
                 }
