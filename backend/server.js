@@ -17,7 +17,6 @@ io.on("connection", (socket) => {
     socket.emit("init", myobj)
     
     socket.on('clientUpdate', (playerInput) => {
-        console.log(playerInput)
         players[socket.id].input = playerInput // Update the input of the player
         Physics.OnInput(players[socket.id])
     });

@@ -43,8 +43,8 @@ function Canvas() {
     strokeWeight(3);
     stroke(palette.outline);
     // fill(palette.fish);
-    fill(typeof id == 'undefined' ? 0 : hashColour(id))
-    for(const [id, player] of Object.entries(players)){
+    for(const [pid, player] of Object.entries(players)){
+        fill(typeof pid == 'undefined' ? 0 : hashColour(pid))
         ellipse(player.physics.x, player.physics.y, 20, 20);
     }
 }
