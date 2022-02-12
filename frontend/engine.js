@@ -8,30 +8,6 @@ socket.on('connect', () => {
     window.requestAnimationFrame(ENGINE_DoFrameTick)
 })
 
-let OnTick = () => {
-    for (const [id, player] of Object.entries(players)) {
-        // Update player
-        player.physics.x += player.physics.vx;
-        player.physics.y += player.physics.vy;
-        if (player.physics.y >= 600){
-            player.physics.y = 600;
-            player.physics.vy *= -0.9;
-        }
-        if (player.physics.x >= 800){
-            player.physics.x = 800
-            player.physics.vx *= -0.9
-        }
-        if (player.physics.x <= 0){
-            player.physics.x = 0
-            player.physics.vx *= -0.9
-        }
-        
-        player.physics.vy += 0.05;
-        player.physics.vy *= 0.999;
-        player.physics.vx *= 0.995;
-    }
-};
-
 socket.on('init', (res) => {
     players = res.players;
     gameMap = res.gameMap;
@@ -43,9 +19,11 @@ socket.on('serverUpdate', (res) => {
     tickBuffer.doTickBuffer = true;
 })
 
+let Frame;
+
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    calculateVirtualScreen();
+    Frame = new ENGINE_Frame()
     for (let element of document.getElementsByClassName("p5Canvas")) {
         //element.addEventListener("contextmenu", (e) => e.preventDefault());
     }
@@ -53,21 +31,42 @@ function setup() {
 // Dynamically change the size of the canvas on window resize
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+    Frame.calculateDimensions()
     calculateVirtualScreen();
 }
 
+class ENGINE_Frame{
+    constructor(width = 800, height = 600, margin = 100){
+        this.width = width;
+        this.height = height;
+        this.margin = margin;
+        this.aspectRatio = width / height
+        this.calculateDimensions()
+    }
+
+    calculateDimensions() {
+        this.screenWidth = this.aspectRatio > (windowHeight - this.margin * 2) / (windowWidth - this.margin * 2) ?
+            (windowHeight - this.margin * 2) / this.aspectRatio : windowWidth - this.margin * 2;
+        this.screenHeight = this.width * this.aspectRatio;
+        this.originX = (windowWidth - this.width) / 2;
+        this.originY = (windowHeight - this.height) / 2;
+    }
+}
+
 function calculateVirtualScreen() {
-    width = aspectRatio > (windowHeight - margins * 2) / (windowWidth - margins * 2) ?
-        (windowHeight - margins * 2) / aspectRatio : windowWidth - margins * 2;
-    height = width * aspectRatio;
-    originX = (windowWidth - width) / 2;
-    originY = (windowHeight - height) / 2;
 }
 
 let lastUpdate = Date.now()
 function ENGINE_DoFrameTick() {
     ENGINE_DoPhysicsTick(players)
+    
+    background(palette.frame)
+    push();
+    translate(Frame.originX, Frame.originY);
+    scale(Frame.screenWidth / Frame.width);
     OnRender();
+    pop();
+    
     window.requestAnimationFrame(ENGINE_DoFrameTick)
 }
 

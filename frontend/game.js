@@ -1,16 +1,11 @@
-let id, gameMap, players = {},
-    originX, originY, 
-    bwidth = 800, bheight = 600,
-    width, height,
-    aspectRatio = 3/4,
-    margins = 100;
+let id, gameMap, players = {};
 
 let palette = {
-    background: '#bdadea',
-    outline:    '#2b3d41',
-    fill:       '#4c5f6b',
-    fish:       '#e57a44',
-    water:      '#9cf6f6',
+    background: '#5EE6EB',
+    outline:    '#000000',
+    fill:       '#EBDD8D',
+    fish:       '#EB75C4',
+    water:      '#4A9EA1',
     frame:      '#222222'
 };
 
@@ -18,26 +13,34 @@ let palette = {
 function OnInit() {
 }
 
-// On frame
-function OnRender() {
-    // display canvas
-    push();
-    translate(originX, originY);
-    scale(width / bwidth);
-    Canvas();
-    pop();
-
-    // mask non-canvas area
-    fill(palette.frame);
-    noStroke();
-    rect(0,0, originX, windowHeight);
-    rect(0,0, windowWidth, originY);
-    rect(originX + width, 0, originX, windowHeight);
-    rect(0, originY + height, windowWidth, originY);
+function OnTick() {
+    for (const [id, player] of Object.entries(players)) {
+        // Update player
+        player.physics.x += player.physics.vx;
+        player.physics.y += player.physics.vy;
+        if (player.physics.y >= 600){
+            player.physics.y = 600;
+            player.physics.vy *= -0.9;
+        }
+        if (player.physics.x >= 800){
+            player.physics.x = 800
+            player.physics.vx *= -0.9
+        }
+        if (player.physics.x <= 0){
+            player.physics.x = 0
+            player.physics.vx *= -0.9
+        }
+        
+        player.physics.vy += 0.05;
+        player.physics.vy *= 0.999;
+        player.physics.vx *= 0.995;
+    }
 }
 
-function Canvas() {
-    background(palette.background);
+// On frame
+function OnRender() {
+    fill (palette.background)
+    rect(0,0,Frame.width,Frame.height);
 
     // draw map
     strokeWeight(3);
@@ -45,10 +48,10 @@ function Canvas() {
     fill(palette.fill);
     for(var i = 0; i < gameMap.width; i++){
         for(var j = 0; j < gameMap.height; j++){
-            if (gameMap.maps[gameMap.currentMap][j].charAt(i) === "#") {
+            if (gameMap.tilemap[j].charAt(i) === "#") {
                 rect(i * gameMap.tileSize, j * gameMap.tileSize, gameMap.tileSize, gameMap.tileSize);
             }
-            if (gameMap.maps[gameMap.currentMap][j].charAt(i) === "M") {
+            if (gameMap.tilemap[j].charAt(i) === "M") {
                 triangle(
                     i * gameMap.tileSize + gameMap.tileSize * 0.5, j * gameMap.tileSize, 
                     i * gameMap.tileSize, (j + 1) * gameMap.tileSize,
@@ -57,7 +60,7 @@ function Canvas() {
             }
         }
     }
-
+    
     // draw players
     for(const [pid, player] of Object.entries(players)){
         fill(typeof pid == 'undefined' ? 0 : hashColour(pid))
@@ -68,8 +71,8 @@ function Canvas() {
 // On input
 function OnInput(mouseX, mouseY) {
     socket.emit("clientUpdate", {
-        mouseX: (mouseX - originX) * (bwidth / width),
-        mouseY: (mouseY - originY) * (bwidth / width)
+        mouseX: (mouseX - Frame.originX) * (Frame.width / Frame.screenWidth),
+        mouseY: (mouseY - Frame.originY) * (Frame.width / Frame.screenWidth)
     })
 }
 
