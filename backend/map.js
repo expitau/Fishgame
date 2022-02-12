@@ -1,7 +1,6 @@
 module.exports = class Map {
     constructor(mapId) {
-        this.currentMap = mapId;
-        this.maps = [
+        this.tilemap = [
             [
                 "                ",
                 "                ",
@@ -30,7 +29,7 @@ module.exports = class Map {
                 "                ",
                 "MMMMMMMMMMMMMMMM"
             ]
-        ];
+        ][mapId];
 
         this.width = 16;
         this.height = 12;
@@ -40,6 +39,6 @@ module.exports = class Map {
     }
 
     getTile(x, y){
-        return this.maps[this.currentMap][y].charAt(x);
+        return this.tilemap[y].charAt(x);
     }
 }

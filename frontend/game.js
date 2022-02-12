@@ -45,10 +45,10 @@ function Canvas() {
     fill(palette.fill);
     for(var i = 0; i < map.width; i++){
         for(var j = 0; j < map.height; j++){
-            if (map.maps[map.currentMap][j].charAt(i) === "#") {
+            if (map.tilemap[j].charAt(i) === "#") {
                 rect(i * map.tileSize, j * map.tileSize, map.tileSize, map.tileSize);
             }
-            if (map.maps[map.currentMap][j].charAt(i) === "M") {
+            if (map.tilemap[j].charAt(i) === "M") {
                 triangle(
                     i * map.tileSize + map.tileSize * 0.5, j * map.tileSize, 
                     i * map.tileSize, (j + 1) * map.tileSize,
