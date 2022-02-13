@@ -81,7 +81,7 @@ function ENGINE_DoPhysicsTick() {
     deltaTime = Math.round(Date.now() / 16) - Math.round(lastUpdate / 16);
     while (deltaTime > 0) {
         deltaTime -= 1;
-        OnTick(players);
+        OnTick(gameMap, players);
         lastUpdate = Date.now()
     }
 }

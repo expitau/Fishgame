@@ -8,6 +8,7 @@ services:
       - 8080:80
     volumes:
       - ./frontend:/usr/share/nginx/html
+      - ./shared:/usr/share/nginx/html/shared
   backend:
     container_name: ws_backend
     build: ./backend
@@ -18,3 +19,4 @@ services:
     volumes:
       - './backend/:/app'
       - '/app/node_modules'
+      - ./shared:/shared

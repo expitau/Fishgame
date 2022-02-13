@@ -49,13 +49,5 @@ module.exports = class Map {
             }
         }
     }
-
-    getCurrentTile(x, y){
-        if (0 < x && x < this.width * this.tileSize && 0 < y && y < this.height * this.tileSize){
-            let tile = [Math.floor(x / this.tileSize), Math.floor(y / this.tileSize)]
-            return this.tilemap[tile[1]].charAt(tile[0]);
-        }
-        return "#";
-    }
 }
 

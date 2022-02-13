@@ -1,6 +1,7 @@
 let Player = require('./player')
 let Map = require('./map')
 let Physics = require('./physics')
+let SharedFunctions = require('../shared/sharedFunctions');
 
 const io = require("socket.io")(3000, {
     cors: {
@@ -10,6 +11,7 @@ const io = require("socket.io")(3000, {
 
 players = {};
 gameMap = new Map(0);
+shared = new SharedFunctions();
 
 io.on("connection", (socket) => {
     console.log(socket.id + " connected");
@@ -42,7 +44,7 @@ setInterval(() => {
     deltaTime = Math.round(Date.now() / 16) - Math.round(lastUpdate / 16);
     while (deltaTime > 0) {
         deltaTime -= 1;
-        Physics.OnTick(players);
+        Physics.OnTick(players, gameMap);
         lastUpdate = Date.now()
     }
 }, 16) // 62.5 times per second
