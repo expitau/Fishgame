@@ -10,7 +10,7 @@ socket.on('connect', () => {
 
 socket.on('init', (res) => {
     players = res.players;
-    gameMap = res.gameMap;
+    gameMap = new Map(res.gameMap);
 })
 
 let tickBuffer = { doTickBuffer: false }

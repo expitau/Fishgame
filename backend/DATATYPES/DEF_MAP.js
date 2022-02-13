@@ -1,5 +1,10 @@
-module.exports = class Map {
+let Map = class {
     constructor(mapId) {
+        if (typeof mapId === 'object'){
+            Object.assign(this, mapId)
+            return;
+        }
+
         this.currentMap = mapId;
         this.tilemap = [
             [
@@ -49,5 +54,30 @@ module.exports = class Map {
             }
         }
     }
+
+    getTile (x, y){
+        if (0 <= x && x < this.width && 0 <= y && y < this.height){
+            return this.tilemap[y].charAt(x);
+        }
+        return "#";
+    }
+    
+    getCurrentTile(x, y){
+        if (0 < x && x < this.width * this.tileSize && 0 < y && y < this.height * this.tileSize){
+            let tile = [Math.floor(x / this.tileSize), Math.floor(y / this.tileSize)]
+            return this.tilemap[tile[1]].charAt(tile[0]);
+        }
+        return "#";
+    }
+
+    getCurrentTile (x, y){
+        if (0 < x && x < this.width * this.tileSize && 0 < y && y < this.height * this.tileSize){
+            return this.tilemap[Math.floor(y / this.tileSize)].charAt(Math.floor(x / this.tileSize));
+        }
+        return "#";
+    }
 }
 
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined'){
+    module.exports = Map
+}

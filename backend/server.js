@@ -1,7 +1,6 @@
-let Player = require('./player')
-let Map = require('./map')
-let Physics = require('./physics')
-let SharedFunctions = require('../shared/sharedFunctions');
+let Player = require('./DATATYPES/DEF_Player')
+let Map = require('./DATATYPES/DEF_Map')
+let Physics = require('./DATATYPES/DEF_Physics')
 
 const io = require("socket.io")(3000, {
     cors: {
@@ -11,7 +10,6 @@ const io = require("socket.io")(3000, {
 
 players = {};
 gameMap = new Map(0);
-shared = new SharedFunctions();
 
 io.on("connection", (socket) => {
     console.log(socket.id + " connected");
@@ -48,4 +46,4 @@ setInterval(() => {
         lastUpdate = Date.now()
     }
 }, 16) // 62.5 times per second
-setInterval(() => {io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players})}, 20)
+setInterval(() => {io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players})}, 2000)

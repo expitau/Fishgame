@@ -16,7 +16,7 @@ function OnInit() {
 }
 
 function OnTick() {
-    shared.physics({players: players}, gameMap);
+    Physics.OnTick(players, gameMap);
 }
 
 // On frame
@@ -30,10 +30,10 @@ function OnRender() {
     fill(palette.fill);
     for(var i = 0; i < gameMap.width; i++){
         for(var j = 0; j < gameMap.height; j++){
-            if (shared.getTile(gameMap, i, j) === "#") {
+            if (gameMap.getTile(i, j) === "#") {
                 rect(i * gameMap.tileSize, j * gameMap.tileSize, gameMap.tileSize, gameMap.tileSize);
             }
-            if (shared.getTile(gameMap, i , j) === "M") {
+            if (gameMap.getTile(i , j) === "M") {
                 triangle(
                     i * gameMap.tileSize + gameMap.tileSize * 0.5, j * gameMap.tileSize, 
                     i * gameMap.tileSize, (j + 1) * gameMap.tileSize,
