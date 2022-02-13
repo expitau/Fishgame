@@ -13,27 +13,34 @@ let palette = {
 function OnInit() {
 }
 
-function OnTick() {
+function OnTick(players) {
+    
     for (const [id, player] of Object.entries(players)) {
         // Update player
-        player.physics.x += player.physics.vx;
-        player.physics.y += player.physics.vy;
-        if (player.physics.y >= 600){
-            player.physics.y = 600;
+        let newPosX = player.physics.x + player.physics.vx;
+        let newPosY = player.physics.y + player.physics.vy;
+
+        if (getCurrentTile(gameMap, newPosX, player.physics.y) !== "#") {
+            player.physics.x = newPosX;
+        }else{
+            player.physics.vx *= -0.9
+        }
+        if (getCurrentTile(gameMap, player.physics.x, newPosY) !== "#") {
+            player.physics.y = newPosY;
+        }else{
             player.physics.vy *= -0.9;
         }
-        if (player.physics.x >= 800){
-            player.physics.x = 800
-            player.physics.vx *= -0.9
-        }
-        if (player.physics.x <= 0){
-            player.physics.x = 0
-            player.physics.vx *= -0.9
-        }
-        
-        player.physics.vy += 0.05;
+
+        player.physics.vy += 0.06;
         player.physics.vy *= 0.999;
         player.physics.vx *= 0.995;
+
+        if (getCurrentTile(gameMap, player.physics.x, player.physics.y) === "M") {
+            player.physics.x = gameMap.spawnPoint[0];
+            player.physics.y = gameMap.spawnPoint[1]; 
+            player.physics.vy = 0;
+            player.physics.vx = 0;   
+        }
     }
 }
 

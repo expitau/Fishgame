@@ -1,4 +1,12 @@
 
+function getCurrentTile(gameMap, x, y){
+    if (0 < x && x < gameMap.width * gameMap.tileSize && 0 < y && y < gameMap.height * gameMap.tileSize){
+        let tile = [Math.floor(x / gameMap.tileSize), Math.floor(y / gameMap.tileSize)]
+        return gameMap.tilemap[tile[1]].charAt(tile[0]);
+    }
+    return "#";
+}
+
 module.exports = class Physics{
     static OnTick (players) {
         for (const [id, player] of Object.entries(players)) {
@@ -6,12 +14,12 @@ module.exports = class Physics{
             let newPosX = player.physics.x + player.physics.vx;
             let newPosY = player.physics.y + player.physics.vy;
 
-            if (gameMap.getCurrentTile(newPosX, player.physics.y) !== "#") {
+            if (getCurrentTile(gameMap, newPosX, player.physics.y) !== "#") {
                 player.physics.x = newPosX;
             }else{
                 player.physics.vx *= -0.9
             }
-            if (gameMap.getCurrentTile(player.physics.x, newPosY) !== "#") {
+            if (getCurrentTile(gameMap, player.physics.x, newPosY) !== "#") {
                 player.physics.y = newPosY;
             }else{
                 player.physics.vy *= -0.9;
@@ -21,7 +29,7 @@ module.exports = class Physics{
             player.physics.vy *= 0.999;
             player.physics.vx *= 0.995;
 
-            if (gameMap.getCurrentTile(player.physics.x, player.physics.y) === "M") {
+            if (getCurrentTile(gameMap, player.physics.x, player.physics.y) === "M") {
                 player.physics.x = gameMap.spawnPoint[0];
                 player.physics.y = gameMap.spawnPoint[1]; 
                 player.physics.vy = 0;
