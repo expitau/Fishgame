@@ -69,14 +69,6 @@ let Map = class {
     setTile (x, y, newTile){
         this.tilemap[y] = this.tilemap[y].substring(0, x) + newTile + this.tilemap[y].substring(x + 1);
     }
-    
-    getCurrentTile(x, y){
-        if (0 < x && x < this.width * this.tileSize && 0 < y && y < this.height * this.tileSize){
-            let tile = [Math.floor(x / this.tileSize), Math.floor(y / this.tileSize)]
-            return this.tilemap[tile[1]].charAt(tile[0]);
-        }
-        return "#";
-    }
 
     getCurrentTile (x, y){
         if (0 < x && x < this.width * this.tileSize && 0 < y && y < this.height * this.tileSize){
