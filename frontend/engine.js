@@ -20,12 +20,12 @@ socket.on('serverUpdate', (res) => {
 })
 
 let Frame;
-let spritesheet;
+let graphics;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
     Frame = new ENGINE_Frame()
-    spritesheet = new Spritesheet();
+    graphics = new Graphics();
 
     noSmooth();
 }

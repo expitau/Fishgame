@@ -16,14 +16,14 @@ function OnTick() {
 
 // On frame
 function OnRender() {
-    image(spritesheet.background, 0, 0, Frame.width,Frame.height);
+    image(graphics.background, 0, 0, Frame.width, Frame.height);
 
     // draw map
-    spritesheet.displayMap();
+    graphics.displayMap();
     // draw players
     for(const [pid, player] of Object.entries(players)){
         fill(typeof pid == 'undefined' ? 0 : hashColour(pid))
-        ellipse(player.physics.x, player.physics.y, 20, 20);
+        graphics.displayFishSprite(player.physics.x, player.physics.y, player.physics.r, player.physics.action);
     }
 }
 

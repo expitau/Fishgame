@@ -6,7 +6,9 @@ let Player = class {
             y: gameMap.spawnPoint[1],
             r: 0,
             vx: 0,
-            vy: 0
+            vy: 0,
+            vr: 0,
+            action: 0
         }
         this.input = {
             mouseX: 0,
