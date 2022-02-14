@@ -75,7 +75,7 @@ let Graphics = class{
         push();
         translate(fishX, fishY);
         rotate(fishR);
-        image(this.fish_sheet, -offset, -offset, gameMap.tileSize * 11/8, gameMap.tileSize * 11/8, action * 11,  fishSpriteR * 11, 11, 11);
+        image(this.fish_sheet, -offset, -offset, gameMap.tileSize * 11/8, gameMap.tileSize * 11/8, action * 12,  fishSpriteR * 11, 11, 11);
         pop();
     }
     

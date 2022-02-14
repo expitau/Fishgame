@@ -8,30 +8,42 @@ let Physics = class {
                 player.physics.x = newPosX;
             }else{
                 player.physics.vx *= -0.9;
-                player.physics.vr = player.physics.vy * (player.physics.vx > 0 ? 1 : -1) * 0.03;
-                player.physics.action ++;
+                player.physics.vr = player.physics.vy * (player.physics.vx > 0 ? 1 : -1) * 0.02;
             }
             if (gameMap.getCurrentTile(player.physics.x, newPosY) !== "#") {
                 player.physics.y = newPosY;
             }else{
                 player.physics.vy *= -0.9;
-                player.physics.vr = player.physics.vx * (player.physics.vy > 0 ? -1 : 1) * 0.03;
-                player.physics.action ++;
+                player.physics.vr = player.physics.vx * (player.physics.vy > 0 ? -1 : 1) * 0.02;
             }
 
             player.physics.vy += 0.06;
             player.physics.vy *= 0.999;
             player.physics.vx *= 0.995;
             player.physics.vr *= 0.995;
-            player.physics.action %= 3;
 
             player.physics.r += player.physics.vr;
 
-            while(player.physics.r > (Math.PI * 2)){
-                player.physics.r -= Math.PI * 2;
+            player.physics.r = ((Math.PI * 4) + player.physics.r) % (Math.PI * 2);
+
+            /*
+            let vAngle = ((Math.PI * 2) + Math.atan2(player.physics.vy, player.physics.vx)) % (Math.PI * 2);
+
+            if(player.physics.vy**2 + player.physics.vx**2 < 1){
+                player.physics.action = 0;
+            }else if(Math.abs(((Math.PI * 4) + player.physics.r + Math.PI/2) % (Math.PI * 2) - vAngle) < Math.PI/2){
+                player.physics.action = 1;
+            }else{
+                player.physics.action = 2;
             }
-            while(player.physics.r < 0){
-                player.physics.r += Math.PI * 2;
+            */
+
+            if(Math.abs(player.physics.vr) < 0.01){
+                player.physics.action = 0;
+            }else if(player.physics.vr > 0){
+                player.physics.action = 2;
+            }else{
+                player.physics.action = 1 ;
             }
 
             if (gameMap.getCurrentTile(player.physics.x, player.physics.y) === "M") {

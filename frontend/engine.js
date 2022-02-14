@@ -26,7 +26,7 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
     Frame = new ENGINE_Frame()
     graphics = new Graphics();
-
+    pixelDensity(1);
     noSmooth();
 }
 // Dynamically change the size of the canvas on window resize
