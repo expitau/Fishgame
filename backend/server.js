@@ -46,4 +46,4 @@ setInterval(() => {
         lastUpdate = Date.now()
     }
 }, 16) // 62.5 times per second
-setInterval(() => {io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players})}, 2000)
+setInterval(() => {io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players})}, 20)

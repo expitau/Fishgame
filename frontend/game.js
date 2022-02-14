@@ -3,11 +3,6 @@ let id, gameMap, players = {};
 //let shared = new SharedFunctions();
 
 let palette = {
-    background: '#5EE6EB',
-    outline:    '#000000',
-    fill:       '#EBDD8D',
-    fish:       '#EB75C4',
-    water:      '#4A9EA1',
     frame:      '#222222'
 };
 
@@ -21,28 +16,10 @@ function OnTick() {
 
 // On frame
 function OnRender() {
-    fill (palette.background)
-    rect(0,0,Frame.width,Frame.height);
+    image(spritesheet.background, 0, 0, Frame.width,Frame.height);
 
     // draw map
-    strokeWeight(3);
-    stroke(palette.outline);
-    fill(palette.fill);
-    for(var i = 0; i < gameMap.width; i++){
-        for(var j = 0; j < gameMap.height; j++){
-            if (gameMap.getTile(i, j) === "#") {
-                rect(i * gameMap.tileSize, j * gameMap.tileSize, gameMap.tileSize, gameMap.tileSize);
-            }
-            if (gameMap.getTile(i , j) === "M") {
-                triangle(
-                    i * gameMap.tileSize + gameMap.tileSize * 0.5, j * gameMap.tileSize, 
-                    i * gameMap.tileSize, (j + 1) * gameMap.tileSize,
-                    (i + 1) * gameMap.tileSize, (j + 1) * gameMap.tileSize
-                );
-            }
-        }
-    }
-    
+    spritesheet.displayMap();
     // draw players
     for(const [pid, player] of Object.entries(players)){
         fill(typeof pid == 'undefined' ? 0 : hashColour(pid))

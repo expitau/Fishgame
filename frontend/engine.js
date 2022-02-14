@@ -20,13 +20,14 @@ socket.on('serverUpdate', (res) => {
 })
 
 let Frame;
+let spritesheet;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
     Frame = new ENGINE_Frame()
-    for (let element of document.getElementsByClassName("p5Canvas")) {
-        //element.addEventListener("contextmenu", (e) => e.preventDefault());
-    }
+    spritesheet = new Spritesheet();
+
+    noSmooth();
 }
 // Dynamically change the size of the canvas on window resize
 function windowResized() {
