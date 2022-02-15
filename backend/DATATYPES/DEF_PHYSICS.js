@@ -44,12 +44,12 @@ let Physics = class {
             
             let vAngle = ((Math.PI * 2) + Math.atan2(player.physics.vy, player.physics.vx)) % (Math.PI * 2);
 
-            if(player.physics.vy**2 + player.physics.vx**2 < 1 || Math.abs(player.physics.vr) < 0.0035){
+            if(player.physics.vy**2 + player.physics.vx**2 < 1){
                 player.physics.action = 0;
             }else if(Math.abs(((Math.PI * 4) + player.physics.r + Math.PI/2) % (Math.PI * 2) - vAngle) < Math.PI/2){
-                player.physics.action = 1;
-            }else{
                 player.physics.action = 2;
+            }else{
+                player.physics.action = 1;
             }
             
             if (gameMap.getCurrentTile(player.physics.x, player.physics.y) === "M") {
@@ -62,12 +62,24 @@ let Physics = class {
     }
 
     static OnInput (player){
-        let dx = player.input.mouseX -  player.physics.x 
-        let dy = player.input.mouseY - player.physics.y
-        dx /= (dx**2 + dy**2)**0.5
-        dy /= (dx**2 + dy**2)**0.5
-        player.physics.vy = -5*dy;
-        player.physics.vx = -5*dx;
+        let smackX = 0;
+        let smackY = 0;
+        let inRange = false;
+        for(var i = -1; i <= 1; i ++){
+            for(var j = -1; j <= 1; j ++){
+                if(gameMap.getCurrentTile(player.physics.x + i * gameMap.tileSize, player.physics.y + j * gameMap.tileSize) === "#"){
+                    inRange = true;
+                }
+            }
+        }
+        if(inRange){
+            let dx = player.input.mouseX -  player.physics.x 
+            let dy = player.input.mouseY - player.physics.y
+            dx /= (dx**2 + dy**2)**0.5
+            dy /= (dx**2 + dy**2)**0.5
+            player.physics.vy += -5*dy;
+            player.physics.vx += -5*dx;
+        }
     }
 }
 
