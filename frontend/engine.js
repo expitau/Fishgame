@@ -4,7 +4,7 @@ const socket = io(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"))
 socket.on('connect', () => {
     console.log("You have connected as " + socket.id)
     id = socket.id;
-    OnInit()
+    OnInit();
     window.requestAnimationFrame(ENGINE_DoFrameTick)
 })
 
@@ -73,11 +73,7 @@ let lastUpdate = Date.now()
 function ENGINE_DoFrameTick() {
     ENGINE_DoPhysicsTick(players)
     
-    if(mouseIsReleased){
-        OnInput(cursorData.r);
-        cursorData.x = 0;
-        cursorData.y = 0;
-    }
+    OnInput();
 
     background(palette.frame)
     push();

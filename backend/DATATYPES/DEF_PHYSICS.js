@@ -62,31 +62,13 @@ let Physics = class {
     }
 
     static OnInput (player){
-        let inRange = false;
-        for(let i = -1; i <= 1; i ++){
-            for(let j = -1; j <= 1; j ++){
-                if(gameMap.getCurrentTile(player.physics.x + i * gameMap.tileSize * 0.3, player.physics.y + j * gameMap.tileSize * 0.3) === "#"){
-                    inRange = true;
-                }
-            }
-        }
-        
         let dx = Math.sin(player.input.cursorR);
         let dy = Math.cos(player.input.cursorR);
 
-
-        for(let i = -1; i <= 1; i ++){
-            for(let j = -1; j <= 1; j ++){
-                if(gameMap.getCurrentTile(player.physics.x + dx * 60  + i * gameMap.tileSize * 0.3, player.physics.y + dy * 60 + j * gameMap.tileSize * 0.3) === "#"){
-                    inRange = true;
-                }
-            }
-        }
-
-        if(inRange){
-            player.physics.vy = -7*dy;
-            player.physics.vx = -7*dx;
-            player.physics.vr = 0.2;
+        if(gameMap.canHit(player.physics.x + dx * 60, player.physics.y + dy * 60)){
+            player.physics.vy = (-8*dy) * 7/8 + player.physics.vy * 1/8;
+            player.physics.vx = (-8*dx) * 7/8 + player.physics.vx * 1/8;
+            player.physics.vr = 0.2 * (player.physics.vx > 0 ? 1 : -1);
         }
     }
 }

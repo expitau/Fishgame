@@ -1,5 +1,6 @@
 let id, gameMap, players = {};
-let mouseIsPressed = false, mouseIsReleased = false;
+let mouseIsPressed = false, 
+    mouseIsReleased = false;
 
 let cursorData = {
     r: 0,
@@ -36,9 +37,30 @@ function OnRender() {
     }
 
     if(mouseIsPressed && cursorData.x !== 0 && cursorData.y !== 0){
-        graphics.displayCursorSprite(players[id].physics.x + sin(cursorData.r) * cursorData.display, players[id].physics.y + cos(cursorData.r) * cursorData.display, 0);
+        let player = players[id];
+        let dx = Math.sin(cursorData.r);
+        let dy = Math.cos(cursorData.r);
+        let fishX = floor(player.physics.x / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
+        let fishY = floor(player.physics.y / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
+        graphics.displayCursorSprite(
+            fishX + sin(cursorData.r) * cursorData.display, 
+            fishY + cos(cursorData.r) * cursorData.display, 
+            !(gameMap.canHit(player.physics.x + dx * 60, player.physics.y + dy * 60))    
+        );
     }
 }
+
+// On input frame
+function OnInput() {
+    if(mouseIsReleased && cursorData.x != 0 && cursorData.y != 0){
+        socket.emit("clientUpdate", {
+            cursorR: cursorData.r
+        });
+        cursorData.x = 0;
+        cursorData.y = 0;
+    }
+}
+
 
 function caclulateCursor(movementX, movementY){
     cursorData.x += movementX, 
@@ -52,14 +74,6 @@ function caclulateCursor(movementX, movementY){
 
     cursorData.r = Math.atan2(cursorData.x, cursorData.y);
 }
-
-// On input
-function OnInput(cursorR) {
-    socket.emit("clientUpdate", {
-        cursorR: cursorR
-    })
-}
-
 
 ///////////////////////////////////////////////////////
 

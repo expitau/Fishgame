@@ -76,6 +76,17 @@ let Map = class {
         }
         return "#";
     }
+
+    canHit(x, y){
+        for(let i = -1; i <= 1; i ++){
+            for(let j = -1; j <= 1; j ++){
+                if(gameMap.getCurrentTile(x + i * gameMap.tileSize * 0.3, y + j * gameMap.tileSize * 0.3) === "#"){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
 
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined'){

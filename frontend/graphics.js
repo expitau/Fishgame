@@ -83,11 +83,11 @@ let Graphics = class{
     displayCursorSprite(x, y, design){
         let cursorX = floor(x / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
         let cursorY = floor(y / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
-        let offset = gameMap.tileSize/8;
+        let offset = gameMap.tileSize * 2/8;
 
         push();
         translate(cursorX, cursorY);
-        image(this.cursor, -offset, -offset, gameMap.tileSize * 3/8, gameMap.tileSize * 3/8, design * 3, 0, 3, 3);
+        image(this.cursor, -offset, -offset, gameMap.tileSize * 5/8, gameMap.tileSize * 5/8, design * 5, 0, 5, 5);
         pop();
     }
     
