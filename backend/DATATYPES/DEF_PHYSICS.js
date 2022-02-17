@@ -65,9 +65,14 @@ let Physics = class {
         let dx = Math.sin(player.input.cursorR);
         let dy = Math.cos(player.input.cursorR);
 
+        let power = 7;
+
+        let xFactor = Math.min(Math.max(Math.abs((-power*dx)/player.physics.vx), 0.01), 0.99);
+        let yFactor = Math.min(Math.max(Math.abs((-power*dy)/player.physics.vy), 0.01), 0.99);     
+
         if(gameMap.canHit(player.physics.x + dx * 60, player.physics.y + dy * 60)){
-            player.physics.vy = (-8*dy) * 7/8 + player.physics.vy * 1/8;
-            player.physics.vx = (-8*dx) * 7/8 + player.physics.vx * 1/8;
+            player.physics.vx = (-power*dx) * xFactor + player.physics.vx * (1 - xFactor);
+            player.physics.vy = (-power*dy) * yFactor + player.physics.vy * (1 - yFactor);
             player.physics.vr = 0.2 * (player.physics.vx > 0 ? 1 : -1);
             player.physics.r = (player.input.cursorR + Math.PI) % (Math.PI * 2);
             effects.push([
