@@ -9,6 +9,7 @@ const io = require("socket.io")(3000, {
 })
 
 players = {};
+effects = [];
 gameMap = new Map(0);
 
 io.on("connection", (socket) => {
@@ -46,4 +47,8 @@ setInterval(() => {
         lastUpdate = Date.now()
     }
 }, 16) // 62.5 times per second
-setInterval(() => {io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players})}, 20)
+
+setInterval(() => {
+    io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players, effects: effects});
+    effects = [];
+}, 20)

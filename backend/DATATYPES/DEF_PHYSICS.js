@@ -69,6 +69,11 @@ let Physics = class {
             player.physics.vy = (-8*dy) * 7/8 + player.physics.vy * 1/8;
             player.physics.vx = (-8*dx) * 7/8 + player.physics.vx * 1/8;
             player.physics.vr = 0.2 * (player.physics.vx > 0 ? 1 : -1);
+            player.physics.r = (player.input.cursorR + Math.PI) % (Math.PI * 2);
+            effects.push([
+                player.physics.x + dx * 15,
+                player.physics.y + dy * 15
+            ]);
         }
     }
 }

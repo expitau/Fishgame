@@ -13,11 +13,14 @@ let Graphics = class{
             "        "
         ];
         this.generateSprites();
+        this.screenShake = [0, 0];
+        this.screenShakeTime = 0;
     }
 
     generateSprites(){
         this.tile_sheet = loadImage('./sprites/tile_spritesheet.png');
         this.fish_sheet = loadImage('./sprites/fish_spritesheet.png');
+        this.slap_sheet = loadImage('./sprites/slap_spritesheet.png')
         this.background = loadImage('./sprites/background.png');
         this.cursor = loadImage('./sprites/cursor_sheet.png');
         for(let i = 0; i < this.tile_pattern[0].length; i++){
@@ -91,11 +94,33 @@ let Graphics = class{
         pop();
     }
     
+    displaySlapSprite(x, y, design){
+        let slapX = floor(x / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
+        let slapY = floor(y / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
+        let offset = gameMap.tileSize * 4/8;
+
+        push();
+        translate(slapX, slapY);
+        image(this.slap_sheet, -offset, -offset, gameMap.tileSize, gameMap.tileSize, (design%2) * 9, floor(design/2) * 9, 8, 8);
+        pop();
+    }
+
     displayMap(){
         for(let i = 0; i < gameMap.width; i++){
             for(let j = 0; j < gameMap.height; j++){
                 this.displayTileSprite(gameMap.getTile(i, j), i, j);
             }
+        }
+    }
+
+    OnScreenShake(){
+        if(this.screenShakeTime > 0){
+            this.screenShake = [
+                ((random(0, 1) > 0.5) ? -1 : 1) * (gameMap.tileSize/8),
+                ((random(0, 1) > 0.5) ? -1 : 1) * (gameMap.tileSize/8)
+            ];
+        }else{
+            this.screenShake = [0, 0];
         }
     }
 }

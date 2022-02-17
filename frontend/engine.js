@@ -74,10 +74,11 @@ function ENGINE_DoFrameTick() {
     ENGINE_DoPhysicsTick(players)
     
     OnInput();
+    graphics.OnScreenShake();
 
     background(palette.frame)
     push();
-    translate(Frame.originX, Frame.originY);
+    translate(Frame.originX + graphics.screenShake[0], Frame.originY + graphics.screenShake[1]);
     scale(Frame.screenWidth / Frame.width);
     OnRender();
     pop();
@@ -89,6 +90,12 @@ function ENGINE_DoFrameTick() {
 function ENGINE_DoPhysicsTick() {
     if (tickBuffer.doTickBuffer) {
         players = tickBuffer.res.players;
+        if(tickBuffer.res.effects && tickBuffer.res.effects.length){
+            for(let i = 0; i < tickBuffer.res.effects.length; i++){
+                effects.push([tickBuffer.res.effects[i][0], tickBuffer.res.effects[i][1], 19]);
+                graphics.screenShakeTime = 3;
+            }
+        }
         tickBuffer.doTickBuffer = false;
         lastUpdate = tickBuffer.res.lastUpdate;
     }

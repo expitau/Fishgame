@@ -1,6 +1,7 @@
-let id, gameMap, players = {};
+let id, gameMap, players = {}, effects = [];
 let mouseIsPressed = false, 
     mouseIsReleased = false;
+
 
 let cursorData = {
     r: 0,
@@ -21,6 +22,16 @@ function OnInit() {
 
 function OnTick() {
     Physics.OnTick(players, gameMap);
+
+    for(let i = 0; i < effects.length; i++){
+        effects[i][2] --;
+        if(effects[i][2] <= 0){
+            effects.pop(i);
+            i--;
+        }
+    }
+    
+    graphics.screenShakeTime --;
 }
 
 // On frame
@@ -48,6 +59,12 @@ function OnRender() {
             !(gameMap.canHit(player.physics.x + dx * 60, player.physics.y + dy * 60))    
         );
     }
+
+    for(let i = 0; i < effects.length; i++){
+        fill(255);
+        noStroke();
+        graphics.displaySlapSprite(effects[i][0], effects[i][1], 4 - floor(effects[i][2]/5));
+    }
 }
 
 // On input frame
@@ -60,7 +77,6 @@ function OnInput() {
         cursorData.y = 0;
     }
 }
-
 
 function caclulateCursor(movementX, movementY){
     cursorData.x += movementX, 
