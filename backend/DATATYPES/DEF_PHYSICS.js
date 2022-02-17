@@ -62,23 +62,31 @@ let Physics = class {
     }
 
     static OnInput (player){
-        let smackX = 0;
-        let smackY = 0;
         let inRange = false;
-        for(var i = -1; i <= 1; i ++){
-            for(var j = -1; j <= 1; j ++){
-                if(gameMap.getCurrentTile(player.physics.x + i * gameMap.tileSize, player.physics.y + j * gameMap.tileSize) === "#"){
+        for(let i = -1; i <= 1; i ++){
+            for(let j = -1; j <= 1; j ++){
+                if(gameMap.getCurrentTile(player.physics.x + i * gameMap.tileSize * 0.3, player.physics.y + j * gameMap.tileSize * 0.3) === "#"){
                     inRange = true;
                 }
             }
         }
+        
+        let dx = Math.sin(player.input.cursorR);
+        let dy = Math.cos(player.input.cursorR);
+
+
+        for(let i = -1; i <= 1; i ++){
+            for(let j = -1; j <= 1; j ++){
+                if(gameMap.getCurrentTile(player.physics.x + dx * 60  + i * gameMap.tileSize * 0.3, player.physics.y + dy * 60 + j * gameMap.tileSize * 0.3) === "#"){
+                    inRange = true;
+                }
+            }
+        }
+
         if(inRange){
-            let dx = player.input.mouseX -  player.physics.x 
-            let dy = player.input.mouseY - player.physics.y
-            dx /= (dx**2 + dy**2)**0.5
-            dy /= (dx**2 + dy**2)**0.5
-            player.physics.vy += -5*dy;
-            player.physics.vx += -5*dx;
+            player.physics.vy = -7*dy;
+            player.physics.vx = -7*dx;
+            player.physics.vr = 0.2;
         }
     }
 }

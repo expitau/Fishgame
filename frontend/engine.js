@@ -23,6 +23,10 @@ let Frame;
 let graphics;
 
 function setup() {
+    document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;
+    document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
+    document.addEventListener("mousemove", this.moveCallback, false);
+
     createCanvas(windowWidth, windowHeight);
     Frame = new ENGINE_Frame()
     graphics = new Graphics();
@@ -35,8 +39,14 @@ function windowResized() {
     Frame.calculateDimensions()
 }
 
+function moveCallback(e) {
+    let movementX = e.movementX || e.mozMovementX || e.webkitMovementX || mouseX-pmouseX;
+    let movementY = e.movementY || e.mozMovementY || e.webkitMovementY || mouseY-pmouseY;
+    caclulateCursor(movementX, movementY);
+}
+
 class ENGINE_Frame{
-    constructor(width = 800, height = 600, marginRatio = 1/10){
+    constructor(width = 800, height = 600, marginRatio = 1/20){
         this.width = width;
         this.height = height;
         this.marginRatio = marginRatio;
@@ -63,6 +73,12 @@ let lastUpdate = Date.now()
 function ENGINE_DoFrameTick() {
     ENGINE_DoPhysicsTick(players)
     
+    if(mouseIsReleased){
+        OnInput(cursorData.r);
+        cursorData.x = 0;
+        cursorData.y = 0;
+    }
+
     background(palette.frame)
     push();
     translate(Frame.originX, Frame.originY);
@@ -70,7 +86,8 @@ function ENGINE_DoFrameTick() {
     OnRender();
     pop();
     
-    window.requestAnimationFrame(ENGINE_DoFrameTick)
+    window.requestAnimationFrame(ENGINE_DoFrameTick);
+    mouseIsReleased = false;
 }
 
 function ENGINE_DoPhysicsTick() {
@@ -88,5 +105,10 @@ function ENGINE_DoPhysicsTick() {
 }
 
 function mousePressed() {
-    OnInput(mouseX, mouseY)
+    mouseIsPressed = true;
+    document.body.requestPointerLock();
+}
+function mouseReleased(){
+    mouseIsPressed = false;
+    mouseIsReleased = true;
 }

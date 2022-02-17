@@ -19,8 +19,9 @@ let Graphics = class{
         this.tile_sheet = loadImage('./sprites/tile_spritesheet.png');
         this.fish_sheet = loadImage('./sprites/fish_spritesheet.png');
         this.background = loadImage('./sprites/background.png');
-        for(var i = 0; i < this.tile_pattern[0].length; i++){
-            for(var j = 0; j < this.tile_pattern.length; j++){
+        this.cursor = loadImage('./sprites/cursor_sheet.png');
+        for(let i = 0; i < this.tile_pattern[0].length; i++){
+            for(let j = 0; j < this.tile_pattern.length; j++){
                 if(this.tile_pattern[j].charAt(i) !== " "){
                     this.tile_sprites.push([this.tile_pattern[j].charAt(i), i, j]);
                 }
@@ -30,7 +31,7 @@ let Graphics = class{
 
     displayTileSprite(spriteSymbol, x, y){
         if(spriteSymbol != " "){
-            for(var i = 0; i < this.tile_sprites.length; i++){
+            for(let i = 0; i < this.tile_sprites.length; i++){
                 if(spriteSymbol === this.tile_sprites[i][0]){
                     image(this.tile_sheet, x * gameMap.tileSize, y * gameMap.tileSize, gameMap.tileSize, gameMap.tileSize, this.tile_sprites[i][1] * 8, this.tile_sprites[i][2] * 8, 8, 8);
                 }
@@ -78,10 +79,21 @@ let Graphics = class{
         image(this.fish_sheet, -offset, -offset, gameMap.tileSize * 11/8, gameMap.tileSize * 11/8, action * 12,  fishSpriteR * 11, 11, 11);
         pop();
     }
+
+    displayCursorSprite(x, y, design){
+        let cursorX = floor(x / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
+        let cursorY = floor(y / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
+        let offset = gameMap.tileSize/8;
+
+        push();
+        translate(cursorX, cursorY);
+        image(this.cursor, -offset, -offset, gameMap.tileSize * 3/8, gameMap.tileSize * 3/8, design * 3, 0, 3, 3);
+        pop();
+    }
     
     displayMap(){
-        for(var i = 0; i < gameMap.width; i++){
-            for(var j = 0; j < gameMap.height; j++){
+        for(let i = 0; i < gameMap.width; i++){
+            for(let j = 0; j < gameMap.height; j++){
                 this.displayTileSprite(gameMap.getTile(i, j), i, j);
             }
         }

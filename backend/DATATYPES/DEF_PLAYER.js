@@ -11,8 +11,7 @@ let Player = class {
             action: 0
         }
         this.input = {
-            mouseX: 0,
-            mouseY: 0
+            cursorR: 0
         };
     };
 }
