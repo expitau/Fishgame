@@ -7,8 +7,8 @@ let cursorData = {
     r: 0,
     x: 0, 
     y: 0,
-    visible: true,
-    max: 25,
+    visible: false,
+    max: 50,
     display: 60
 };
 
@@ -44,20 +44,22 @@ function OnRender() {
     // draw players
     for(const [pid, player] of Object.entries(players)){
         fill(typeof pid == 'undefined' ? 0 : hashColour(pid))
-        graphics.displayFishSprite(player.physics.x, player.physics.y, player.physics.r, player.physics.action);
+        graphics.displayFishSprite(player.physics.x, player.physics.y, player.physics.r, player.physics.action, pid);
     }
 
-    if(mouseIsPressed && cursorData.x !== 0 && cursorData.y !== 0){
+    if(mouseIsPressed){
         let player = players[id];
-        let dx = Math.sin(cursorData.r);
-        let dy = Math.cos(cursorData.r);
         let fishX = floor(player.physics.x / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
         let fishY = floor(player.physics.y / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
-        graphics.displayCursorSprite(
-            fishX + sin(cursorData.r) * cursorData.display, 
-            fishY + cos(cursorData.r) * cursorData.display, 
-            !(gameMap.canHit(player.physics.x + dx * 60, player.physics.y + dy * 60))    
-        );
+        if(cursorData.x !== 0 && cursorData.y !== 0){
+            let dx = Math.sin(cursorData.r);
+            let dy = Math.cos(cursorData.r);
+            graphics.displayCursorSprite(
+                fishX + sin(cursorData.r) * cursorData.display, 
+                fishY + cos(cursorData.r) * cursorData.display, 
+                !(gameMap.canHit(player.physics.x + dx * 60, player.physics.y + dy * 60))    
+            );
+        }
     }
 
     for(let i = 0; i < effects.length; i++){
@@ -79,7 +81,7 @@ function OnInput() {
 }
 
 function caclulateCursor(movementX, movementY){
-    cursorData.x += movementX, 
+    cursorData.x += movementX; 
     cursorData.y += movementY;
 
     let cursorDist = (cursorData.x**2 + cursorData.y**2)**0.5;
@@ -104,7 +106,7 @@ function hashColour(str) {
     let color = '#';
     for (let i = 0; i < 3; i++) {
         let value = (hash >> (i * 8)) & 255;
-        color += ('00' + value.toString(16)).substr(-2);
+        color += ('00' + value.toString(16)).substring(-2);
     }
     return color;
 }

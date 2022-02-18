@@ -30,7 +30,7 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
     Frame = new ENGINE_Frame()
     graphics = new Graphics();
-    pixelDensity(1);
+    //pixelDensity(1);
     noSmooth();
 }
 // Dynamically change the size of the canvas on window resize
@@ -78,7 +78,7 @@ function ENGINE_DoFrameTick() {
 
     background(palette.frame)
     push();
-    translate(Frame.originX + graphics.screenShake[0], Frame.originY + graphics.screenShake[1]);
+    translate(Frame.originX + graphics.screenShake[0] * Frame.screenWidth / Frame.width, Frame.originY + graphics.screenShake[1] * Frame.screenWidth / Frame.width);
     scale(Frame.screenWidth / Frame.width);
     OnRender();
     pop();
@@ -93,7 +93,7 @@ function ENGINE_DoPhysicsTick() {
         if(tickBuffer.res.effects && tickBuffer.res.effects.length){
             for(let i = 0; i < tickBuffer.res.effects.length; i++){
                 effects.push([tickBuffer.res.effects[i][0], tickBuffer.res.effects[i][1], 19]);
-                graphics.screenShakeTime = 3;
+                graphics.screenShakeTime = 5;
             }
         }
         tickBuffer.doTickBuffer = false;
@@ -109,6 +109,8 @@ function ENGINE_DoPhysicsTick() {
 
 function mousePressed() {
     mouseIsPressed = true;
+    cursorData.x = 0;
+    cursorData.y = 0;
     document.body.requestPointerLock();
 }
 function mouseReleased(){

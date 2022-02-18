@@ -3,14 +3,9 @@ let Graphics = class{
         this.tile_sprites = [];
         this.fish_sprites = [];
         this.tile_pattern = [
-            "1234S0* ",
-            "[]#%_ c ",
-            "        ",
-            "        ",
-            "        ",
-            "        ",
-            "        ",
-            "        "
+            "1234S0",
+            "[]#%  ",
+            "*c_   ",
         ];
         this.generateSprites();
         this.screenShake = [0, 0];
@@ -20,7 +15,7 @@ let Graphics = class{
     generateSprites(){
         this.tile_sheet = loadImage('./sprites/tile_spritesheet.png');
         this.fish_sheet = loadImage('./sprites/fish_spritesheet.png');
-        this.slap_sheet = loadImage('./sprites/slap_spritesheet.png')
+        this.slap_sheet = loadImage('./sprites/slap_spritesheet.png');
         this.background = loadImage('./sprites/background.png');
         this.cursor = loadImage('./sprites/cursor_sheet.png');
         for(let i = 0; i < this.tile_pattern[0].length; i++){
@@ -36,7 +31,7 @@ let Graphics = class{
         if(spriteSymbol != " "){
             for(let i = 0; i < this.tile_sprites.length; i++){
                 if(spriteSymbol === this.tile_sprites[i][0]){
-                    image(this.tile_sheet, x * gameMap.tileSize, y * gameMap.tileSize, gameMap.tileSize, gameMap.tileSize, this.tile_sprites[i][1] * 8, this.tile_sprites[i][2] * 8, 8, 8);
+                    image(this.tile_sheet, x * gameMap.tileSize, y * gameMap.tileSize, gameMap.tileSize, gameMap.tileSize, 1 + this.tile_sprites[i][1] * 10, 1 + this.tile_sprites[i][2] * 10, 8, 8);
                 }
             }
         }
@@ -47,34 +42,8 @@ let Graphics = class{
         let fishY = floor(y / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
         let offset = 5 * (gameMap.tileSize/8);
 
-        let fishR = 0;
-        let fishSpriteR = 0;
-
-        if(r >= Math.PI * 15/8 || r < Math.PI * 1/8){
-            fishR = 0;
-            fishSpriteR = 0;
-        }else if(r >= Math.PI * 1/8 && r < Math.PI * 3/8){
-            fishR = 0;
-            fishSpriteR = 1;
-        }else if(r >= Math.PI * 3/8 && r < Math.PI * 5/8){
-            fishR = Math.PI/2;
-            fishSpriteR = 0;
-        }else if(r >= Math.PI * 5/8 && r < Math.PI * 7/8){
-            fishR = Math.PI/2;
-            fishSpriteR = 1;
-        }else if(r >= Math.PI * 7/8 && r < Math.PI * 9/8){
-            fishR = Math.PI;
-            fishSpriteR = 0;
-        }else if(r >= Math.PI * 9/8 && r < Math.PI * 11/8){
-            fishR = Math.PI;
-            fishSpriteR = 1;
-        }else if(r >= Math.PI * 11/8 && r < Math.PI * 13/8){
-            fishR = Math.PI * 3/2;
-            fishSpriteR = 0;
-        }else if(r >= Math.PI * 13/8 && r < Math.PI * 15/8){
-            fishR = Math.PI * 3/2;
-            fishSpriteR = 1;
-        }
+        let fishR = (Math.floor(((2*r)/Math.PI) + 1/4) * (Math.PI/2)) % (Math.PI * 2);
+        let fishSpriteR = ((r/Math.PI + 1/8) % (1/2)) > (1/4);
 
         push();
         translate(fishX, fishY);
