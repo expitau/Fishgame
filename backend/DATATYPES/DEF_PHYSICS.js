@@ -8,7 +8,7 @@ let Physics = class {
             let newPosY = player.physics.y + player.physics.vy;
             
             //Test for x coordinate collisions
-            if (gameMap.getCurrentTile(newPosX, player.physics.y) !== "#") {
+            if (!gameMap.isCollider(gameMap.getCurrentTile(newPosX, player.physics.y))) {
                 // On no collision, update player position
                 player.physics.x = newPosX;
             }else{
@@ -20,7 +20,7 @@ let Physics = class {
             }
 
             //Test for y coordinate collision
-            if (gameMap.getCurrentTile(player.physics.x, newPosY) !== "#") {
+            if (!gameMap.isCollider(gameMap.getCurrentTile(player.physics.x, newPosY))) {
                  // On no collision, update player position
                 player.physics.y = newPosY;
             }else{
@@ -83,7 +83,7 @@ let Physics = class {
         let dy = Math.cos(player.input.cursorR);
 
         // If player can hit a tile
-        if(gameMap.getTileCluster(player.physics.x + dx * 60, player.physics.y + dy * 60)){
+        if(gameMap.getCollisionArea(player.physics.x + dx * 60, player.physics.y + dy * 60)){
             // Set hit power
             let power = 7;
 

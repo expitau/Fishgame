@@ -6,19 +6,20 @@ let Map = class {
         }
 
         this.currentMap = mapId;
+        this.colliders = "#%$X";
         this.tilemap = [
             [
                 "                ",
-                "                ",
                 "      0S        ",
                 "      []        ",
-                "     ######     ",
-                "            30  ",
-                "            []  ",
-                "  ####    ####  ",
-                "                ",
-                "    10    24 *  ",
-                "    []    [] c  ",
+                "   ########     ",
+                "   ##         3E",
+                "              []",
+                "E           ####",
+                "]     ####      ",
+                "##              ",
+                "##  1     24 *  ",
+                "##  []    [] c  ",
                 "################"
             ],
             [
@@ -54,6 +55,11 @@ let Map = class {
                     this.spawnPoint = [(i + 0.5) * this.tileSize, (j + 0.5) * this.tileSize];
                 }
 
+                // Set wall tiles
+                if (this.getTile(i, j) === "#" && (this.getTile(i, j - 1) === "#" || this.getTile(i, j - 1) === "$")) {
+                    this.setTile(i, j, "$");
+                }
+
                 if (this.getTile(i, j) === " ") {
                     // Set flooring
                     if(this.getTile(i, j + 1) === "#"){
@@ -69,9 +75,12 @@ let Map = class {
         }
     }
 
-    // Read tile on tilemap [tile coordinates]
+    // Read tile on tilemap [tile coordinates] > [tile symbol]
     getTile (x, y){
-        return this.tilemap[y].charAt(x);
+        if(x >= 0 && x < this.width && y >= 0 && y < this.height){
+            return this.tilemap[y].charAt(x);
+        }
+        return "X";
     }
 
     // Change tile on tilemap [tile coordinates]
@@ -79,19 +88,24 @@ let Map = class {
         this.tilemap[y] = this.tilemap[y].substring(0, x) + newTile + this.tilemap[y].substring(x + 1);
     }
 
-    // Read tile on tilemap [world coordinates] 
+    // Read tile on tilemap [world coordinates] > [tile symbol]
     getCurrentTile (x, y){
         if (0 < x && x < this.width * this.tileSize && 0 < y && y < this.height * this.tileSize){
             return this.tilemap[Math.floor(y / this.tileSize)].charAt(Math.floor(x / this.tileSize));
         }
-        return "#";
+        return "X";
+    }
+
+    // Returns if a tile is a collider    
+    isCollider(tileSymbol){
+        return this.colliders.includes(tileSymbol);
     }
 
     // Read tiles on tilemap in a small rectangular cluster [world coordinates] 
-    getTileCluster(x, y){
+    getCollisionArea(x, y){
         for(let i = -1; i <= 1; i ++){
             for(let j = -1; j <= 1; j ++){
-                if(gameMap.getCurrentTile(x + i * gameMap.tileSize * 0.3, y + j * gameMap.tileSize * 0.3) === "#"){
+                if(this.isCollider(gameMap.getCurrentTile(x + i * this.tileSize * 0.3, y + j * this.tileSize * 0.3))){
                     return true;
                 }
             }

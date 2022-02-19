@@ -10,8 +10,8 @@ let Graphics = class{
         // Generate tile set
         this.tileSprites = {};
         this.tileSpriteGen([
-            "1234S0",
-            "[]#%  ",
+            "1234SE",
+            "[]#%$0",
             "*c_   ",
         ]);
     }
