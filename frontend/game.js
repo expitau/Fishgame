@@ -1,112 +1,49 @@
-let id, gameMap, players = {}, effects = [];
-let mouseIsPressed = false, 
-    mouseIsReleased = false;
-
-
-let cursorData = {
-    r: 0,
-    x: 0, 
-    y: 0,
-    visible: false,
-    max: 50,
-    display: 60
-};
-
-let palette = {
-    frame: '#222222'
-};
+let id, players = {};
+let gameMap, effects, frame, graphics, input;
 
 // On initialize
 function OnInit() {
+    effects = new Effects();
+    frame = new Frame();
+    graphics = new Graphics();
+    input = new Input();
 }
 
+// On game tick (game logic only)
 function OnTick() {
+    // calculate physics
     Physics.OnTick(players, gameMap);
 
-    for(let i = 0; i < effects.length; i++){
-        effects[i][2] --;
-        if(effects[i][2] <= 0){
-            effects.pop(i);
-            i--;
-        }
-    }
-    
-    graphics.screenShakeTime --;
+    effects.update();
 }
 
-// On frame
+// On frame render (visuals only)
 function OnRender() {
-    image(graphics.background, 0, 0, Frame.width, Frame.height);
+    // draw background
+    image(graphics.background, 0, 0, frame.width, frame.height);
 
     // draw map
-    graphics.displayMap();
+    for(let i = 0; i < gameMap.width; i++){
+        for(let j = 0; j < gameMap.height; j++){
+            graphics.displayTileSprite(gameMap.getTile(i, j), i, j);
+        }
+    }
 
     // draw players
     for(const [pid, player] of Object.entries(players)){
-        fill(typeof pid == 'undefined' ? 0 : hashColour(pid))
         graphics.displayFishSprite(player.physics.x, player.physics.y, player.physics.r, player.physics.action, pid);
     }
 
-    if(mouseIsPressed){
+    // draw cursor
+    if(mouseIsHeld){
         let player = players[id];
-        let fishX = floor(player.physics.x / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
-        let fishY = floor(player.physics.y / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
         if(cursorData.x !== 0 && cursorData.y !== 0){
-            let dx = Math.sin(cursorData.r);
-            let dy = Math.cos(cursorData.r);
-            graphics.displayCursorSprite(
-                fishX + sin(cursorData.r) * cursorData.display, 
-                fishY + cos(cursorData.r) * cursorData.display, 
-                !(gameMap.canHit(player.physics.x + dx * 60, player.physics.y + dy * 60))    
-            );
+            let cursorX = align(player.physics.x) + sin(cursorData.r) * cursorData.display;
+            let cursorY = align(player.physics.y) + cos(cursorData.r) * cursorData.display;
+            graphics.displayCursorSprite(cursorX, cursorY, !gameMap.canHit(cursorX, cursorY));
         }
     }
 
-    for(let i = 0; i < effects.length; i++){
-        fill(255);
-        noStroke();
-        graphics.displaySlapSprite(effects[i][0], effects[i][1], 4 - floor(effects[i][2]/5));
-    }
-}
-
-// On input frame
-function OnInput() {
-    if(mouseIsReleased && cursorData.x != 0 && cursorData.y != 0){
-        socket.emit("clientUpdate", {
-            cursorR: cursorData.r
-        });
-        cursorData.x = 0;
-        cursorData.y = 0;
-    }
-}
-
-function caclulateCursor(movementX, movementY){
-    cursorData.x += movementX; 
-    cursorData.y += movementY;
-
-    let cursorDist = (cursorData.x**2 + cursorData.y**2)**0.5;
-    if(cursorDist > cursorData.max){
-        cursorData.x *= cursorData.max/cursorDist;
-        cursorData.y *= cursorData.max/cursorDist;
-    }
-
-    cursorData.r = Math.atan2(cursorData.x, cursorData.y);
-}
-
-///////////////////////////////////////////////////////
-
-
-function hashColour(str) {
-    let hash = 0;
-    if (str.length === 0) return hash;
-    for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        hash = hash & hash;
-    }
-    let color = '#';
-    for (let i = 0; i < 3; i++) {
-        let value = (hash >> (i * 8)) & 255;
-        color += ('00' + value.toString(16)).substring(-2);
-    }
-    return color;
+    // draw effects
+    effects.display();
 }
