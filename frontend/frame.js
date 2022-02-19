@@ -7,6 +7,7 @@ class Frame{
         this.calculateDimensions();
     }
 
+    // Calculate frame Dimensions
     calculateDimensions() {
         if(this.aspectRatio > windowHeight / windowWidth){
             this.margin = windowHeight * this.marginRatio;
@@ -21,12 +22,16 @@ class Frame{
         this.originY = (windowHeight - this.screenHeight) / 2;
     }
 
-    display() {
+    // Apply frame
+    push() {
         background('#222222')
         push();
         translate(frame.originX + effects.screenShake[0] * frame.screenWidth / frame.width, frame.originY + effects.screenShake[1] * frame.screenWidth / frame.width);
         scale(frame.screenWidth / frame.width);
-        OnRender();
+    }
+
+    // Clean-up frame
+    pop() {
         pop();    
     }
 }

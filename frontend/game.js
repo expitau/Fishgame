@@ -1,3 +1,4 @@
+// Create global variables
 let id, players = {};
 let gameMap, effects, frame, graphics, input;
 
@@ -14,6 +15,7 @@ function OnTick() {
     // calculate physics
     Physics.OnTick(players, gameMap);
 
+    // update effects
     effects.update();
 }
 
@@ -40,7 +42,7 @@ function OnRender() {
         if(cursorData.x !== 0 && cursorData.y !== 0){
             let cursorX = align(player.physics.x) + sin(cursorData.r) * cursorData.display;
             let cursorY = align(player.physics.y) + cos(cursorData.r) * cursorData.display;
-            graphics.displayCursorSprite(cursorX, cursorY, !gameMap.canHit(cursorX, cursorY));
+            graphics.displayCursorSprite(cursorX, cursorY, !gameMap.getTileCluster(cursorX, cursorY));
         }
     }
 

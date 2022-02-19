@@ -1,34 +1,43 @@
+// Require global classes
 let Player = require('./DATATYPES/DEF_Player')
 let Map = require('./DATATYPES/DEF_Map')
 let Physics = require('./DATATYPES/DEF_Physics')
 
+// Require io
 const io = require("socket.io")(3000, {
     cors: {
         origin: "*",
     }
 })
 
+// Global variables
 players = {};
 effects = [];
 gameMap = new Map(0);
 
+// Socket handler
 io.on("connection", (socket) => {
+    // Create new Player instance if necessary
     console.log(socket.id + " connected");
-    players[socket.id] ??= new Player(socket.id); // Create new player if does not already exist
-    let myobj = {
+    players[socket.id] ??= new Player(socket.id);
+
+    // Send initial world data
+    let initialWorldData = {
         players: players, 
         gameMap: gameMap
     }
-    socket.emit("init", myobj)
+    socket.emit("init", initialWorldData);
     
+    // Handle client update
     socket.on('clientUpdate', (playerInput) => {
-        players[socket.id].input = playerInput // Update the input of the player
-        Physics.OnInput(players[socket.id])
+        players[socket.id].input = playerInput;
+        Physics.OnInput(players[socket.id]);
     });
 
+    // Handle client disconnet
     socket.on('disconnect', () => {
-        console.log(socket.id + " disconnected")
-        delete players[socket.id]
+        console.log(socket.id + " disconnected");
+        delete players[socket.id];
     });
 
     // Debug test
@@ -37,6 +46,7 @@ io.on("connection", (socket) => {
     });
 });
 
+// Update serverside physics
 let lastUpdate = Date.now()
 let deltaTime = 0;
 setInterval(() => {
@@ -48,6 +58,7 @@ setInterval(() => {
     }
 }, 16) // 62.5 times per second
 
+// Emit server update to client
 setInterval(() => {
     io.emit("serverUpdate", {lastUpdate: lastUpdate, players: players, effects: effects});
     effects = [];
