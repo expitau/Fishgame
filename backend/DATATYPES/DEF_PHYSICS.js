@@ -60,7 +60,6 @@ let Physics = class {
             // Bound player rotation between 0 and 2 * PI
             player.physics.r = ((Math.PI * 4) + player.physics.r) % (Math.PI * 2);
             
-            // Calculate and set player action (fish bend)
             // Calculate angle of velocity
             let vAngle = ((Math.PI * 2) + Math.atan2(player.physics.vy, player.physics.vx)) % (Math.PI * 2);
 
