@@ -46,8 +46,13 @@ let Physics = class {
                 }
             }
 
-            // Apply forces
-            this.ApplyForces();
+            // Add gravity
+            player.physics.vy += 0.06;
+
+            // Add air resistance
+            player.physics.vy *= 0.998;
+            player.physics.vx *= 0.997;
+            player.physics.vr *= 0.995;
 
             // Update player rotation
             player.physics.r += player.physics.vr;
@@ -56,35 +61,19 @@ let Physics = class {
             player.physics.r = ((Math.PI * 4) + player.physics.r) % (Math.PI * 2);
             
             // Calculate and set player action (fish bend)
-            this.setAction();
-        }
-    }
+            // Calculate angle of velocity
+            let vAngle = ((Math.PI * 2) + Math.atan2(player.physics.vy, player.physics.vx)) % (Math.PI * 2);
 
-    // Apply forces
-    static ApplyForces(){
-        // Add gravity
-        player.physics.vy += 0.06;
-
-        // Add air resistance
-        player.physics.vy *= 0.998;
-        player.physics.vx *= 0.997;
-        player.physics.vr *= 0.995;
-    }
-
-    // Calculate and set player action (fishbend)
-    static setAction(){
-        // Calculate angle of velocity
-        let vAngle = ((Math.PI * 2) + Math.atan2(player.physics.vy, player.physics.vx)) % (Math.PI * 2);
-
-        if(player.physics.vy**2 + player.physics.vx**2 < 1){
-            // If absolute player velocity is less than 1, flatfish
-            player.physics.action = 0;
-        }else if(Math.abs(((Math.PI * 4) + player.physics.r + Math.PI/2) % (Math.PI * 2) - vAngle) < Math.PI/2){
-            // If velocity angle pointed up down the fish, bend ends up
-            player.physics.action = 2;
-        }else{
-            // If velocity angle pointed down on the fish, bend ends down
-            player.physics.action = 1;
+            if(player.physics.vy**2 + player.physics.vx**2 < 1){
+                // If absolute player velocity is less than 1, flatfish
+                player.physics.action = 0;
+            }else if(Math.abs(((Math.PI * 4) + player.physics.r + Math.PI/2) % (Math.PI * 2) - vAngle) < Math.PI/2){
+                // If velocity angle pointed up down the fish, bend ends up
+                player.physics.action = 2;
+            }else{
+                // If velocity angle pointed down on the fish, bend ends down
+                player.physics.action = 1;
+            }
         }
     }
 
