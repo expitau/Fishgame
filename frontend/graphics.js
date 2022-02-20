@@ -8,6 +8,7 @@ let Graphics = class{
         this.cursorSheet = loadImage('./sprites/cursor_sheet.png');
         this.background = loadImage('./sprites/background.png');
         this.iconSheet = loadImage('./sprites/icon_spritesheet.png');
+        this.levelImage;
 
         // Generate tile set
         this.tileSprites = {};
@@ -30,18 +31,48 @@ let Graphics = class{
             }
         }
     }
-
-    // Draw tile sprite [ASCII, tile coordinates]
-    displayTileSprite(spriteSymbol, x, y){
-        if(spriteSymbol != " "){
-            try{
-                image(this.tileSheet, x * gameMap.tileSize, y * gameMap.tileSize, gameMap.tileSize, gameMap.tileSize, 1 + this.tileSprites[spriteSymbol][0] * 10, 1 + this.tileSprites[spriteSymbol][1] * 10, 8, 8);
-            } catch (e){
-                console.log("No Tile Labeled as '" + spriteSymbol + "'");
-            }
+    
+    // Display level image
+    displayLevelImage(){
+        // Make sure sprites are loaded
+        if(!(this.tileSheet.width > 1)){
+            return;
         }
-    }
 
+        if(this.levelImage === undefined){
+            this.levelImage = createImage(gameMap.width * 8, gameMap.height * 8);
+            this.levelImage.loadPixels();
+            this.tileSheet.loadPixels();
+            for(let i = 0; i < gameMap.width; i++){
+                for(let j = 0; j < gameMap.height; j++){
+                    // Get tile sprite
+                    let spriteSymbol = gameMap.getTile(i, j);
+
+                    if(spriteSymbol === " "){
+                        continue;
+                    }
+                    
+                    // Draw tiles
+                    for(let px = 0; px < 8; px++){
+                        for(let py = 0; py < 8; py++){
+                            let pixelColor =  this.tileSheet.get(1 + this.tileSprites[spriteSymbol][0] * 10 + px, 1 + this.tileSprites[spriteSymbol][1] * 10 + py);
+                            if(alpha(pixelColor) > 10){
+                                // draw sprite pixel
+                                this.levelImage.set(i*8 + px, j*8 + py, pixelColor);
+                            }
+                            if(alpha(pixelColor) > 200 && i*8 + px + 1 < gameMap.width * 8 && j*8 + py + 1 < gameMap.height * 8){
+                                // draw shadow pixel
+                                this.levelImage.set(i*8 + px + 1, j*8 + py + 1, color(0, 0, 0, 47));
+                            }
+                        }
+                    }
+                }
+            }
+            this.levelImage.updatePixels();
+        }
+
+        image(this.levelImage, 0, 0, gameMap.width * gameMap.tileSize, gameMap.height * gameMap.tileSize);
+    }
 
     // Draw fish shadow sprite [player]
     displayFishShadowSprite(player){

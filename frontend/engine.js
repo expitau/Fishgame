@@ -1,4 +1,4 @@
-const SERVER_IP = "localhost:3000";
+const SERVER_IP = "172.31.128.1:3000";
 const socket = io(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"));
 
 /** Socket Connection **/
