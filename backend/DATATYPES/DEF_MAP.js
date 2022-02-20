@@ -6,7 +6,7 @@ let Map = class {
         }
 
         this.currentMap = mapId;
-        this.colliders = "#%$X";
+        this.colliders = "#$X";
         this.tilemap = [
             [
                 "                ",

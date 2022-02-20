@@ -119,8 +119,8 @@ let Physics = class {
         
                     // Add slap effect
                     effects.push([
-                        player.physics.x + dx * 15,
-                        player.physics.y + dy * 15
+                        (otherPlayer.physics.x + player.physics.x)/2,
+                        (otherPlayer.physics.y + player.physics.y)/2
                     ]);
                 }
             }

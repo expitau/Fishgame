@@ -2,7 +2,6 @@ let Player = class {
     constructor(id){
         this.id = id;
         this.color = Math.floor(Math.random() * 360);
-        this.water = 3;
         this.health = 3;
         this.physics = {
             x: gameMap.spawnPoint[0],

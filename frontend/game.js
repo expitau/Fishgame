@@ -14,13 +14,13 @@ function OnInit() {
 function OnTick() {
     // calculate physics
     Physics.OnTick(players, gameMap);
-
-    // update effects
-    effects.update();
 }
 
 // On frame render (visuals only)
 function OnRender() {
+    // update effects
+    effects.update();
+
     // draw background
     image(graphics.background, 0, 0, frame.width, frame.height);
 
