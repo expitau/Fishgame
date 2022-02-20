@@ -1,6 +1,7 @@
 let Player = class {
     constructor(id){
         this.id = id;
+        this.color = Math.floor(Math.random() * 360);
         this.physics = {
             x: gameMap.spawnPoint[0],
             y: gameMap.spawnPoint[1],
@@ -8,8 +9,7 @@ let Player = class {
             vx: 0,
             vy: 0,
             vr: 0,
-            action: 0,
-            slap: false
+            action: 0
         }
         this.input = {
             cursorR: 0

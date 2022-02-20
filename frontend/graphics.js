@@ -14,9 +14,11 @@ let Graphics = class{
             "[]#%$0",
             "*c_   ",
         ]);
+
+        this.fishSheets = {};
     }
 
-    // Generate tile sprites from spritesheet and pattern
+    // Generate tile sprites from spritesheet and pattern [ASCII]
     tileSpriteGen(pattern){
         for(let i = 0; i < pattern[0].length; i++){
             for(let j = 0; j < pattern.length; j++){
@@ -27,7 +29,7 @@ let Graphics = class{
         }
     }
 
-    // Draw tile sprite [tile coordinates]
+    // Draw tile sprite [ASCII, tile coordinates]
     displayTileSprite(spriteSymbol, x, y){
         if(spriteSymbol != " "){
             try{
@@ -38,17 +40,43 @@ let Graphics = class{
         }
     }
 
-    // Draw fish sprite [world coordinates, radians, 0-1]
-    displayFishSprite(x, y, r, action){
+    // Draw fish sprite [player]
+    displayFishSprite(player){
+        // Make sure sprites are loaded
+        if(!(this.fishSheet.width > 1)){
+            return;
+        }
+
+        // Create new fish based on fish hue
+        let tempFishSheet;
+        if(this.fishSheets[player.color] === undefined){
+            tempFishSheet = createImage(this.fishSheet.width, this.fishSheet.height);
+            tempFishSheet.loadPixels();
+            this.fishSheet.loadPixels();
+            for(let i = 0; i < this.fishSheet.width; i++){
+                for(let j = 0; j < this.fishSheet.height; j++){
+                    let pixel = (i + this.fishSheet.width * j) * 4;
+                    if(this.fishSheet.pixels[pixel + 3] > 100){
+                        let hsbPixel = RGBToHSB(this.fishSheet.pixels[pixel], this.fishSheet.pixels[pixel + 1], this.fishSheet.pixels[pixel + 2]);
+                        let rgbPixel = HSBToRGB((hsbPixel[0] + player.color) % 360, hsbPixel[1], hsbPixel[2]);
+                        tempFishSheet.set(i, j, color(rgbPixel[0], rgbPixel[1], rgbPixel[2], 255));
+                    }
+                }
+            }
+            tempFishSheet.updatePixels();
+            this.fishSheets[player.color] = tempFishSheet;
+        }
+
+        // Display fish
         let offset = 5 * (gameMap.pixelSize);
 
-        let fishR = (Math.floor(((2*r)/Math.PI) + 1/4) * (Math.PI/2)) % (Math.PI * 2);
-        let fishSpriteR = ((r/Math.PI + 1/8) % (1/2)) > (1/4);
+        let fishR = (Math.floor(((2*player.physics.r)/Math.PI) + 1/4) * (Math.PI/2)) % (Math.PI * 2);
+        let fishSpriteR = ((player.physics.r/Math.PI + 1/8) % (1/2)) > (1/4);
 
         push();
-        translate(align(x), align(y));
+        translate(align(player.physics.x), align(player.physics.y));
         rotate(fishR);
-        image(this.fishSheet, -offset, -offset, gameMap.pixelSize * 11, gameMap.pixelSize * 11, action * 12,  fishSpriteR * 11, 11, 11);
+        image(this.fishSheets[player.color], -offset, -offset, gameMap.pixelSize * 11, gameMap.pixelSize * 11, player.physics.action * 12,  fishSpriteR * 11, 11, 11);
         pop();
     }
 

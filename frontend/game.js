@@ -45,7 +45,7 @@ function OnRender() {
 
     // draw players
     for(const [pid, player] of Object.entries(players)){
-        graphics.displayFishSprite(player.physics.x, player.physics.y, player.physics.r, player.physics.action, pid);
+        graphics.displayFishSprite(player);
     }
 
     // draw cursor

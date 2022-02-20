@@ -3,23 +3,7 @@ function align(value){
     return floor(value / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
 }
 
-// hash a string into a color
-function hashColour(str) {
-    let hash = 0;
-    if (str.length === 0) return hash;
-    for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        hash = hash & hash;
-    }
-    let color = '#';
-    for (let i = 0; i < 3; i++) {
-        let value = (hash >> (i * 8)) & 255;
-        color += ('00' + value.toString(16)).substring(-2);
-    }
-    return color;
-}
-
-// convert an HSB color to RGB
+// convert an HSB color to RGB [0-360, 0-100, 0-100]
 function HSBToRGB(h, s, b) {
     s /= 100;
     b /= 100;
@@ -28,7 +12,7 @@ function HSBToRGB(h, s, b) {
     return [255 * f(5), 255 * f(3), 255 * f(1)];
 }
 
-// convert an RGB color to HSB
+// convert an RGB color to HSB [0-255, 0-255, 0-255]
 function RGBToHSB(r, g, b) {
     r /= 255;
     g /= 255;
