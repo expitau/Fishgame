@@ -7,6 +7,7 @@ let Graphics = class{
         this.slapSheet = loadImage('./sprites/slap_spritesheet.png');
         this.cursorSheet = loadImage('./sprites/cursor_sheet.png');
         this.background = loadImage('./sprites/background.png');
+        this.iconSheet = loadImage('./sprites/icon_spritesheet.png');
 
         // Generate tile set
         this.tileSprites = {};
@@ -99,15 +100,18 @@ let Graphics = class{
         pop();
     }
 
-    // Draw cursor sprite [world coordinates, 0-1]
-    displayCursorSprite(x, y, design){
-        let offset = gameMap.pixelSize * 2;
-        image(this.cursorSheet, align(x) - offset, align(y) - offset, gameMap.pixelSize * 5, gameMap.pixelSize * 5, design * 5, 0, 5, 5);
+    // Draw cursor sprite [world coordinates, 0-1, 0-1]
+    displayCursorSprite(x, y, design, attack){
+        image(this.cursorSheet, align(x) - gameMap.pixelSize * 2, align(y) - gameMap.pixelSize * 2, gameMap.pixelSize * 5, gameMap.pixelSize * 5, design * 6, attack * 6, 5, 5);
     }
     
     // Draw slap sprite [world coordinates, 0-3]
     displaySlapSprite(x, y, design){
-        let offset = gameMap.pixelSize * 4;
-        image(this.slapSheet, align(x) - offset, align(y) - offset, gameMap.tileSize, gameMap.tileSize, (design%2) * 9, floor(design/2) * 9, 8, 8);
+        image(this.slapSheet, align(x) - gameMap.pixelSize * 4, align(y) - gameMap.pixelSize * 4, gameMap.tileSize, gameMap.tileSize, (design%2) * 9, floor(design/2) * 9, 8, 8);
+    }
+
+    // Draw the icons  [world coordinates, 0-1, 0-2]
+    displayIconSprite(x, y, icon, state){
+        image(this.iconSheet, align(x), align(y), gameMap.pixelSize * 7, gameMap.pixelSize * 7, icon * 8, state * 8, 7, 7);
     }
 }

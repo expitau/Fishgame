@@ -3,6 +3,21 @@ let Physics = class {
     static OnTick (players, gameMap) {
         // Loop through all players
         for (const [id, player] of Object.entries(players)) {
+            // On Player death
+            if(player.health <= 0){
+                player.health = 3;
+                player.physics = {
+                    x: gameMap.spawnPoint[0],
+                    y: gameMap.spawnPoint[1],
+                    r: 0,
+                    vx: 0,
+                    vy: 0,
+                    vr: 0,
+                    action: 0
+                }
+            }
+
+
             // Add gravity
             player.physics.vy += 0.06;
 
@@ -81,6 +96,35 @@ let Physics = class {
         // Break cursor into x,y components
         let dx = Math.sin(player.input.cursorR);
         let dy = Math.cos(player.input.cursorR);
+
+        // If player can hit a player
+        for(const [opid, otherPlayer] of Object.entries(players)){
+            if(opid !== player.id){
+                if(((player.physics.x + dx * 60 - otherPlayer.physics.x)**2 + (player.physics.y + dy * 60 - otherPlayer.physics.y)**2)**0.5 < 7 * gameMap.pixelSize ||
+                    ((player.physics.x - otherPlayer.physics.x)**2 + (player.physics.y - otherPlayer.physics.y)**2)**0.5 < 5 * gameMap.pixelSize){
+                    // Set hit power
+                    let power = 7;
+            
+                    // Apply new player velocities
+                    player.physics.vx = -power*dx;
+                    player.physics.vy = -power*dy;
+                    player.physics.vr = 0.2 * (player.physics.vx > 0 ? 1 : -1);
+                    otherPlayer.physics.vx = power*dx;
+                    otherPlayer.physics.vy = power*dy;
+                    otherPlayer.physics.vr = -player.physics.vr;
+                    otherPlayer.health --;
+        
+                    // Update player rotation to point of contact
+                    player.physics.r = (player.input.cursorR + Math.PI) % (Math.PI * 2);
+        
+                    // Add slap effect
+                    effects.push([
+                        player.physics.x + dx * 15,
+                        player.physics.y + dy * 15
+                    ]);
+                }
+            }
+        }
 
         // If player can hit a tile
         if(gameMap.getCollisionArea(player.physics.x + dx * 60, player.physics.y + dy * 60)){
