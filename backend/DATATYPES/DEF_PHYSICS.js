@@ -3,12 +3,20 @@ let Physics = class {
     static OnTick (players, gameMap) {
         // Loop through all players
         for (const [id, player] of Object.entries(players)) {
+            // Add gravity
+            player.physics.vy += 0.06;
+
+            // Add air resistance
+            player.physics.vy *= 0.998;
+            player.physics.vx *= 0.997;
+            player.physics.vr *= 0.995;
+
             // Calculate next position
             let newPosX = player.physics.x + player.physics.vx;
             let newPosY = player.physics.y + player.physics.vy;
             
             //Test for x coordinate collisions
-            if (!gameMap.isCollider(gameMap.getCurrentTile(newPosX, player.physics.y))) {
+            if (!gameMap.isCollider(gameMap.getCurrentTile(newPosX + ((newPosX > player.physics.x)? 1 : -1) * gameMap.pixelSize, player.physics.y))) {
                 // On no collision, update player position
                 player.physics.x = newPosX;
             }else{
@@ -20,7 +28,7 @@ let Physics = class {
             }
 
             //Test for y coordinate collision
-            if (!gameMap.isCollider(gameMap.getCurrentTile(player.physics.x, newPosY))) {
+            if (!gameMap.isCollider(gameMap.getCurrentTile(player.physics.x, newPosY + ((newPosY > player.physics.y)? 1 : -1) * gameMap.pixelSize))) {
                  // On no collision, update player position
                 player.physics.y = newPosY;
             }else{
@@ -45,14 +53,6 @@ let Physics = class {
                     }
                 }
             }
-
-            // Add gravity
-            player.physics.vy += 0.06;
-
-            // Add air resistance
-            player.physics.vy *= 0.998;
-            player.physics.vx *= 0.997;
-            player.physics.vr *= 0.995;
 
             // Update player rotation
             player.physics.r += player.physics.vr;

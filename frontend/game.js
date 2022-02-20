@@ -24,6 +24,11 @@ function OnRender() {
     // draw background
     image(graphics.background, 0, 0, frame.width, frame.height);
 
+    // draw player shadows
+    for(const [pid, player] of Object.entries(players)){
+        graphics.displayFishShadowSprite(player);
+    }
+
     // draw map
     for(let i = 0; i < gameMap.width; i++){
         for(let j = 0; j < gameMap.height; j++){

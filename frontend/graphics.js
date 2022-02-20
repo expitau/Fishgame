@@ -3,6 +3,7 @@ let Graphics = class{
         // load sprites
         this.tileSheet = loadImage('./sprites/tile_spritesheet.png');
         this.fishSheet = loadImage('./sprites/fish_spritesheet.png');
+        this.fishShadowSheet = loadImage('./sprites/fishshadow_spritesheet.png');
         this.slapSheet = loadImage('./sprites/slap_spritesheet.png');
         this.cursorSheet = loadImage('./sprites/cursor_sheet.png');
         this.background = loadImage('./sprites/background.png');
@@ -40,6 +41,23 @@ let Graphics = class{
         }
     }
 
+
+    // Draw fish shadow sprite [player]
+    displayFishShadowSprite(player){
+        // Calculate fish pos/rot
+        let offset = 5 * (gameMap.pixelSize);
+
+        let fishR = (Math.floor(((2*player.physics.r)/Math.PI) + 1/4) * (Math.PI/2)) % (Math.PI * 2);
+        let fishSpriteR = ((player.physics.r/Math.PI + 1/8) % (1/2)) > (1/4);
+
+        // Display shadow
+        push();
+        translate(align(player.physics.x + gameMap.pixelSize), align(player.physics.y + gameMap.pixelSize * 3));
+        rotate(fishR);
+        image(this.fishShadowSheet, -offset, -offset, gameMap.pixelSize * 11, gameMap.pixelSize * 11, player.physics.action * 12,  fishSpriteR * 11, 11, 11);
+        pop();
+    }
+
     // Draw fish sprite [player]
     displayFishSprite(player){
         // Make sure sprites are loaded
@@ -67,12 +85,13 @@ let Graphics = class{
             this.fishSheets[player.color] = tempFishSheet;
         }
 
-        // Display fish
+        // Calculate fish pos/rot
         let offset = 5 * (gameMap.pixelSize);
 
         let fishR = (Math.floor(((2*player.physics.r)/Math.PI) + 1/4) * (Math.PI/2)) % (Math.PI * 2);
         let fishSpriteR = ((player.physics.r/Math.PI + 1/8) % (1/2)) > (1/4);
 
+        // Display fish
         push();
         translate(align(player.physics.x), align(player.physics.y));
         rotate(fishR);

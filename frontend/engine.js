@@ -33,6 +33,7 @@ function setup() {
     // Create canvas
     createCanvas(windowWidth, windowHeight);
     noSmooth();
+    pixelDensity(1);
 
     // Initialize game
     OnInit();
