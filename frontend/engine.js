@@ -33,14 +33,22 @@ socket.on('serverUpdate', (res) => {
 
 // On p5.js ready
 let programReady = false;
+var cnv;
 function setup() {
     // Create canvas
-    createCanvas(windowWidth, windowHeight);
+    cnv = createCanvas(windowWidth, windowHeight);
     noSmooth();
     pixelDensity(1);
 
     // Initialize game
     OnInit();
+
+    // resize
+    resizeCanvas(frame.screenWidth/2 + 300, frame.screenHeight/2 + 300);
+    cnv.style('display', 'block');
+    $("#defaultCanvas0").css({ 'width': (frame.screenWidth + 300 + "px") });
+    $("#defaultCanvas0").css({ 'height': (frame.screenHeight + 300 + "px") });
+    cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
 
     // Set program flag ready
     programReady = true;
@@ -48,10 +56,15 @@ function setup() {
 
 // On window resize
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    frame.calculateDimensions();
+    if(programReady && serverConnectionInitialized){
+        frame.calculateDimensions();
+        resizeCanvas(frame.screenWidth/2 + 300, frame.screenHeight/2 + 300);
+        cnv.style('display', 'block');
+        $("#defaultCanvas0").css({ 'width': (frame.screenWidth + 300 + "px") });
+        $("#defaultCanvas0").css({ 'height': (frame.screenHeight + 300 + "px") });
+        cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
+    }
 }
-
 // On client update
 function ENGINE_DoFrameTick() {
     // Wait for program and server flags
@@ -63,12 +76,10 @@ function ENGINE_DoFrameTick() {
         ENGINE_DoPhysicsTick(players);
 
         // Create Frame (was encapulated, but moved for performance [firebug screenshot before: https://i.gyazo.com/efc59d13b2d4fb7700b13aebe5a41698.png])
-        fill("#222222");
-        noStroke();
-        rect(frame.originX - 150, frame.originY - 150, frame.screenWidth + 250, frame.screenHeight + 250);
+        background("#222222");
         push();
-        translate(frame.originX + effects.screenShake[0] * frame.changeRatio, frame.originY + effects.screenShake[1] * frame.changeRatio);
-        scale(frame.changeRatio);
+        translate(150, 150);
+        scale(frame.changeRatio / 2);
 
         // Render game
         OnRender();
@@ -76,7 +87,7 @@ function ENGINE_DoFrameTick() {
         // Draw FPS (rounded to 2 decimal places) at the top right of the screen
         let fps = frameRate();
         fill(255);
-        text("FPS: " + fps.toFixed(2), 0, -10);
+        text("FPS: " + fps.toFixed(2), 0, 20);
 
         // Reset matrix
         pop();
