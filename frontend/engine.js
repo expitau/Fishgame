@@ -54,16 +54,24 @@ function ENGINE_DoFrameTick() {
     if(programReady && serverConnectionInitialized){
         // Setup game elements
         input.update();
-        frame.push();
 
         // Do physics ticks
         ENGINE_DoPhysicsTick(players);
 
+        // Create Frame (was encapulated, but moved for performance [firebug screenshot before: https://i.gyazo.com/efc59d13b2d4fb7700b13aebe5a41698.png])
+        fill("#222222");
+        rect(0, 0, windowWidth, windowHeight);
+        push();
+        translate(frame.originX + effects.screenShake[0] * frame.changeRatio, frame.originY + effects.screenShake[1] * frame.changeRatio);
+        scale(frame.changeRatio);
+
         // Render game
         OnRender();
 
+        // Reset matrix
+        pop();
+
         // Cleanup game elements
-        frame.pop();
         input.reset();
     }
     // Rerun this function

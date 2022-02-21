@@ -96,6 +96,7 @@ let Physics = class {
         // Break cursor into x,y components
         let dx = Math.sin(player.input.cursorR);
         let dy = Math.cos(player.input.cursorR);
+        let pvp = false;
 
         // If player can hit a player
         for(const [opid, otherPlayer] of Object.entries(players)){
@@ -122,12 +123,14 @@ let Physics = class {
                         (otherPlayer.physics.x + player.physics.x)/2,
                         (otherPlayer.physics.y + player.physics.y)/2
                     ]);
+                    
+                    pvp = true;
                 }
             }
         }
 
         // If player can hit a tile
-        if(gameMap.getCollisionArea(player.physics.x + dx * 60, player.physics.y + dy * 60)){
+        if(!pvp && gameMap.getCollisionArea(player.physics.x + dx * 60, player.physics.y + dy * 60)){
             // Set hit power
             let power = 7;
 
