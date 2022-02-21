@@ -118,7 +118,8 @@ let Physics = class {
                             otherPlayer.physics.x,
                             otherPlayer.physics.y,
                             otherPlayer.color,
-                            player.physics.r
+                            player.physics.r,
+                            15
                         ]);
                         otherPlayer.health = 3;
                         otherPlayer.physics = {

@@ -19,8 +19,14 @@ let Effects = class{
                         i--;
                     }
                 break;
-                case "kill": //[player id, radians]
+                case "kill": //[player id, radians, time]
                     graphics.addDeathEffect(this.effectList[i][1], this.effectList[i][2], this.effectList[i][3], this.effectList[i][4]);
+                    // handle update
+                    this.effectList[i][5] --;
+                    if(this.effectList[i][5] <= 0){
+                        this.effectList.pop(i);
+                        i--;
+                    }
                 break;
             }
         }
