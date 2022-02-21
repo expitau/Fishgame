@@ -64,7 +64,8 @@ function ENGINE_DoFrameTick() {
 
         // Create Frame (was encapulated, but moved for performance [firebug screenshot before: https://i.gyazo.com/efc59d13b2d4fb7700b13aebe5a41698.png])
         fill("#222222");
-        rect(0, 0, windowWidth, windowHeight);
+        noStroke();
+        rect(frame.originX - 150, frame.originY - 150, frame.screenWidth + 250, frame.screenHeight + 250);
         push();
         translate(frame.originX + effects.screenShake[0] * frame.changeRatio, frame.originY + effects.screenShake[1] * frame.changeRatio);
         scale(frame.changeRatio);
@@ -72,17 +73,16 @@ function ENGINE_DoFrameTick() {
         // Render game
         OnRender();
 
+        // Draw FPS (rounded to 2 decimal places) at the top right of the screen
+        let fps = frameRate();
+        fill(255);
+        text("FPS: " + fps.toFixed(2), 0, -10);
+
         // Reset matrix
         pop();
 
         // Cleanup game elements
         input.reset();
-
-        // Draw FPS (rounded to 2 decimal places) at the bottom left of the screen
-        let fps = frameRate();
-        fill(255);
-        stroke(0);
-        text("FPS: " + fps.toFixed(2), 10, 15);
     }
     // Rerun this function
     window.requestAnimationFrame(ENGINE_DoFrameTick);
