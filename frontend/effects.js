@@ -11,7 +11,7 @@ let Effects = class{
             switch(this.effectList[i][0]) {
                 case "impact": //[world coordinates, time]
                     // display
-                    graphics.displaySlapSprite(this.effectList[i][1], this.effectList[i][2], 4 - floor(this.effectList[i][3]/4));
+                    graphics.displaySlapSprite(this.effectList[i][1], this.effectList[i][2], 4 - Math.floor(this.effectList[i][3]/4));
                     // handle update
                     this.effectList[i][3] --;
                     if(this.effectList[i][3] <= 0){
@@ -42,18 +42,13 @@ let Effects = class{
         }
     }
 
-    //displays a semitranparent impact mark, input array with [world coordinates, time]
-    impact(x, y, time){
-        graphics.displaySlapSprite(this.spriteEffects[i][0], this.spriteEffects[i][1], 4 - floor(this.spriteEffects[i][2]/5));
-    }
-
     /* Animations not associated with a single effect */
     update(){
         // screenshake
         if(this.screenShakeTime > 0){
             this.screenShake = [
-                ((random(0, 1) > 0.5) ? -1 : 1) * (gameMap.tileSize/8),
-                ((random(0, 1) > 0.5) ? -1 : 1) * (gameMap.tileSize/8)
+                ((Math.random() > 0.5) ? -1 : 1) * (gameMap.tileSize/8),
+                ((Math.random() > 0.5) ? -1 : 1) * (gameMap.tileSize/8)
             ];
         }else{
             this.screenShake = [0, 0];

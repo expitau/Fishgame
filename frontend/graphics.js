@@ -71,22 +71,22 @@ let Graphics = class{
             this.levelImage.updatePixels();
         }
 
-        image(this.levelImage, 0, 0, gameMap.width * gameMap.tileSize, gameMap.height * gameMap.tileSize);
+        image(this.levelImage, 0, 0, gameMap.width * 50, gameMap.height * 50);
     }
 
     // Draw fish shadow sprite [player]
     displayFishShadowSprite(player){
         // Calculate fish pos/rot
-        let offset = 5 * (gameMap.pixelSize);
+        let offset = 5 * (6.25);
 
         let fishR = (Math.floor(((2*player.physics.r)/Math.PI) + 1/4) * (Math.PI/2)) % (Math.PI * 2);
         let fishSpriteR = ((player.physics.r/Math.PI + 1/8) % (1/2)) > (1/4);
 
         // Display shadow
         push();
-        translate(align(player.physics.x + gameMap.pixelSize), align(player.physics.y + gameMap.pixelSize * 3));
+        translate(this.align(player.physics.x + 6.25), this.align(player.physics.y + 6.25 * 3));
         rotate(fishR);
-        image(this.fishShadowSheet, -offset, -offset, gameMap.pixelSize * 11, gameMap.pixelSize * 11, player.physics.action * 12,  fishSpriteR * 11, 11, 11);
+        image(this.fishShadowSheet, -offset, -offset, 6.25 * 11, 6.25 * 11, player.physics.action * 12,  fishSpriteR * 11, 11, 11);
         pop();
     }
 
@@ -107,8 +107,8 @@ let Graphics = class{
                 for(let j = 0; j < this.fishSheet.height; j++){
                     let pixel = (i + this.fishSheet.width * j) * 4;
                     if(this.fishSheet.pixels[pixel + 3] > 100){
-                        let hsbPixel = RGBToHSB(this.fishSheet.pixels[pixel], this.fishSheet.pixels[pixel + 1], this.fishSheet.pixels[pixel + 2]);
-                        let rgbPixel = HSBToRGB((hsbPixel[0] + player.color) % 360, hsbPixel[1], hsbPixel[2]);
+                        let hsbPixel = this.RGBToHSB(this.fishSheet.pixels[pixel], this.fishSheet.pixels[pixel + 1], this.fishSheet.pixels[pixel + 2]);
+                        let rgbPixel = this.HSBToRGB((hsbPixel[0] + player.color) % 360, hsbPixel[1], hsbPixel[2]);
                         tempFishSheet.set(i, j, color(rgbPixel[0], rgbPixel[1], rgbPixel[2], 255));
                     }
                 }
@@ -118,32 +118,32 @@ let Graphics = class{
         }
 
         // Calculate fish pos/rot
-        let offset = 5 * (gameMap.pixelSize);
+        let offset = 5 * (6.25);
 
         let fishR = (Math.floor(((2*player.physics.r)/Math.PI) + 1/4) * (Math.PI/2)) % (Math.PI * 2);
         let fishSpriteR = ((player.physics.r/Math.PI + 1/8) % (1/2)) > (1/4);
 
         // Display fish
         push();
-        translate(align(player.physics.x), align(player.physics.y));
+        translate(this.align(player.physics.x), this.align(player.physics.y));
         rotate(fishR);
-        image(this.fishSheets[player.color], -offset, -offset, gameMap.pixelSize * 11, gameMap.pixelSize * 11, player.physics.action * 12,  fishSpriteR * 11, 11, 11);
+        image(this.fishSheets[player.color], -offset, -offset, 6.25 * 11, 6.25 * 11, player.physics.action * 12,  fishSpriteR * 11, 11, 11);
         pop();
     }
 
     // Draw cursor sprite [world coordinates, 0-1, 0-1]
     displayCursorSprite(x, y, design, attack){
-        image(this.cursorSheet, align(x) - gameMap.pixelSize * 2, align(y) - gameMap.pixelSize * 2, gameMap.pixelSize * 5, gameMap.pixelSize * 5, design * 6, attack * 6, 5, 5);
+        image(this.cursorSheet, this.align(x) - 6.25 * 2, this.align(y) - 6.25 * 2, 6.25 * 5, 6.25 * 5, design * 6, attack * 6, 5, 5);
     }
     
     // Draw slap sprite [world coordinates, 0-3]
     displaySlapSprite(x, y, design){
-        image(this.slapSheet, align(x) - gameMap.pixelSize * 4, align(y) - gameMap.pixelSize * 4, gameMap.tileSize, gameMap.tileSize, (design%2) * 9, floor(design/2) * 9, 8, 8);
+        image(this.slapSheet, this.align(x) - 6.25 * 4, this.align(y) - 6.25 * 4, 50, 50, (design%2) * 9, floor(design/2) * 9, 8, 8);
     }
 
     // Draw the icons  [world coordinates, 0-1, 0-2]
     displayIconSprite(x, y, icon, state){
-        image(this.iconSheet, align(x), align(y), gameMap.pixelSize * 7, gameMap.pixelSize * 7, icon * 8, state * 8, 7, 7);
+        image(this.iconSheet, this.align(x), this.align(y), 6.25 * 7, 6.25 * 7, icon * 8, state * 8, 7, 7);
     }
 
     // Add paint to background on fish death [world coordinates, hue, radians]
@@ -154,8 +154,34 @@ let Graphics = class{
         for(let i = 0; i < 25; i++){
             let angle = random(r - PI/10, r + PI/10) + PI;
             let distance = random(0, 15);
-            this.background.set(floor(x/gameMap.pixelSize + sin(angle) * distance + random(-3, 3)), floor(y/gameMap.pixelSize + cos(angle) * distance + random(-3, 3)), fishColor);
+            this.background.set(Math.floor(x/6.25 + Math.sin(angle) * distance + random(-3, 3)), Math.floor(y/6.25 + Math.cos(angle) * distance + random(-3, 3)), fishColor);
         }
         this.background.updatePixels();
+    }
+
+    // this.align a value to the global grid
+    align(value){
+        return Math.floor(value / (gameMap.tileSize/8)) * (gameMap.tileSize/8);
+    }
+
+    // convert an HSB color to RGB [0-360, 0-100, 0-100]
+    HSBToRGB(h, s, b) {
+        s /= 100;
+        b /= 100;
+        const k = (n) => (n + h / 60) % 6;
+        const f = (n) => b * (1 - s * Math.max(0, Math.min(k(n), 4 - k(n), 1)));
+        return [255 * f(5), 255 * f(3), 255 * f(1)];
+    }
+
+    // convert an RGB color to HSB [0-255, 0-255, 0-255]
+    RGBToHSB(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        const v = Math.max(r, g, b),
+            n = v - Math.min(r, g, b);
+        const h =
+            n === 0 ? 0 : n && v === r ? (g - b) / n : v === g ? 2 + (b - r) / n : 4 + (r - g) / n;
+        return [60 * (h < 0 ? h + 6 : h), v && (n / v) * 100, v * 100];
     }
 }

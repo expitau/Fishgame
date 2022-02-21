@@ -1,5 +1,6 @@
 const SERVER_IP = "localhost:3000";
 const socket = io(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"));
+//p5.disableFriendlyErrors = true;
 
 /** Socket Connection **/
 socket.on('connect', () => {
@@ -24,7 +25,9 @@ let tickBuffer = { doTickBuffer: false }
 socket.on('serverUpdate', (res) => {
     // Update to tick buffer
     tickBuffer.res = res;
-    effects.add(tickBuffer.res.effects);
+    if(programReady && serverConnectionInitialized){
+        effects.add(tickBuffer.res.effects);
+    }
     tickBuffer.doTickBuffer = true;
 })
 
@@ -74,6 +77,12 @@ function ENGINE_DoFrameTick() {
 
         // Cleanup game elements
         input.reset();
+
+        // Draw FPS (rounded to 2 decimal places) at the bottom left of the screen
+        let fps = frameRate();
+        fill(255);
+        stroke(0);
+        text("FPS: " + fps.toFixed(2), 10, 15);
     }
     // Rerun this function
     window.requestAnimationFrame(ENGINE_DoFrameTick);
