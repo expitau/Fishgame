@@ -1,4 +1,4 @@
-const SERVER_IP = "localhost:3000";
+const SERVER_IP = "192.168.86.20:3000";
 const socket = io(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"));
 //p5.disableFriendlyErrors = true;
 
@@ -36,7 +36,7 @@ let programReady = false;
 var cnv;
 function setup() {
     // Create canvas
-    cnv = createCanvas(windowWidth, windowHeight);
+    cnv = createCanvas(0, 0);
     noSmooth();
     pixelDensity(1);
 
@@ -44,7 +44,7 @@ function setup() {
     OnInit();
 
     // resize
-    resizeCanvas(frame.screenWidth/2 + 300, frame.screenHeight/2 + 300);
+    resizeCanvas(frame.screenWidth + 300, frame.screenHeight + 300);
     cnv.style('display', 'block');
     $("#defaultCanvas0").css({ 'width': (frame.screenWidth + 300 + "px") });
     $("#defaultCanvas0").css({ 'height': (frame.screenHeight + 300 + "px") });
@@ -58,7 +58,7 @@ function setup() {
 function windowResized() {
     if(programReady && serverConnectionInitialized){
         frame.calculateDimensions();
-        resizeCanvas(frame.screenWidth/2 + 300, frame.screenHeight/2 + 300);
+        resizeCanvas(frame.screenWidth + 300, frame.screenHeight + 300);
         cnv.style('display', 'block');
         $("#defaultCanvas0").css({ 'width': (frame.screenWidth + 300 + "px") });
         $("#defaultCanvas0").css({ 'height': (frame.screenHeight + 300 + "px") });
@@ -79,7 +79,7 @@ function ENGINE_DoFrameTick() {
         background("#222222");
         push();
         translate(150, 150);
-        scale(frame.changeRatio / 2);
+        scale(frame.changeRatio);
 
         // Render game
         OnRender();
