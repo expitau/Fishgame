@@ -1,28 +1,47 @@
 let Effects = class{
     constructor() {
-        this.spriteEffects = [];
+        this.effectList = [];
         this.screenShake = [0, 0];
         this.screenShakeTime = 0;
     }
 
     /* Use this to display effects on frame tick */
     display(){
-        for(let i = 0; i < this.spriteEffects.length; i++){
-            graphics.displaySlapSprite(this.spriteEffects[i][0], this.spriteEffects[i][1], 4 - floor(this.spriteEffects[i][2]/5));
+        for(let i = 0; i < this.effectList.length; i++){
+            switch(this.effectList[i][0]) {
+                case "impact": //[world coordinates, time]
+                    // display
+                    graphics.displaySlapSprite(this.effectList[i][1], this.effectList[i][2], 4 - floor(this.effectList[i][3]/4));
+                    // handle update
+                    this.effectList[i][3] --;
+                    if(this.effectList[i][3] <= 0){
+                        this.effectList.pop(i);
+                        i--;
+                    }
+                break;
+                case "kill": //[player id, radians]
+                    graphics.addDeathEffect(this.effectList[i][1], this.effectList[i][2], this.effectList[i][3], this.effectList[i][4]);
+                break;
+            }
         }
     }
 
-    /* Use this to add any new effets (spriteEffects should be updated to include effect ID once there are more than one type of effect)*/
+    /* Use this to add any new effets to the list*/
     add(newEffects){
         if(newEffects && newEffects.length){
             for(let i = 0; i < newEffects.length; i++){
-                this.spriteEffects.push([newEffects[i][0], newEffects[i][1], 19]);
+                this.effectList.push(newEffects[i]);
             }
-            this.screenShakeTime = 5;
+            this.screenShakeTime = 3;
         }
     }
 
-    /* Use this to update effects on game tick */
+    //displays a semitranparent impact mark, input array with [world coordinates, time]
+    impact(x, y, time){
+        graphics.displaySlapSprite(this.spriteEffects[i][0], this.spriteEffects[i][1], 4 - floor(this.spriteEffects[i][2]/5));
+    }
+
+    /* Animations not associated with a single effect */
     update(){
         // screenshake
         if(this.screenShakeTime > 0){
@@ -34,14 +53,5 @@ let Effects = class{
             this.screenShake = [0, 0];
         }
         this.screenShakeTime --;
-
-        // slap effect
-        for(let i = 0; i < this.spriteEffects.length; i++){
-            this.spriteEffects[i][2] --;
-            if(this.spriteEffects[i][2] <= 0){
-                this.spriteEffects.pop(i);
-                i--;
-            }
-        }
     }
 }

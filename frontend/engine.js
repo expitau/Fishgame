@@ -24,6 +24,7 @@ let tickBuffer = { doTickBuffer: false }
 socket.on('serverUpdate', (res) => {
     // Update to tick buffer
     tickBuffer.res = res;
+    effects.add(tickBuffer.res.effects);
     tickBuffer.doTickBuffer = true;
 })
 
@@ -84,7 +85,6 @@ function ENGINE_DoPhysicsTick() {
     // Read new tick buffer information
     if (tickBuffer.doTickBuffer) {
         players = tickBuffer.res.players
-        effects.add(tickBuffer.res.effects);
 
         tickBuffer.doTickBuffer = false;
         lastUpdate = tickBuffer.res.lastUpdate;

@@ -3,21 +3,6 @@ let Physics = class {
     static OnTick (players, gameMap) {
         // Loop through all players
         for (const [id, player] of Object.entries(players)) {
-            // On Player death
-            if(player.health <= 0){
-                player.health = 3;
-                player.physics = {
-                    x: gameMap.spawnPoint[0],
-                    y: gameMap.spawnPoint[1],
-                    r: 0,
-                    vx: 0,
-                    vy: 0,
-                    vr: 0,
-                    action: 0
-                }
-            }
-
-
             // Add gravity
             player.physics.vy += 0.06;
 
@@ -120,9 +105,32 @@ let Physics = class {
         
                     // Add slap effect
                     effects.push([
+                        "impact",
                         (otherPlayer.physics.x + player.physics.x)/2,
-                        (otherPlayer.physics.y + player.physics.y)/2
+                        (otherPlayer.physics.y + player.physics.y)/2,
+                        15
                     ]);
+
+                     // On Player death
+                    if(otherPlayer.health <= 0){
+                        effects.push([
+                            "kill",
+                            otherPlayer.physics.x,
+                            otherPlayer.physics.y,
+                            otherPlayer.color,
+                            player.physics.r
+                        ]);
+                        otherPlayer.health = 3;
+                        otherPlayer.physics = {
+                            x: gameMap.spawnPoint[0],
+                            y: gameMap.spawnPoint[1],
+                            r: 0,
+                            vx: 0,
+                            vy: 0,
+                            vr: 0,
+                            action: 0
+                        }
+                    }
                     
                     pvp = true;
                 }
@@ -148,8 +156,10 @@ let Physics = class {
 
             // Add slap effect
             effects.push([
+                "impact",
                 player.physics.x + dx * 15,
-                player.physics.y + dy * 15
+                player.physics.y + dy * 15,
+                15
             ]);
         }
     }

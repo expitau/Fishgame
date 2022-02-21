@@ -145,4 +145,17 @@ let Graphics = class{
     displayIconSprite(x, y, icon, state){
         image(this.iconSheet, align(x), align(y), gameMap.pixelSize * 7, gameMap.pixelSize * 7, icon * 8, state * 8, 7, 7);
     }
+
+    // Add paint to background on fish death [world coordinates, hue, radians]
+    addDeathEffect(x, y, hue, r){
+        this.background.loadPixels();
+        this.fishSheets[hue].loadPixels();
+        let fishColor = this.fishSheets[hue].get(2, 5);
+        for(let i = 0; i < 25; i++){
+            let angle = random(r - PI/10, r + PI/10) + PI;
+            let distance = random(0, 15);
+            this.background.set(floor(x/gameMap.pixelSize + sin(angle) * distance + random(-3, 3)), floor(y/gameMap.pixelSize + cos(angle) * distance + random(-3, 3)), fishColor);
+        }
+        this.background.updatePixels();
+    }
 }
