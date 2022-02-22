@@ -31,6 +31,7 @@ let Input = class{
         if(mouseIsPressed){
             cursorData.x = 0;
             cursorData.y = 0;
+            
             if(!(isMobile())){
                 document.body.requestPointerLock();
             }
@@ -85,6 +86,10 @@ function isMobile(){
 function mousePressed() {
     mouseIsPressed = !mouseIsHeld;
     mouseIsHeld = true;
+}
+
+function doubleClicked() {
+    toggleFullScreen();
 }
 
 function mouseReleased(){

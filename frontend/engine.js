@@ -1,4 +1,5 @@
-const SERVER_IP = "192.168.86.20:3000";
+var currentUrl = window.location.href;
+const SERVER_IP = currentUrl.replace("8080", "3000");
 const socket = io(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"));
 //p5.disableFriendlyErrors = true;
 
@@ -37,6 +38,7 @@ var cnv;
 function setup() {
     // Create canvas
     cnv = createCanvas(0, 0);
+    
     noSmooth();
     pixelDensity(1);
 
@@ -65,6 +67,7 @@ function windowResized() {
         cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
     }
 }
+
 // On client update
 function ENGINE_DoFrameTick() {
     // Wait for program and server flags
