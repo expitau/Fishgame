@@ -41,10 +41,11 @@ io.on("connection", (socket) => {
     });
 
     // Time sync
-    socket.on('timeSync', () => {
-        io.emit("timeSync", Date.now());
+    socket.on('timeSync', (callback) => {
+        let currentTime = Date.now();
+        callback({time: currentTime});
     });
-
+      
     // Debug test
     socket.on('test', () => {
         console.log(socket.id + " sent a test message");

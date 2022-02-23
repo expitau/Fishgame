@@ -1,7 +1,6 @@
 let currentUrl = window.location.href;
 const SERVER_IP = currentUrl.replace("8080", "3000");
 const socket = io(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"));
-let timeSyncRequest, timeOffset;
 //p5.disableFriendlyErrors = true;
 
 /** Socket Connection **/
@@ -14,10 +13,6 @@ socket.on('connect', () => {
 /* On connection initialized */
 let serverConnectionInitialized = false;
 socket.on('init', (res) => {
-    // start server and client time sync
-    timeSyncRequest = Date.now();
-    socket.emit("timeSync", timeSyncRequest);
-
     // set game data
     players = res.players;
     gameMap = new Map(res.gameMap);
@@ -26,10 +21,16 @@ socket.on('init', (res) => {
     serverConnectionInitialized = true;
 })
 
-/* On Time Sync*/
-socket.on('timeSync', (res) => {
-    timeOffset = ((res - timeSyncRequest) + (Date.now() - res)) / 2;
-})
+/* Server-client time sync : CURRENTLY ONLY USED AS CONSOLE COMMAND, WILL BE RUN AUTOMATICALLY WHEN USER JOINS A LOBBY */
+let timeOffset = 0;
+function DEBUG_timeSync() {
+    let timeSyncRequest = Date.now();
+    socket.emit("timeSync", (res) => {
+        timeOffset = ((res.time - timeSyncRequest) + (Date.now() - res.time)) / 2;
+        console.log("Time was dsynced by " + timeOffset + "ms");
+    });
+}
+
 
 /* On server update */
 let tickBuffer = { doTickBuffer: false }
