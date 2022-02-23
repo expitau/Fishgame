@@ -114,7 +114,7 @@ let Physics = class {
                      // On Player death
                     if(otherPlayer.health <= 0){
                         effects.push([
-                            "kill",
+                            "splat",
                             otherPlayer.physics.x,
                             otherPlayer.physics.y,
                             otherPlayer.color,
@@ -131,6 +131,17 @@ let Physics = class {
                             vr: 0,
                             action: 0
                         }
+                    }else{
+                        /* Maybe too much
+                        effects.push([
+                            "splat",
+                            otherPlayer.physics.x,
+                            otherPlayer.physics.y,
+                            otherPlayer.color,
+                            player.physics.r,
+                            2
+                        ]);
+                        */
                     }
                     
                     pvp = true;

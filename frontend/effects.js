@@ -19,7 +19,7 @@ let Effects = class{
                         i--;
                     }
                 break;
-                case "kill": //[player id, radians, time]
+                case "splat": //[player id, radians, time]
                     graphics.addDeathEffect(this.effectList[i][1], this.effectList[i][2], this.effectList[i][3], this.effectList[i][4]);
                     // handle update
                     this.effectList[i][5] --;
@@ -47,8 +47,8 @@ let Effects = class{
         // screenshake
         if(this.screenShakeTime > 0){
             this.screenShake = [
-                ((Math.random() > 0.5) ? -1 : 1) * (gameMap.tileSize/8),
-                ((Math.random() > 0.5) ? -1 : 1) * (gameMap.tileSize/8)
+                ((Math.random() > 0.5) ? -1 : 1) * (gameMap.pixelSize),
+                ((Math.random() > 0.5) ? -1 : 1) * (gameMap.pixelSize)
             ];
         }else{
             this.screenShake = [0, 0];

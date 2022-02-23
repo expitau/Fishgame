@@ -23,14 +23,13 @@ socket.on('init', (res) => {
 
 /* Server-client time sync : CURRENTLY ONLY USED AS CONSOLE COMMAND, WILL BE RUN AUTOMATICALLY WHEN USER JOINS A LOBBY */
 let timeOffset = 0;
-function DEBUG_timeSync() {
+function syncTime() {
     let timeSyncRequest = Date.now();
     socket.emit("timeSync", (res) => {
         timeOffset = ((res.time - timeSyncRequest) + (Date.now() - res.time)) / 2;
         console.log("Time was dsynced by " + timeOffset + "ms");
     });
 }
-
 
 /* On server update */
 let tickBuffer = { doTickBuffer: false }
@@ -88,7 +87,7 @@ function ENGINE_DoFrameTick() {
         // Create Frame (was encapulated, but moved for performance [firebug screenshot before: https://i.gyazo.com/efc59d13b2d4fb7700b13aebe5a41698.png])
         background("#222222");
         push();
-        translate(150, 150);
+        translate(150 + effects.screenShake[0], 150  + effects.screenShake[1]);
         scale(frame.changeRatio);
 
         // Render game
@@ -126,5 +125,21 @@ function ENGINE_DoPhysicsTick() {
         deltaTime -= 1;
         OnTick();
         lastUpdate = (Date.now() + timeOffset)
+    }
+}
+
+// Toggle fullscreen mode
+function toggleFullScreen() {
+    var doc = window.document;
+    var docEl = doc.documentElement;
+
+    var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+    var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+    if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        requestFullScreen.call(docEl);
+    }
+    else {
+        cancelFullScreen.call(doc);
     }
 }
