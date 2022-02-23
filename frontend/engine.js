@@ -1,24 +1,34 @@
-var currentUrl = window.location.href;
+let currentUrl = window.location.href;
 const SERVER_IP = currentUrl.replace("8080", "3000");
 const socket = io(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"));
+let timeSyncRequest, timeOffset;
 //p5.disableFriendlyErrors = true;
 
 /** Socket Connection **/
 socket.on('connect', () => {
     console.log("You have connected as " + socket.id)
     id = socket.id;
-    window.requestAnimationFrame(ENGINE_DoFrameTick)
+    window.requestAnimationFrame(ENGINE_DoFrameTick);
 })
 
 /* On connection initialized */
 let serverConnectionInitialized = false;
 socket.on('init', (res) => {
+    // start server and client time sync
+    timeSyncRequest = Date.now();
+    socket.emit("timeSync", timeSyncRequest);
+
     // set game data
     players = res.players;
     gameMap = new Map(res.gameMap);
 
     // set server flag ready
     serverConnectionInitialized = true;
+})
+
+/* On Time Sync*/
+socket.on('timeSync', (res) => {
+    timeOffset = ((res - timeSyncRequest) + (Date.now() - res)) / 2;
 })
 
 /* On server update */
@@ -48,8 +58,6 @@ function setup() {
     // resize
     resizeCanvas(frame.screenWidth + 300, frame.screenHeight + 300);
     cnv.style('display', 'block');
-    $("#defaultCanvas0").css({ 'width': (frame.screenWidth + 300 + "px") });
-    $("#defaultCanvas0").css({ 'height': (frame.screenHeight + 300 + "px") });
     cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
 
     // Set program flag ready
@@ -62,8 +70,6 @@ function windowResized() {
         frame.calculateDimensions();
         resizeCanvas(frame.screenWidth + 300, frame.screenHeight + 300);
         cnv.style('display', 'block');
-        $("#defaultCanvas0").css({ 'width': (frame.screenWidth + 300 + "px") });
-        $("#defaultCanvas0").css({ 'height': (frame.screenHeight + 300 + "px") });
         cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
     }
 }
@@ -114,10 +120,10 @@ function ENGINE_DoPhysicsTick() {
     }
 
     // Run physics ticks on client as necessary
-    deltaTime = Math.round(Date.now() / 16) - Math.round(lastUpdate / 16);
+    deltaTime = Math.round((Date.now() + timeOffset) / 16) - Math.round(lastUpdate / 16);
     while (deltaTime > 0) {
         deltaTime -= 1;
         OnTick();
-        lastUpdate = Date.now()
+        lastUpdate = (Date.now() + timeOffset)
     }
 }

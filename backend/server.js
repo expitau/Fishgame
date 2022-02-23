@@ -40,6 +40,11 @@ io.on("connection", (socket) => {
         delete players[socket.id];
     });
 
+    // Time sync
+    socket.on('timeSync', () => {
+        io.emit("timeSync", Date.now());
+    });
+
     // Debug test
     socket.on('test', () => {
         console.log(socket.id + " sent a test message");
