@@ -19,6 +19,7 @@ socket.on('init', (res) => {
 
     // set server flag ready
     serverConnectionInitialized = true;
+    syncTime()
 })
 
 /* Server-client time sync : CURRENTLY ONLY USED AS CONSOLE COMMAND, WILL BE RUN AUTOMATICALLY WHEN USER JOINS A LOBBY */
@@ -26,7 +27,7 @@ let timeOffset = 0;
 function syncTime() {
     let timeSyncRequest = Date.now();
     socket.emit("timeSync", (res) => {
-        timeOffset = ((res.time - timeSyncRequest) + (Date.now() - res.time)) / 2;
+        timeOffset = ((res.time - timeSyncRequest) - (Date.now() - res.time)) / 2;
         console.log("Time was dsynced by " + timeOffset + "ms");
     });
 }
@@ -116,16 +117,19 @@ function ENGINE_DoPhysicsTick() {
         players = tickBuffer.res.players
 
         tickBuffer.doTickBuffer = false;
-        lastUpdate = tickBuffer.res.lastUpdate;
+        console.log(lastUpdate - tickBuffer.res.lastUpdate)
+        lastUpdate = tickBuffer.res.lastUpdate - timeOffset;
     }
 
     // Run physics ticks on client as necessary
-    deltaTime = Math.round((Date.now() + timeOffset) / 16) - Math.round(lastUpdate / 16);
+    deltaTime = (Math.round((Date.now() - lastUpdate) / 16));
+    // deltaTime = 1
+    // console.log(deltaTime)
     while (deltaTime > 0) {
         deltaTime -= 1;
         OnTick();
-        lastUpdate = (Date.now() + timeOffset)
     }
+    lastUpdate = (Date.now())
 }
 
 // Toggle fullscreen mode
@@ -143,3 +147,4 @@ function toggleFullScreen() {
         cancelFullScreen.call(doc);
     }
 }
+
