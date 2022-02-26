@@ -132,7 +132,6 @@ let Physics = class {
                             action: 0
                         }
                     }else{
-                        /* Maybe too much
                         effects.push([
                             "splat",
                             otherPlayer.physics.x,
@@ -141,7 +140,6 @@ let Physics = class {
                             player.physics.r,
                             2
                         ]);
-                        */
                     }
                     
                     pvp = true;
