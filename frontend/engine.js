@@ -99,8 +99,11 @@ function ENGINE_DoFrameTick() {
 
         // Draw FPS (rounded to 2 decimal places) at the top right of the screen
         let fps = frameRate();
-        fill(255);
-        text("FPS: " + fps.toFixed(2), 0, -10);
+        if(fps < 45){
+            fill(255, 0, 0);
+            textSize(20);
+            text("FPS DROP: " + fps.toFixed(2), 4, 19);
+        }
 
         // Reset matrix
         pop();
