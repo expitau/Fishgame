@@ -151,10 +151,13 @@ let Graphics = class{
         this.background.loadPixels();
         this.fishSheets[hue].loadPixels();
         let fishColor = this.fishSheets[hue].get(2, 5);
+        let angle, distance, xPos, yPos;
         for(let i = 0; i < 25; i++){
-            let angle = random(r - PI/10, r + PI/10) + PI;
-            let distance = random(0, 15);
-            this.background.set(Math.floor(x/6.25 + Math.sin(angle) * distance + random(-3, 3)), Math.floor(y/6.25 + Math.cos(angle) * distance + random(-3, 3)), fishColor);
+            angle = random(r - PI/10, r + PI/10) + PI;
+            distance = random(0, 15);
+            xPos = Math.floor(x/6.25 + Math.sin(angle) * distance + random(-3, 3));
+            yPos = Math.floor(y/6.25 + Math.cos(angle) * distance + random(-3, 3));
+            this.background.set(constrain(xPos, 0, 127), yPos, fishColor);
         }
         this.background.updatePixels();
     }
