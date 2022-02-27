@@ -22,13 +22,13 @@ socket.on('init', (res) => {
     syncTime()
 })
 
-/* Server-client time sync : CURRENTLY ONLY USED AS CONSOLE COMMAND, WILL BE RUN AUTOMATICALLY WHEN USER JOINS A LOBBY */
+/* Server-client time sync*/
 let timeOffset = 0;
 function syncTime() {
     let timeSyncRequest = Date.now();
     socket.emit("timeSync", (res) => {
         timeOffset = ((res.time - timeSyncRequest) - (Date.now() - res.time)) / 2;
-        console.log("Time was dsynced by " + timeOffset + "ms");
+        console.log("Time was desynced by " + timeOffset + "ms");
     });
 }
 
@@ -86,10 +86,13 @@ function ENGINE_DoFrameTick() {
         ENGINE_DoPhysicsTick(players);
 
         // Create Frame (was encapulated, but moved for performance [firebug screenshot before: https://i.gyazo.com/efc59d13b2d4fb7700b13aebe5a41698.png])
-        background("#222222");
+        background("#dbba67");
         push();
-        translate(150 + effects.screenShake[0], 150  + effects.screenShake[1]);
+        translate(150 + effects.screenShake[0] * frame.changeRatio, 150  + effects.screenShake[1] * frame.changeRatio);
         scale(frame.changeRatio);
+        fill("#b09554");
+        noStroke();
+        rect(-gameMap.pixelSize, -gameMap.pixelSize, frame.width + gameMap.pixelSize * 2, frame.height + gameMap.pixelSize * 2);
 
         // Render game
         OnRender();
@@ -117,14 +120,11 @@ function ENGINE_DoPhysicsTick() {
         players = tickBuffer.res.players
 
         tickBuffer.doTickBuffer = false;
-        console.log(lastUpdate - tickBuffer.res.lastUpdate)
         lastUpdate = tickBuffer.res.lastUpdate - timeOffset;
     }
 
     // Run physics ticks on client as necessary
     deltaTime = (Math.round((Date.now() - lastUpdate) / 16));
-    // deltaTime = 1
-    // console.log(deltaTime)
     while (deltaTime > 0) {
         deltaTime -= 1;
         OnTick();

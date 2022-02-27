@@ -36,11 +36,7 @@ function OnRender() {
     for(let i = 0; i < 3; i++){
         graphics.displayIconSprite((gameMap.width * 8 - (i + 1) * 8) * gameMap.pixelSize, gameMap.pixelSize, 0, (players[id].health > i) ? 0 : 1, 2);
     }
-
-    //for(let i = 0; i < players[id].water; i++){
-    //    graphics.displayIconSprite((1 + i * 8) * gameMap.pixelSize, gameMap.pixelSize, 1, (players[id].water > i) ? 0 : 1);
-    //}
-
+    
     // draw players
     for(const [pid, player] of Object.entries(players)){
         graphics.displayFishSprite(player);
