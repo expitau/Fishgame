@@ -87,7 +87,7 @@ let Physics = class {
         for(const [opid, otherPlayer] of Object.entries(players)){
             if(opid !== player.id){
                 if(((player.physics.x + dx * 60 - otherPlayer.physics.x)**2 + (player.physics.y + dy * 60 - otherPlayer.physics.y)**2)**0.5 < 7 * gameMap.pixelSize ||
-                    ((player.physics.x - otherPlayer.physics.x)**2 + (player.physics.y - otherPlayer.physics.y)**2)**0.5 < 5 * gameMap.pixelSize){
+                    ((player.physics.x - otherPlayer.physics.x)**2 + (player.physics.y - otherPlayer.physics.y)**2)**0.5 < 7 * gameMap.pixelSize){
                     // Set hit power
                     let power = 7;
             

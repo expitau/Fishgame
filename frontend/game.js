@@ -53,8 +53,7 @@ function OnRender() {
             // check if you can attack another player
             for(const [opid, otherPlayer] of Object.entries(players)){
                 if(opid !== id){
-                    if(((player.physics.x + Math.sin(cursorData.r) * cursorData.display- otherPlayer.physics.x)**2 + (player.physics.y + Math.cos(cursorData.r) * cursorData.display - otherPlayer.physics.y)**2)**0.5 < 5 * gameMap.pixelSize || 
-                      ((player.physics.x - otherPlayer.physics.x)**2 + (player.physics.y - otherPlayer.physics.y)**2)**0.5 < 7 * gameMap.pixelSize){
+                    if(((player.physics.x + Math.sin(cursorData.r) * cursorData.display- otherPlayer.physics.x)**2 + (player.physics.y + Math.cos(cursorData.r) * cursorData.display - otherPlayer.physics.y)**2)**0.5 < 7 * gameMap.pixelSize || ((player.physics.x - otherPlayer.physics.x)**2 + (player.physics.y - otherPlayer.physics.y)**2)**0.5 < 7 * gameMap.pixelSize){
                         pvp = true;
                     }
                 }

@@ -2,6 +2,7 @@ let currentUrl = window.location.href;
 const SERVER_IP = currentUrl.replace("8080", "3000");
 const socket = io(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"));
 //p5.disableFriendlyErrors = true;
+let debugMode = false;
 
 /** Socket Connection **/
 socket.on('connect', () => {
@@ -19,16 +20,30 @@ socket.on('init', (res) => {
 
     // set server flag ready
     serverConnectionInitialized = true;
-    syncTime()
 })
 
 /* Server-client time sync*/
 let timeOffset = 0;
+let timeSamples = [];
 function syncTime() {
     let timeSyncRequest = Date.now();
     socket.emit("timeSync", (res) => {
-        timeOffset = ((res.time - timeSyncRequest) - (Date.now() - res.time)) / 2;
-        console.log("Time was desynced by " + timeOffset + "ms");
+        // get current time offset
+        timeSamples.push((res.time - timeSyncRequest) - (Date.now() - res.time)) / 2;
+
+        // calculate average time offset
+        timeOffset = 0;
+        for(let i = 0; i < timeSamples.length; i++){
+            timeOffset += timeSamples[i];
+        }
+        timeOffset /= timeSamples.length;
+
+        // TODO: create function to find outlining datasamples and eliminate them from the average
+
+        // print results
+        if(debugMode){
+            console.log("Time resynced by " + timeOffset + "ms");
+        }
     });
 }
 
@@ -98,13 +113,15 @@ function ENGINE_DoFrameTick() {
         OnRender();
 
         // Draw FPS (rounded to 2 decimal places) at the top right of the screen
-        let fps = frameRate();
-        if(fps < 45){
-            fill(255, 0, 0);
-            textSize(20);
-            text("FPS DROP: " + fps.toFixed(2), 4, 19);
+        if(debugMode){
+            let fps = frameRate();
+            if(fps < 45){
+                fill(255, 0, 0);
+                textSize(20);
+                text("FPS DROP: " + fps.toFixed(2), 4, 19);
+            }
         }
-
+        
         // Reset matrix
         pop();
 

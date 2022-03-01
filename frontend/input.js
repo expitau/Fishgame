@@ -38,6 +38,7 @@ let Input = class{
         }
 
         if(mouseIsReleased && cursorData.x != 0 && cursorData.y != 0){
+            syncTime();
             socket.emit("clientUpdate", {
                 cursorR: cursorData.r
             });
