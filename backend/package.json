@@ -2,13 +2,13 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
   "scripts": {
-    "start": "nodemon"
+    "start": "nodemon ./server.js 192.168.137.1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cli-select": "^1.1.2",
     "firebase": "^9.1.0",
     "firebase-tools": "^9.19.0",
     "socket.io": "^4.2.0"

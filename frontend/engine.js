@@ -1,5 +1,3 @@
-let currentUrl = window.location.href;
-const SERVER_IP = currentUrl.match(/(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/)[0] || (currentUrl.includes("localhost") ? '127.0.0.1' : '');
 let socket;
 //p5.disableFriendlyErrors = true;
 let debugMode = false;
@@ -9,7 +7,8 @@ let tickBuffer = { doTickBuffer: false }
 
 let roomCode = function (){
     // Characters that are allowed to exist in a room code
-    let permittedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "1234567890"// + "abcdefghijklmnopqrstuvwxyz"
+    // let permittedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "1234567890"// + "abcdefghijklmnopqrstuvwxyz"
+    let permittedChars = "ABCDEFGHJKLMNPQRTUVWXYZ" + "2346789"
 
     function fromIP(ip){
         let bitSequence = ip.split(".").reduce((p,c) => p * 256 + parseInt(c),0)
@@ -36,10 +35,19 @@ let roomCode = function (){
 
 
 // Change me!
-let code = roomCode.fromIP(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"))
+let code;
+let params = new URLSearchParams(window.location.search)
+if (params.get("room")){
+    code = params.get("room")
+} else {
+    code = prompt("Enter room code", "").toUpperCase()
+    params.set("room", code)
+    window.location.href = `?${params}`
+}
 startGame(roomCode.toIP(code))
 
 function startGame(ip){
+    console.log(ip)
     socket = io(`${ip}:3000`);
     /** Socket Connection **/
     socket.on('connect', () => {
