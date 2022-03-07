@@ -1,26 +1,72 @@
 let currentUrl = window.location.href;
-const SERVER_IP = currentUrl.replace("8080", "3000");
-const socket = io(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"));
+const SERVER_IP = currentUrl.match(/(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/)[0] || (currentUrl.includes("localhost") ? '127.0.0.1' : '');
+let socket;
 //p5.disableFriendlyErrors = true;
 let debugMode = false;
-
-/** Socket Connection **/
-socket.on('connect', () => {
-    console.log("You have connected as " + socket.id)
-    id = socket.id;
-    window.requestAnimationFrame(ENGINE_DoFrameTick);
-})
-
-/* On connection initialized */
 let serverConnectionInitialized = false;
-socket.on('init', (res) => {
-    // set game data
-    players = res.players;
-    gameMap = new Map(res.gameMap);
 
-    // set server flag ready
-    serverConnectionInitialized = true;
-})
+let tickBuffer = { doTickBuffer: false }
+
+let roomCode = function (){
+    // Characters that are allowed to exist in a room code
+    let permittedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "1234567890"// + "abcdefghijklmnopqrstuvwxyz"
+
+    function fromIP(ip){
+        let bitSequence = ip.split(".").reduce((p,c) => p * 256 + parseInt(c),0)
+        let out = []
+        while (bitSequence > 0){
+            let x = bitSequence % permittedChars.length
+            bitSequence = (bitSequence - x) / permittedChars.length
+            out = out.concat(permittedChars[x])
+        }
+        return out.reverse().join("")
+    }
+    function toIP(code){
+        let bitSequence = code.split('').reduce((p,c) => p * permittedChars.length + permittedChars.indexOf(c), 0)
+        let out = []
+        while (bitSequence > 0){
+            let x = bitSequence % 256
+            bitSequence = (bitSequence - x) / 256
+            out = out.concat([x])
+        }
+        return out.reverse().join(".")
+    }
+    return {fromIP, toIP}
+}()
+
+
+// Change me!
+let code = roomCode.fromIP(SERVER_IP || prompt("Enter server IP:Port", "localhost:3000"))
+startGame(roomCode.toIP(code))
+
+function startGame(ip){
+    socket = io(`${ip}:3000`);
+    /** Socket Connection **/
+    socket.on('connect', () => {
+        console.log("You have connected as " + socket.id)
+        id = socket.id;
+        window.requestAnimationFrame(ENGINE_DoFrameTick);
+    })
+    
+    /* On connection initialized */
+    socket.on('init', (res) => {
+        // set game data
+        players = res.players;
+        gameMap = new Map(res.gameMap);
+        
+        // set server flag ready
+        serverConnectionInitialized = true;
+    })
+    /* On server update */
+    socket.on('serverUpdate', (res) => {
+        // Update to tick buffer
+        tickBuffer.res = res;
+        if(programReady && serverConnectionInitialized){
+            effects.add(tickBuffer.res.effects);
+        }
+        tickBuffer.doTickBuffer = true;
+    })
+}
 
 /* Server-client time sync*/
 let timeOffset = 0;
@@ -47,16 +93,6 @@ function syncTime() {
     });
 }
 
-/* On server update */
-let tickBuffer = { doTickBuffer: false }
-socket.on('serverUpdate', (res) => {
-    // Update to tick buffer
-    tickBuffer.res = res;
-    if(programReady && serverConnectionInitialized){
-        effects.add(tickBuffer.res.effects);
-    }
-    tickBuffer.doTickBuffer = true;
-})
 
 // On p5.js ready
 let programReady = false;
