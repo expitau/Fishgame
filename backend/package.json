@@ -9,8 +9,6 @@
   "license": "ISC",
   "dependencies": {
     "cli-select": "^1.1.2",
-    "firebase": "^9.1.0",
-    "firebase-tools": "^9.19.0",
     "socket.io": "^4.2.0"
   },
   "devDependencies": {
