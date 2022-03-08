@@ -1,7 +1,7 @@
 // Require global classes
-let Player = require('./DATATYPES/DEF_Player')
-let Map = require('./DATATYPES/DEF_Map')
-let Physics = require('./DATATYPES/DEF_Physics')
+let Player = require('./DATATYPES/player')
+let Map = require('./DATATYPES/map')
+let Physics = require('./DATATYPES/physics')
 
 // Require io
 const io = require("socket.io")(3000, {

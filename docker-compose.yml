@@ -8,7 +8,6 @@ services:
       - 8080:80
     volumes:
       - ./frontend:/usr/share/nginx/html
-      - ./backend/datatypes:/usr/share/nginx/html/DATATYPES
   backend:
     container_name: ws_backend
     build: ./backend
