@@ -48,7 +48,7 @@ startGame(roomCode.toIP(code))
 
 function startGame(ip){
     console.log(ip)
-    socket = io(`${ip}:3000`);
+    socket = io(`http://${ip}:3000`);
     /** Socket Connection **/
     socket.on('connect', () => {
         console.log("You have connected as " + socket.id)
