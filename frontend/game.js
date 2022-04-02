@@ -1,11 +1,38 @@
 // Create global variables
 let id, players = {};
-let gameMap, frame, graphics, input;
+let gameMap, graphics, input;
 
+function getFrame(width = 800, height = 600, marginRatio = 1/20){
+    let frame = {
+        width: width,
+        height: height,
+        marginRatio: marginRatio,
+        aspectRatio: height / width,
+        changeRatio: 0,
+    }
+    if(frame.aspectRatio > windowHeight / windowWidth){
+        frame.margin = windowHeight * frame.marginRatio;
+        frame.screenHeight = windowHeight - frame.margin * 2;
+        frame.screenWidth = frame.screenHeight / frame.aspectRatio;
+    }else{
+        frame.margin = windowWidth * frame.marginRatio;
+        frame.screenWidth = windowWidth - frame.margin * 2;
+        frame.screenHeight = frame.screenWidth * frame.aspectRatio;
+    }
+    frame.originX = (windowWidth - frame.screenWidth) / 2;
+    frame.originY = (windowHeight - frame.screenHeight) / 2;
+    frame.changeRatio = frame.screenWidth / frame.width;
+    
+    return frame
+}
 // On initialize
 function OnInit() {
     // effects = new Effects();
-    frame = new Frame();
+    // frame = new Frame();
+    frame = getFrame()
+
+
+    
     // graphics = new Graphics();
     input = new Input();
 }
@@ -150,15 +177,14 @@ function OnRender(effects, screenShake) {
                     tempFishSheet.updatePixels();
                     fishSheets[player.color] = tempFishSheet;
                 }
-
-
             }
         }
     }
-    // draw background
+
+    // Draw background
     image(graphics.background, 0, 0, frame.width, frame.height);
 
-    // draw player shadows
+    // Draw player shadows
     for (const [pid, player] of Object.entries(players)) {
         {
             // Calculate fish pos/rot
@@ -177,29 +203,22 @@ function OnRender(effects, screenShake) {
     }
 
     // Draw level
-    {
-        // Make sure sprites are loaded
-        if (!graphics.ready) {
-            return;
-        }
+    image(levelImage, 0, 0, gameMap.width * 50, gameMap.height * 50);
 
-        image(levelImage, 0, 0, gameMap.width * 50, gameMap.height * 50);
-    }
-
-    // icons
+    // Health bar
     for (let i = 0; i < 3; i++) {
         image(graphics.iconSheet, align((gameMap.width * 8 - (i + 1) * 8) * gameMap.pixelSize), align(gameMap.pixelSize), 6.25 * 7, 6.25 * 7, 0 * 8, ((players[id].health > i) ? 0 : 1) * 8, 7, 7);
-        // graphics.displayIconSprite(, , 0, , 2);
     }
 
+    // Display fish
     for (const [pid, player] of Object.entries(players)) {
         // Calculate fish pos/rot
         let offset = 5 * (6.25);
 
         let fishR = (Math.floor(((2 * player.physics.r) / Math.PI) + 1 / 4) * (Math.PI / 2)) % (Math.PI * 2);
         let fishSpriteR = ((player.physics.r / Math.PI + 1 / 8) % (1 / 2)) > (1 / 4);
-        
-        // Display fish
+
+        // Draw fish
         push();
         translate(align(player.physics.x), align(player.physics.y));
         rotate(fishR);
@@ -208,7 +227,7 @@ function OnRender(effects, screenShake) {
     }
 
 
-    // draw cursor
+    // Draw cursor
     {
         if (mouseIsHeld) {
             let player = players[id];
@@ -228,12 +247,11 @@ function OnRender(effects, screenShake) {
 
 
                 image(graphics.cursorSheet, align(cursorX) - 6.25 * 2, align(cursorY) - 6.25 * 2, 6.25 * 5, 6.25 * 5, (pvp ? 0 : !gameMap.getCollisionArea(cursorX, cursorY)) * 6, pvp * 6, 5, 5);
-                // graphics.displayCursorSprite(cursorX, cursorY, pvp ? 0 : !gameMap.getCollisionArea(cursorX, cursorY), pvp);
             }
         }
     }
 
-    // draw effects
+    // Draw effects
     {
         for (let i = 0; i < effects.length; i++) {
             switch (effects[i][0]) {

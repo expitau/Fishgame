@@ -6,6 +6,7 @@ let serverConnectionInitialized = false;
 let tickBuffer = { doTickBuffer: false }
 let effects = []
 let screenShakeTime = 0
+let frame;
 
 let roomCode = function () {
     // Characters that are allowed to exist in a room code
@@ -168,6 +169,7 @@ function startGame(ip) {
 // On p5.js ready
 let programReady = false;
 var cnv;
+
 function setup() {
     // Create canvas
     cnv = createCanvas(0, 0);
@@ -183,14 +185,18 @@ function setup() {
     cnv.style('display', 'block');
     cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
 
+    
+
     // Set program flag ready
     programReady = true;
 }
 
+
+
 // On window resize
 function windowResized() {
     if (programReady && serverConnectionInitialized) {
-        frame.calculateDimensions();
+        frame = getFrame();
         resizeCanvas(frame.screenWidth + 300, frame.screenHeight + 300);
         cnv.style('display', 'block');
         cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');

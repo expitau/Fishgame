@@ -1,6 +1,6 @@
-let mouseIsPressed = false, 
-    mouseIsHeld = false;;
-    mouseIsReleased = false;
+let mouseIsPressed = false;
+let mouseIsHeld = false;
+let mouseIsReleased = false;
 
 let keys = [];
 
