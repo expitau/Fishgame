@@ -4,6 +4,8 @@ let debugMode = false;
 let serverConnectionInitialized = false;
 
 let tickBuffer = { doTickBuffer: false }
+let effects = []
+let screenShakeTime = 0
 
 let roomCode = function () {
     // Characters that are allowed to exist in a room code
@@ -74,7 +76,7 @@ function startGame(ip) {
             // Update to tick buffer
             tickBuffer.res = res;
             if (programReady && serverConnectionInitialized) {
-                effects.add(tickBuffer.res.effects);
+                tickBuffer.res.effects.forEach(x => {effects.push(x); screenShakeTime = 3})
             }
             tickBuffer.doTickBuffer = true;
         })
@@ -109,7 +111,6 @@ function startGame(ip) {
         }
     }
 
-    
     // Render loop
     function update() {
         // Wait for program and server flags
@@ -138,17 +139,8 @@ function startGame(ip) {
                 lastUpdate = Date.now()
             }
 
-            // Create Frame (was encapulated, but moved for performance [firebug screenshot before: https://i.gyazo.com/efc59d13b2d4fb7700b13aebe5a41698.png])
-            background("#dbba67");
-            push();
-            translate(150 + effects.screenShake[0] * frame.changeRatio, 150 + effects.screenShake[1] * frame.changeRatio);
-            scale(frame.changeRatio);
-            fill("#b09554");
-            noStroke();
-            rect(-gameMap.pixelSize, -gameMap.pixelSize, frame.width + gameMap.pixelSize * 2, frame.height + gameMap.pixelSize * 2);
-
             // Render game
-            OnRender();
+            OnRender(effects, screenShakeTime > 0 && screenShakeTime-- && true);
 
             // Draw FPS (rounded to 2 decimal places) at the top right of the screen
             if (debugMode) {
