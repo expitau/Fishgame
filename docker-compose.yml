@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-  frontend:
-    container_name: ws_frontend
-    image: nginx:alpine
-    ports:
-      - 8080:80
-    volumes:
-      - ./frontend:/usr/share/nginx/html
+  # frontend:
+  #   container_name: ws_frontend
+  #   image: nginx:alpine
+  #   ports:
+  #     - 8080:80
+  #   volumes:
+  #     - ./frontend:/usr/share/nginx/html
   backend:
     container_name: ws_backend
     build: ./backend
