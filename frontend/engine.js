@@ -1,12 +1,14 @@
 let socket;
 //p5.disableFriendlyErrors = true;
-let debugMode = false;
+let debugMode = true;
 let serverConnectionInitialized = false;
 
 let tickBuffer = { doTickBuffer: false }
 let effects = []
 let screenShakeTime = 0
 let frame;
+
+let timeOffset = 0;
 
 let roomCode = function () {
     // Characters that are allowed to exist in a room code
@@ -49,6 +51,7 @@ if (params.get("room")) {
 }
 
 startGame(roomCode.toIP(code))
+let lastUpdate = Date.now();
 function startGame(ip) {
 
     // Connect to server
@@ -77,37 +80,34 @@ function startGame(ip) {
             // Update to tick buffer
             tickBuffer.res = res;
             if (programReady && serverConnectionInitialized) {
-                tickBuffer.res.effects.forEach(x => {effects.push(x); screenShakeTime = 3})
+                tickBuffer.res.effects.forEach(x => { effects.push(x); screenShakeTime = 3 })
             }
             tickBuffer.doTickBuffer = true;
         })
     }
 
     // Server-client time sync
-    let timeOffset = 0;
     {
-        setInterval(syncTime, 3000)
+        setInterval(syncTime, 1000)
+        syncTime()
 
-        let timeSamples = [];
         function syncTime() {
             let timeSyncRequest = Date.now();
             socket.emit("timeSync", (res) => {
-                // get current time offset
-                timeSamples.push((res.time - timeSyncRequest) - (Date.now() - res.time)) / 2;
+                
+                // timeOffset is the time it takes for the server to send data to the client
+                let newTimeOffset = Date.now() - res.time;
 
                 // calculate average time offset
-                timeOffset = 0;
-                for (let i = 0; i < timeSamples.length; i++) {
-                    timeOffset += timeSamples[i];
+                if (!timeOffset) {
+                    timeOffset = newTimeOffset
+                } else {
+                    timeOffset /= 2;
+                    timeOffset = Math.floor(newTimeOffset / 2 + timeOffset)
                 }
-                timeOffset /= timeSamples.length;
 
-                // TODO: create function to find outlining datasamples and eliminate them from the average
-
-                // print results
-                if (debugMode) {
-                    console.log("Time resynced by " + timeOffset + "ms");
-                }
+                // Print results
+                console.log("Time resynced by " + timeOffset + "ms");
             });
         }
     }
@@ -116,10 +116,31 @@ function startGame(ip) {
     function update() {
         // Wait for program and server flags
         if (programReady && serverConnectionInitialized) {
-            // Setup game elements
-            input.update();
-            
-            let lastUpdate;
+            // Handle Input
+            {
+
+                if (keys[27] || keys[80]) {
+                    document.exitPointerLock();
+                }
+
+                if (mouseIsPressed) {
+                    cursorData.x = 0;
+                    cursorData.y = 0;
+
+                    if (!(isMobile())) {
+                        document.body.requestPointerLock();
+                    }
+                }
+
+                if (mouseIsReleased && cursorData.x != 0 && cursorData.y != 0) {
+                    socket.emit("clientUpdate", {
+                        cursorR: cursorData.r
+                    });
+                    cursorData.x = 0;
+                    cursorData.y = 0;
+                }
+
+            }
             // Update physics information
             {
                 lastUpdate ??= Date.now()
@@ -128,16 +149,16 @@ function startGame(ip) {
                     players = tickBuffer.res.players
 
                     tickBuffer.doTickBuffer = false;
-                    lastUpdate = tickBuffer.res.lastUpdate - timeOffset;
+                    lastUpdate = tickBuffer.res.lastUpdate;
                 }
 
                 // Run physics ticks on client as necessary
-                deltaTime = (Math.round((Date.now() - lastUpdate) / 16));
+                deltaTime = (Math.round((Date.now() - timeOffset - lastUpdate) / 16));
                 while (deltaTime > 0) {
                     deltaTime -= 1;
                     OnTick();
                 }
-                lastUpdate = Date.now()
+                lastUpdate = Date.now() - timeOffset
             }
 
             // Render game
@@ -157,7 +178,8 @@ function startGame(ip) {
             pop();
 
             // Cleanup game elements
-            input.reset();
+            mouseIsReleased = false;
+            mouseIsPressed = false;
         }
         // Rerun this function
         window.requestAnimationFrame(update);
@@ -185,7 +207,7 @@ function setup() {
     cnv.style('display', 'block');
     cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
 
-    
+
 
     // Set program flag ready
     programReady = true;

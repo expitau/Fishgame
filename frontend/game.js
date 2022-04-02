@@ -32,9 +32,15 @@ function OnInit() {
     frame = getFrame()
 
 
+    if(!(isMobile())){
+        document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;
+        document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
+        document.addEventListener("mousemove", OnMouseMove, false);
+    }
+
+    
     
     // graphics = new Graphics();
-    input = new Input();
 }
 
 // On game tick (game logic only)
