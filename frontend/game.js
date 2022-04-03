@@ -96,7 +96,7 @@ function OnRender(effects, screenShake) {
             rect(-gameMap.pixelSize, -gameMap.pixelSize, frame.width + gameMap.pixelSize * 2, frame.height + gameMap.pixelSize * 2);
         }
     }
-
+    
     // Compute graphics
     {
         function HSBToRGB(h, s, b) {
@@ -131,7 +131,13 @@ function OnRender(effects, screenShake) {
             for (let i = 0; i < gameMap.width; i++) {
                 for (let j = 0; j < gameMap.height; j++) {
                     // Get tile sprite
-                    let spriteSymbol = gameMap.getTile(i, j);
+                    function getTile(map, x, y){
+                        if (x >= 0 && x < map.width && y >= 0 && y < map.height) {
+                            return map.tilemap[y].charAt(x);
+                        }
+                        return "X";
+                    }
+                    let spriteSymbol = getTile(gameMap,i, j);
 
                     if (spriteSymbol === " ") {
                         continue;

@@ -80,7 +80,7 @@ function startServer(ip) {
     console.log(`Server running on ${ip}:3000`)
     players = {};
     effects = [];
-    let gameMap = new Map(0);
+    let gameMap = Map(0);
     // Socket handler
     io.on("connection", (socket) => {
         // Create new Player instance if necessary

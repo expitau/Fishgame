@@ -53,28 +53,29 @@ if (params.get("room")) {
 startGame(roomCode.toIP(code))
 let lastUpdate = Date.now();
 function startGame(ip) {
-
+    
     // Connect to server
     {
         socket = io(`http://${ip}:3000`);
-
+        
         /** Socket Connection **/
         socket.on('connect', () => {
             console.log("You have connected as " + socket.id)
             id = socket.id;
         })
-
+        
         /* On connection initialized */
         socket.on('init', (res) => {
             // set game data
             players = res.players;
-            gameMap = new Map(res.gameMap);
-
+            gameMap = res.gameMap;
             // set server flag ready
             serverConnectionInitialized = true;
+            
             window.requestAnimationFrame(update)
+            
         })
-
+        
         /* On server update */
         socket.on('serverUpdate', (res) => {
             // Update to tick buffer
@@ -85,19 +86,19 @@ function startGame(ip) {
             tickBuffer.doTickBuffer = true;
         })
     }
-
+    
     // Server-client time sync
     {
         setInterval(syncTime, 1000)
         syncTime()
-
+        
         function syncTime() {
             let timeSyncRequest = Date.now();
             socket.emit("timeSync", (res) => {
                 
                 // timeOffset is the time it takes for the server to send data to the client
                 let newTimeOffset = Date.now() - res.time;
-
+                
                 // calculate average time offset
                 if (!timeOffset) {
                     timeOffset = newTimeOffset
@@ -105,7 +106,7 @@ function startGame(ip) {
                     timeOffset /= 2;
                     timeOffset = Math.floor(newTimeOffset / 2 + timeOffset)
                 }
-
+                
                 // Print results
                 // console.log("Time resynced by " + timeOffset + "ms");
             });
@@ -118,15 +119,15 @@ function startGame(ip) {
         if (programReady && serverConnectionInitialized) {
             // Handle Input
             {
-
+                
                 if (keys[27] || keys[80]) {
                     document.exitPointerLock();
                 }
-
+                
                 if (mouseIsPressed) {
                     cursorData.x = 0;
                     cursorData.y = 0;
-
+                    
                     if (!(isMobile())) {
                         document.body.requestPointerLock();
                     }
@@ -139,7 +140,7 @@ function startGame(ip) {
                     cursorData.x = 0;
                     cursorData.y = 0;
                 }
-
+                
             }
             // Update physics information
             {
@@ -147,7 +148,7 @@ function startGame(ip) {
                 // Read new tick buffer information
                 if (tickBuffer.doTickBuffer) {
                     players = tickBuffer.res.players
-
+                    
                     tickBuffer.doTickBuffer = false;
                     lastUpdate = tickBuffer.res.lastUpdate;
                 }
@@ -160,10 +161,10 @@ function startGame(ip) {
                 }
                 lastUpdate = Date.now() - timeOffset
             }
-
+            
             // Render game
             OnRender(effects, screenShakeTime > 0 && screenShakeTime-- && true);
-
+            
             // Draw FPS (rounded to 2 decimal places) at the top right of the screen
             if (debugMode) {
                 let fps = frameRate();

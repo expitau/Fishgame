@@ -1,13 +1,10 @@
-let Map = class {
-    constructor(mapId) {
-        if (typeof mapId === 'object'){
-            Object.assign(this, mapId)
-            return;
-        }
+module.exports = [Map, getCollisionArea, getCurrentTile]
 
-        this.currentMap = mapId;
-        this.colliders = "#$X";
-        this.tilemap = [
+function Map(mapId) {
+    let map = {
+        currentMap: mapId,
+        colliders: "#$X",
+        tilemap:
             [
                 "                ",
                 "      0S        ",
@@ -22,98 +19,70 @@ let Map = class {
                 "##  []    [] c  ",
                 "################"
             ],
-            [
-                "                ",
-                "                ",
-                "                ",
-                "                ",
-                "     ######     ",
-                "                ",
-                "  S             ",
-                " ## ## ## ## ## ",
-                "                ",
-                "                ",
-                "                ",
-                "MMMMMMMMMMMMMMMM"
-            ]
-        ][mapId]; 
-
-        this.width = this.tilemap[0].length;
-        this.height = this.tilemap.length;
-        this.pixelSize = 6.25;
-        this.tileSize = this.pixelSize * 8;
-        this.spawnPoint = [100, 100];
-        this.levelGen();
+        spawnPoint: [100, 100],
     }
+    map.width = map.tilemap[0].length
+    map.height = map.tilemap.length
+    map.pixelSize = 6.25
+    map.tileSize = map.pixelSize * 8
 
-    // Generate the level tilemap
-    levelGen(){
-        for(let i = 0; i < this.width; i++){
-            for(let j = 0; j < this.height; j++){
-                // Set spawn point
-                if (this.getTile(i, j) === "S") {
-                    this.spawnPoint = [(i + 0.5) * this.tileSize, (j + 0.5) * this.tileSize];
-                }
-
-                // Set wall tiles
-                if (this.getTile(i, j) === "#" && (this.getTile(i, j - 1) === "#" || this.getTile(i, j - 1) === "$")) {
-                    this.setTile(i, j, "$");
-                }
-
-                if (this.getTile(i, j) === " ") {
-                    // Set flooring
-                    if(this.getTile(i, j + 1) === "#"){
-                        this.setTile(i, j, "_");
-                    }
-
-                    // Set desk tops
-                    if(this.getTile(i, j + 1) === "[" || this.getTile(i, j + 1) === "]"){
-                        this.setTile(i, j, 0);
-                    }
-                }
-            }
-        }
-    }
 
     // Read tile on tilemap [tile coordinates] > [tile symbol]
-    getTile (x, y){
-        if(x >= 0 && x < this.width && y >= 0 && y < this.height){
-            return this.tilemap[y].charAt(x);
+    function getTile(x, y) {
+        if (x >= 0 && x < map.width && y >= 0 && y < map.height) {
+            return map.tilemap[y].charAt(x);
         }
         return "X";
     }
 
     // Change tile on tilemap [tile coordinates]
-    setTile (x, y, newTile){
-        this.tilemap[y] = this.tilemap[y].substring(0, x) + newTile + this.tilemap[y].substring(x + 1);
+    function setTile(x, y, newTile) {
+        map.tilemap[y] = map.tilemap[y].substring(0, x) + newTile + map.tilemap[y].substring(x + 1);
     }
 
-    // Read tile on tilemap [world coordinates] > [tile symbol]
-    getCurrentTile (x, y){
-        if (0 < x && x < this.width * this.tileSize && 0 < y && y < this.height * this.tileSize){
-            return this.tilemap[Math.floor(y / this.tileSize)].charAt(Math.floor(x / this.tileSize));
+    for (let i = 0; i < map.width; i++) {
+        for (let j = 0; j < map.height; j++) {
+            // Set spawn point
+            if (getTile(i, j) === "S") {
+                map.spawnPoint = [(i + 0.5) * map.tileSize, (j + 0.5) * map.tileSize];
+            }
+
+            // Set wall tiles
+            if (getTile(i, j) === "#" && (getTile(i, j - 1) === "#" || getTile(i, j - 1) === "$")) {
+                setTile(i, j, "$");
+            }
+
+            if (getTile(i, j) === " ") {
+                // Set flooring
+                if (getTile(i, j + 1) === "#") {
+                    setTile(i, j, "_");
+                }
+
+                // Set desk tops
+                if (getTile(i, j + 1) === "[" || getTile(i, j + 1) === "]") {
+                    setTile(i, j, 0);
+                }
+            }
         }
-        return "X";
     }
-
-    // Returns if a tile is a collider    
-    isCollider(tileSymbol){
-        return this.colliders.includes(tileSymbol);
+    return map;
+}
+// Read tile on tilemap [world coordinates] > [tile symbol]
+function getCurrentTile(gameMap, x, y) {
+    if (0 < x && x < gameMap.width * gameMap.tileSize && 0 < y && y < gameMap.height * gameMap.tileSize) {
+        return gameMap.tilemap[Math.floor(y / gameMap.tileSize)].charAt(Math.floor(x / gameMap.tileSize));
     }
-
+    return "X";
 }
 
 // Read tiles on tilemap in a small rectangular cluster [world coordinates] 
-function getCollisionArea(gameMap, x, y){
-    for(let i = -1; i <= 1; i ++){
-        for(let j = -1; j <= 1; j ++){
-            if(gameMap.colliders.includes(gameMap.getCurrentTile(x + i * gameMap.tileSize * 0.3, y + j * gameMap.tileSize * 0.3))){
+function getCollisionArea(gameMap, x, y) {
+    for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+            if (gameMap.colliders.includes(getCurrentTile(gameMap, x + i * gameMap.tileSize * 0.3, y + j * gameMap.tileSize * 0.3))) {
                 return true;
             }
         }
     }
     return false;
-}
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined'){
-    module.exports = [Map, getCollisionArea]
 }

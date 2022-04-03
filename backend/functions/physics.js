@@ -1,5 +1,5 @@
 module.exports = [doPhysicsTick,doPhysicsInput]
-let [_, getCollisionArea] = require('./map')
+let [_, getCollisionArea, getCurrentTile] = require('./map')
 
 // On physics tick
 function doPhysicsTick(players, gameMap) {
@@ -18,7 +18,7 @@ function doPhysicsTick(players, gameMap) {
         let newPosY = player.physics.y + player.physics.vy;
 
         //Test for x coordinate collisions
-        if (!gameMap.colliders.includes(gameMap.getCurrentTile(newPosX + ((newPosX > player.physics.x) ? 1 : -1) * gameMap.pixelSize, player.physics.y))) {
+        if (!gameMap.colliders.includes(getCurrentTile(gameMap, newPosX + ((newPosX > player.physics.x) ? 1 : -1) * gameMap.pixelSize, player.physics.y))) {
             // On no collision, update player position
             player.physics.x = newPosX;
         } else {
@@ -30,7 +30,7 @@ function doPhysicsTick(players, gameMap) {
         }
 
         //Test for y coordinate collision
-        if (!gameMap.colliders.includes(gameMap.getCurrentTile(player.physics.x, newPosY + ((newPosY > player.physics.y) ? 1 : -1) * gameMap.pixelSize))) {
+        if (!gameMap.colliders.includes(getCurrentTile(gameMap, player.physics.x, newPosY + ((newPosY > player.physics.y) ? 1 : -1) * gameMap.pixelSize))) {
             // On no collision, update player position
             player.physics.y = newPosY;
         } else {
