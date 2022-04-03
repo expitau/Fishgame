@@ -1,7 +1,7 @@
 // Require global classes
 let Player = require('./functions/player')
-let Map = require('./functions/map')
-let Physics = require('./functions/physics')
+let [Map] = require('./functions/map')
+let [doPhysicsTick,doPhysicsInput] = require('./functions/physics')
 
 // Require io
 const io = require("socket.io")(3000, {
@@ -80,12 +80,12 @@ function startServer(ip) {
     console.log(`Server running on ${ip}:3000`)
     players = {};
     effects = [];
-    gameMap = new Map(0);
+    let gameMap = new Map(0);
     // Socket handler
     io.on("connection", (socket) => {
         // Create new Player instance if necessary
         console.log(socket.id + " connected");
-        players[socket.id] ??= new Player(socket.id);
+        players[socket.id] ??= Player(socket.id, gameMap);
 
         // Send initial world data
         let initialWorldData = {
@@ -97,7 +97,7 @@ function startServer(ip) {
         // Handle client update
         socket.on('clientUpdate', (playerInput) => {
             players[socket.id].input = playerInput;
-            Physics.OnInput(players[socket.id]);
+            doPhysicsInput(players[socket.id], gameMap);
         });
 
         // Handle client disconnet
@@ -125,7 +125,7 @@ function startServer(ip) {
         deltaTime = Math.round(Date.now() / 16) - Math.round(lastUpdate / 16);
         while (deltaTime > 0) {
             deltaTime -= 1;
-            Physics.OnTick(players, gameMap);
+            doPhysicsTick(players, gameMap);
             lastUpdate = Date.now()
         }
     }, 16) // 62.5 times per second

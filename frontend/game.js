@@ -46,7 +46,7 @@ function OnInit() {
 // On game tick (game logic only)
 function OnTick() {
     // calculate physics
-    Physics.OnTick(players, gameMap);
+    doPhysicsTick(players, gameMap);
 }
 
 // On frame render (visuals only)
@@ -252,7 +252,7 @@ function OnRender(effects, screenShake) {
                 }
 
 
-                image(graphics.cursorSheet, align(cursorX) - 6.25 * 2, align(cursorY) - 6.25 * 2, 6.25 * 5, 6.25 * 5, (pvp ? 0 : !gameMap.getCollisionArea(cursorX, cursorY)) * 6, pvp * 6, 5, 5);
+                image(graphics.cursorSheet, align(cursorX) - 6.25 * 2, align(cursorY) - 6.25 * 2, 6.25 * 5, 6.25 * 5, (pvp ? 0 : !getCollisionArea(gameMap, cursorX, cursorY)) * 6, pvp * 6, 5, 5);
             }
         }
     }

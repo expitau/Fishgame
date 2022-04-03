@@ -1,6 +1,6 @@
 let socket;
 //p5.disableFriendlyErrors = true;
-let debugMode = true;
+let debugMode = false;
 let serverConnectionInitialized = false;
 
 let tickBuffer = { doTickBuffer: false }
@@ -107,7 +107,7 @@ function startGame(ip) {
                 }
 
                 // Print results
-                console.log("Time resynced by " + timeOffset + "ms");
+                // console.log("Time resynced by " + timeOffset + "ms");
             });
         }
     }

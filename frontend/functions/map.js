@@ -101,19 +101,19 @@ let Map = class {
         return this.colliders.includes(tileSymbol);
     }
 
-    // Read tiles on tilemap in a small rectangular cluster [world coordinates] 
-    getCollisionArea(x, y){
-        for(let i = -1; i <= 1; i ++){
-            for(let j = -1; j <= 1; j ++){
-                if(this.isCollider(gameMap.getCurrentTile(x + i * this.tileSize * 0.3, y + j * this.tileSize * 0.3))){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }
 
+// Read tiles on tilemap in a small rectangular cluster [world coordinates] 
+function getCollisionArea(gameMap, x, y){
+    for(let i = -1; i <= 1; i ++){
+        for(let j = -1; j <= 1; j ++){
+            if(gameMap.colliders.includes(gameMap.getCurrentTile(x + i * gameMap.tileSize * 0.3, y + j * gameMap.tileSize * 0.3))){
+                return true;
+            }
+        }
+    }
+    return false;
+}
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined'){
-    module.exports = Map
+    module.exports = [Map, getCollisionArea]
 }

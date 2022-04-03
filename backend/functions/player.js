@@ -1,9 +1,11 @@
-let Player = class {
-    constructor(id){
-        this.id = id;
-        this.color = Math.floor(Math.random() * 360);
-        this.health = 3;
-        this.physics = {
+module.exports = Player
+
+function Player (id, gameMap){
+    return {
+        id: id,
+        color: Math.floor(Math.random() * 360),
+        health: 3,
+        physics: {
             x: gameMap.spawnPoint[0],
             y: gameMap.spawnPoint[1],
             r: 0,
@@ -11,13 +13,9 @@ let Player = class {
             vy: 0,
             vr: 0,
             action: 0,
-        }
-        this.input = {
+        },
+        input: {
             cursorR: 0
-        };
-    };
-}
-
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined'){
-    module.exports = Player
+        }
+    }
 }
