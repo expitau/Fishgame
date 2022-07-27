@@ -55,13 +55,13 @@ let levelImage;
 let fishSheets = {}
 function OnRender(effects, screenShake) {
     graphics ??= {
-        tileSheet: loadImage('./sprites/tile_spritesheet.png'),
-        fishSheet: loadImage('./sprites/fish_spritesheet.png'),
-        fishShadowSheet: loadImage('./sprites/fishshadow_spritesheet.png'),
-        slapSheet: loadImage('./sprites/slap_spritesheet.png'),
-        cursorSheet: loadImage('./sprites/cursor_sheet.png'),
-        background: loadImage('./sprites/background.png'),
-        iconSheet: loadImage('./sprites/icon_spritesheet.png', () => { graphics.ready = true }),
+        tileSheet: loadImage('./resources/tile_spritesheet.png'),
+        fishSheet: loadImage('./resources/fish_spritesheet.png'),
+        fishShadowSheet: loadImage('./resources/fishshadow_spritesheet.png'),
+        slapSheet: loadImage('./resources/slap_spritesheet.png'),
+        cursorSheet: loadImage('./resources/cursor_sheet.png'),
+        background: loadImage('./resources/background.png'),
+        iconSheet: loadImage('./resources/icon_spritesheet.png', () => { graphics.ready = true }),
         ready: false
     };
 

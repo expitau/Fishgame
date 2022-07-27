@@ -78,99 +78,99 @@ function doPhysicsTick(players, gameMap) {
 }
 
 // On player input
-function doPhysicsInput(player, gameMap) {
-    // Break cursor into x,y components
-    let dx = Math.sin(player.input.cursorR);
-    let dy = Math.cos(player.input.cursorR);
-    let pvp = false;
+// function doPhysicsInput(player, gameMap) {
+//     // Break cursor into x,y components
+//     let dx = Math.sin(player.input.cursorR);
+//     let dy = Math.cos(player.input.cursorR);
+//     let pvp = false;
 
-    // If player can hit a player
-    for (const [opid, otherPlayer] of Object.entries(players)) {
-        if (opid !== player.id) {
-            if (((player.physics.x + dx * 60 - otherPlayer.physics.x) ** 2 + (player.physics.y + dy * 60 - otherPlayer.physics.y) ** 2) ** 0.5 < 7 * gameMap.pixelSize ||
-                ((player.physics.x - otherPlayer.physics.x) ** 2 + (player.physics.y - otherPlayer.physics.y) ** 2) ** 0.5 < 7 * gameMap.pixelSize) {
-                // Set hit power
-                let power = 7;
+//     // If player can hit a player
+//     for (const [opid, otherPlayer] of Object.entries(players)) {
+//         if (opid !== player.id) {
+//             if (((player.physics.x + dx * 60 - otherPlayer.physics.x) ** 2 + (player.physics.y + dy * 60 - otherPlayer.physics.y) ** 2) ** 0.5 < 7 * gameMap.pixelSize ||
+//                 ((player.physics.x - otherPlayer.physics.x) ** 2 + (player.physics.y - otherPlayer.physics.y) ** 2) ** 0.5 < 7 * gameMap.pixelSize) {
+//                 // Set hit power
+//                 let power = 7;
 
-                // Apply new player velocities
-                player.physics.vx = -power * dx;
-                player.physics.vy = -power * dy;
-                player.physics.vr = 0.2 * (player.physics.vx > 0 ? 1 : -1);
-                otherPlayer.physics.vx = power * dx;
-                otherPlayer.physics.vy = power * dy;
-                otherPlayer.physics.vr = -player.physics.vr;
-                otherPlayer.health--;
+//                 // Apply new player velocities
+//                 player.physics.vx = -power * dx;
+//                 player.physics.vy = -power * dy;
+//                 player.physics.vr = 0.2 * (player.physics.vx > 0 ? 1 : -1);
+//                 otherPlayer.physics.vx = power * dx;
+//                 otherPlayer.physics.vy = power * dy;
+//                 otherPlayer.physics.vr = -player.physics.vr;
+//                 otherPlayer.health--;
 
-                // Update player rotation to point of contact
-                player.physics.r = (player.input.cursorR + Math.PI) % (Math.PI * 2);
+//                 // Update player rotation to point of contact
+//                 player.physics.r = (player.input.cursorR + Math.PI) % (Math.PI * 2);
 
-                // Add slap effect
-                effects.push([
-                    "impact",
-                    (otherPlayer.physics.x + player.physics.x) / 2,
-                    (otherPlayer.physics.y + player.physics.y) / 2,
-                    15
-                ]);
+//                 // Add slap effect
+//                 effects.push([
+//                     "impact",
+//                     (otherPlayer.physics.x + player.physics.x) / 2,
+//                     (otherPlayer.physics.y + player.physics.y) / 2,
+//                     15
+//                 ]);
 
-                // On Player death
-                if (otherPlayer.health <= 0) {
-                    effects.push([
-                        "splat",
-                        otherPlayer.physics.x,
-                        otherPlayer.physics.y,
-                        otherPlayer.color,
-                        player.physics.r,
-                        15
-                    ]);
-                    otherPlayer.health = 3;
-                    otherPlayer.physics = {
-                        x: gameMap.spawnPoint[0],
-                        y: gameMap.spawnPoint[1],
-                        r: 0,
-                        vx: 0,
-                        vy: 0,
-                        vr: 0,
-                        action: 0
-                    }
-                } else {
-                    effects.push([
-                        "splat",
-                        otherPlayer.physics.x,
-                        otherPlayer.physics.y,
-                        otherPlayer.color,
-                        player.physics.r,
-                        2
-                    ]);
-                }
+//                 // On Player death
+//                 if (otherPlayer.health <= 0) {
+//                     effects.push([
+//                         "splat",
+//                         otherPlayer.physics.x,
+//                         otherPlayer.physics.y,
+//                         otherPlayer.color,
+//                         player.physics.r,
+//                         15
+//                     ]);
+//                     otherPlayer.health = 3;
+//                     otherPlayer.physics = {
+//                         x: gameMap.spawnPoint[0],
+//                         y: gameMap.spawnPoint[1],
+//                         r: 0,
+//                         vx: 0,
+//                         vy: 0,
+//                         vr: 0,
+//                         action: 0
+//                     }
+//                 } else {
+//                     effects.push([
+//                         "splat",
+//                         otherPlayer.physics.x,
+//                         otherPlayer.physics.y,
+//                         otherPlayer.color,
+//                         player.physics.r,
+//                         2
+//                     ]);
+//                 }
 
-                pvp = true;
-            }
-        }
-    }
+//                 pvp = true;
+//             }
+//         }
+//     }
 
-    // If player can hit a tile
-    if (!pvp && getCollisionArea(gameMap, player.physics.x + dx * 60, player.physics.y + dy * 60)) {
-        // Set hit power
-        let power = 7;
+//     // If player can hit a tile
+//     if (!pvp && getCollisionArea(gameMap, player.physics.x + dx * 60, player.physics.y + dy * 60)) {
+//         // Set hit power
+//         let power = 7;
 
-        // Calculate what factor of new movement to conserved momentum to use on both the x and y axis
-        let xFactor = Math.min(Math.max(Math.abs((-power * dx) / player.physics.vx), 0.01), 0.99);
-        let yFactor = Math.min(Math.max(Math.abs((-power * dy) / player.physics.vy), 0.01), 0.99);
+//         // Calculate what factor of new movement to conserved momentum to use on both the x and y axis
+//         let xFactor = Math.min(Math.max(Math.abs((-power * dx) / player.physics.vx), 0.01), 0.99);
+//         let yFactor = Math.min(Math.max(Math.abs((-power * dy) / player.physics.vy), 0.01), 0.99);
 
-        // Apply new player velocities
-        player.physics.vx = (-power * dx) * xFactor + player.physics.vx * (1 - xFactor);
-        player.physics.vy = (-power * dy) * yFactor + player.physics.vy * (1 - yFactor);
-        player.physics.vr = 0.2 * (player.physics.vx > 0 ? 1 : -1);
+//         // Apply new player velocities
+//         player.physics.vx = (-power * dx) * xFactor + player.physics.vx * (1 - xFactor);
+//         player.physics.vy = (-power * dy) * yFactor + player.physics.vy * (1 - yFactor);
+//         player.physics.vr = 0.2 * (player.physics.vx > 0 ? 1 : -1);
 
-        // Update player rotation to point of contact
-        player.physics.r = (player.input.cursorR + Math.PI) % (Math.PI * 2);
+//         // Update player rotation to point of contact
+//         player.physics.r = (player.input.cursorR + Math.PI) % (Math.PI * 2);
 
-        // Add slap effect
-        effects.push([
-            "impact",
-            player.physics.x + dx * 15,
-            player.physics.y + dy * 15,
-            15
-        ]);
-    }
-}
+//         // Add slap effect
+//         effects.push([
+//             "impact",
+//             player.physics.x + dx * 15,
+//             player.physics.y + dy * 15,
+//             15
+//         ]);
+//     }
+// }

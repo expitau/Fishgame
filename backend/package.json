@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "nodemon ./server.js 192.168.137.1"
+    "start": "nodemon ./server.js 192.168.2.33"
   },
   "author": "",
   "license": "ISC",
