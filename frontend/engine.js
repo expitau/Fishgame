@@ -56,7 +56,7 @@ function startGame(ip) {
     
     // Connect to server
     {
-        socket = io(`https://${ip}`);
+        socket = io(`http://${ip}:3000`);
         
         /** Socket Connection **/
         socket.on('connect', () => {
