@@ -4,7 +4,7 @@ let [Map] = require('./functions/map')
 let [doPhysicsTick,doPhysicsInput] = require('./functions/physics')
 
 // Require io
-const io = require("socket.io")(3000, {
+const io = require("socket.io")(80, {
     cors: {
         origin: "*",
     }
