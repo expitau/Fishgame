@@ -12,7 +12,6 @@ const io = require("socket.io")(3000, {
 
 const os = require("os")
 const cliSelect = require('cli-select');
-const chalk = require('chalk');
 
 let roomCode = function () {
     // Characters that are allowed to exist in a room code
