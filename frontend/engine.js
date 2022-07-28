@@ -56,7 +56,7 @@ function startGame(ip) {
     
     // Connect to server
     {
-        socket = io(`http://${ip}:3000`);
+        socket = io(`https://${ip}`);
         
         /** Socket Connection **/
         socket.on('connect', () => {
@@ -241,4 +241,3 @@ function toggleFullScreen() {
         cancelFullScreen.call(doc);
     }
 }
-
