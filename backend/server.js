@@ -43,7 +43,6 @@ let roomCode = function () {
 
 let networks = os.networkInterfaces()
 let available = Object.fromEntries(Object.entries(networks).map(x => [x[0], x[1].filter(y => y.family == 'IPv4')[0]]).filter(x => !x[0].includes("vEthernet") && !x[0].includes("Loopback")))
-// console.log(process.argv)
 if (process.argv.length > 2){
     startServer(process.argv[2])
 }

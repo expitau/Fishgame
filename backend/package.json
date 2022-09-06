@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "node ./server.js 0.0.0.0",
-    "dev": "nodemon ./server.js 192.168.2.33"
+    "start": "node ./server.js",
+    "dev": "nodemon ./server.js"
   },
   "author": "",
   "license": "ISC",
