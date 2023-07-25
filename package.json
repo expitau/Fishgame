@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"start": "pnpm exec live-server src --port=3000",
+		"start": "pnpm exec live-server --port=3000",
 		"dev": "pnpm run start"
 	},
 	"dependencies": {

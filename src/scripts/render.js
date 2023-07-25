@@ -39,13 +39,13 @@ function fg_setupGraphics(state) {
     cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
 
     graphics = {
-        tileSheet: loadImage('./resources/tile_spritesheet.png'),
-        fishSheet: loadImage('./resources/fish_spritesheet.png'),
-        fishShadowSheet: loadImage('./resources/fishshadow_spritesheet.png'),
-        slapSheet: loadImage('./resources/slap_spritesheet.png'),
-        cursorSheet: loadImage('./resources/cursor_sheet.png'),
-        background: loadImage('./resources/background.png'),
-        iconSheet: loadImage('./resources/icon_spritesheet.png', () => { graphicsReady = true; fg_initalizeGraphics(state) })
+        tileSheet: loadImage('resources/tile_spritesheet.png'),
+        fishSheet: loadImage('resources/fish_spritesheet.png'),
+        fishShadowSheet: loadImage('resources/fishshadow_spritesheet.png'),
+        slapSheet: loadImage('resources/slap_spritesheet.png'),
+        cursorSheet: loadImage('resources/cursor_sheet.png'),
+        background: loadImage('resources/background.png'),
+        iconSheet: loadImage('resources/icon_spritesheet.png', () => { graphicsReady = true; fg_initalizeGraphics(state) })
     };
 }
 
