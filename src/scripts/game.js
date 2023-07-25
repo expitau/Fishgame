@@ -1,7 +1,4 @@
 
-let lastUpdate = Date.now()
-let deltaTime = 0;
-
 function setup() {
     fg_setupGraphics(gameState);
 
@@ -26,15 +23,15 @@ function setup() {
 
 
     setInterval(() => {
-        deltaTime = Math.round(Date.now() / 16) - Math.round(lastUpdate / 16);
+        let deltaTime = Math.round(syncedTime() / 16) - Math.round(lastUpdate / 16);
         while (deltaTime > 0) {
             deltaTime -= 1;
             if (connected) {
                 fg_physicsTick(gameState);
             }
-            lastUpdate = Date.now()
+            lastUpdate = syncedTime()
         }
-    }, 1000 / 60) // 20 times per second
+    }, 1000 / 60) // 60 times per second
 }
 
 let cursorData = {
@@ -108,9 +105,9 @@ function mouseReleased() {
     mouseIsHeld = false;
 
     if (cursorData.x != 0 && cursorData.y != 0) {
-        fg_physicsInput(gameState, {
-            cursorR: cursorData.r
-        }, id);
+        // fg_physicsInput(gameState, {
+        //     cursorR: cursorData.r
+        // }, id);
         serverConnection.send({ type: CONN_EVENTS.clientUpdate, data: { cursorR: cursorData.r } });
         cursorData.x = 0;
         cursorData.y = 0;

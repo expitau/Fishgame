@@ -104,9 +104,9 @@ function startServer() {
         // // Emit server update to client
         setInterval(() => {
             Object.values(connections).forEach(conn => {
-                conn.send({ type: CONN_EVENTS.serverUpdate, data: { lastUpdate: lastUpdate, state: gameState } });
+                conn.send({ type: CONN_EVENTS.serverUpdate, data: { timeStamp: lastUpdate, state: gameState } });
             })
-        }, 200)
+        }, 1000 / 20)
 
         startClient(server.id);
     })

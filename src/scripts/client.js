@@ -55,12 +55,21 @@ function startClient(roomCode) {
                         break;
                     case CONN_EVENTS.serverUpdate:
                         gameState = data.data.state
-                        lastUpdate = data.data.lastUpdate
+                        lastUpdate = data.data.timeStamp
+                        timeOffset = Date.now() - lastUpdate;
                         break;
                 }
             })
         })
     })
+}
+
+
+let timeOffset = 0;
+let lastUpdate = Date.now()
+
+function syncedTime() {
+    return Date.now() - timeOffset
 }
 
 if (!isServer) {
