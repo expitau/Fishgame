@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<script>
+    const onRoomInput = (text) => {
+        console.log(text)
+        const button = document.getElementById('join')
+        if (text.length > 0) {
+            button.disabled = false
+            // button.onclick = () => {
+            //     location.href = `/game.html?server=0&room=${e.target.value}`
+            // }
+        } else {
+            button.disabled = true
+        }
+    }
+</script>
+
+<body scroll="no" style="overflow: hidden">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <h1>Fish game</h1>
+        <input id="room" placeholder="Room id" oninput="onRoomInput(this.value)"></input>
+        <button id="join" disabled onclick="location.href = '/game.html?server=0&room=' + document.getElementById('room').value">Join</button>
+        <p>OR</p>
+        <button onclick="location.href = '/game.html?server=1'">Create</button>
+    </div>
+</body>
+
+
+<style>
+    body {
+        background-color: #DBBA67;
+        font-family: Arial, sans-serif;
+        margin: 0px;
+    }
+    h1 {
+        text-align: center;
+        font-size: 100px;
+        margin-top: 100px;
+        font-weight: 900;
+        color: #221C0C;
+    }
+    button {
+        background-color: #6AC8AD;
+        color: #221C0C;
+        border: none;
+        padding: 0.6rem;
+        border-radius: 0.5rem;
+        width: 50%;
+        max-width: 8rem;
+        margin: 2rem;
+        box-shadow: 0.4rem 0.4rem 1rem rgba(0, 0, 0, 0.25);
+        font-size: larger;
+        cursor: pointer;
+    }
+    button:disabled {
+        background-color: #46806f;
+        cursor: default;
+
+    }
+    input {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border: none
+    }
+</style>
+
+</html>
