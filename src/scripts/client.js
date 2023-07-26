@@ -36,6 +36,11 @@ let gameState = {
     map: 0
 }
 
+let screenShakeTime = 0;
+let graphicsEffects = []
+
+let serverHeartbeat = 0;
+
 function startClient(roomCode) {
     client = new Peer()
 
@@ -46,6 +51,7 @@ function startClient(roomCode) {
 
         conn.on('open', () => {
             console.log("Client connected")
+            setupGame()
             serverConnection = conn
             conn.on('data', (data) => {
                 switch (data.type) {
@@ -58,8 +64,27 @@ function startClient(roomCode) {
                         lastUpdate = data.data.timeStamp
                         timeOffset = Date.now() - lastUpdate;
                         break;
+                    case CONN_EVENTS.heartbeatResponse:
+                        serverHeartbeat = 0
+                        break
+                    case CONN_EVENTS.heartbeat:
+                        conn.send({ type: CONN_EVENTS.heartbeatResponse })
+                        break
+                    case CONN_EVENTS.serverEffect:
+                        graphicsEffects = [...graphicsEffects, ...data.data]
+                        break;
                 }
             })
+
+
+            setInterval(() => {
+                conn.send({ type: CONN_EVENTS.heartbeat })
+                serverHeartbeat++
+                if (serverHeartbeat > 5) {
+                    conn.close()
+                    connected = false
+                }
+            }, 1000)
         })
     })
 }

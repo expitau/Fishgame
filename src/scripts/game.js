@@ -1,11 +1,11 @@
 
-function setup() {
-    fg_setupGraphics(gameState);
+function setupGame() {
+    setupGraphics(gameState);
+    setupInputs()
 
     if (!(isMobile())) {
         document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;
         document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
-        document.addEventListener("mousemove", OnMouseMove, false);
     }
 
     function renderLoop() {
@@ -16,7 +16,7 @@ function setup() {
                 document.exitPointerLock();
             }
         }
-        fg_renderGraphics(gameState);
+        renderGraphics(gameState);
         window.requestAnimationFrame(renderLoop)
     }
     window.requestAnimationFrame(renderLoop)
@@ -27,111 +27,35 @@ function setup() {
         while (deltaTime > 0) {
             deltaTime -= 1;
             if (connected) {
-                fg_physicsTick(gameState);
+                physicsTick(gameState);
             }
             lastUpdate = syncedTime()
         }
     }, 1000 / 60) // 60 times per second
 }
 
-let cursorData = {
-    r: 0,
-    x: 0,
-    y: 0,
-    visible: false,
-    max: 50,
-    display: 60
-};
-let keys = [];
-let mouseIsHeld = false;
-
-function OnMouseMove(e) {
-    let movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-    let movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
-
-    {
-        cursorData.x += movementX;
-        cursorData.y += movementY;
-
-        let cursorDist = (cursorData.x ** 2 + cursorData.y ** 2) ** 0.5;
-        if (cursorDist > cursorData.max) {
-            cursorData.x *= cursorData.max / cursorDist;
-            cursorData.y *= cursorData.max / cursorDist;
-        }
-
-        cursorData.r = Math.atan2(cursorData.x, cursorData.y);
+// Read tile on tilemap [world coordinates] > [tile symbol]
+function getCurrentTile(gameMap, x, y) {
+    if (0 < x && x < gameMap.width * gameMap.tileSize && 0 < y && y < gameMap.height * gameMap.tileSize) {
+        return gameMap.tilemap[Math.floor(y / gameMap.tileSize)].charAt(Math.floor(x / gameMap.tileSize));
     }
+    return "X";
 }
 
-function mouseDragged() {
-    if (isMobile()) {
-        let movementX = mouseX - pmouseX;
-        let movementY = mouseY - pmouseY;
-
-        {
-            cursorData.x += movementX;
-            cursorData.y += movementY;
-
-            let cursorDist = (cursorData.x ** 2 + cursorData.y ** 2) ** 0.5;
-            if (cursorDist > cursorData.max) {
-                cursorData.x *= cursorData.max / cursorDist;
-                cursorData.y *= cursorData.max / cursorDist;
+// Read tiles on tilemap in a small rectangular cluster [world coordinates] 
+function getCollisionArea(gameMap, x, y) {
+    for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+            if (gameMap.colliders.includes(getCurrentTile(gameMap, x + i * gameMap.tileSize * 0.3, y + j * gameMap.tileSize * 0.3))) {
+                return true;
             }
-
-            cursorData.r = Math.atan2(cursorData.x, cursorData.y);
         }
     }
+    return false;
 }
 
-function isMobile() {
-    return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
-}
-
-function mousePressed() {
-    mouseIsHeld = true;
-    cursorData.x = 0;
-    cursorData.y = 0;
-
-    if (!(isMobile())) {
-        // document.body.requestPointerLock();
-    }
-}
-
-function doubleClicked() {
-    toggleFullScreen();
-}
-
-function mouseReleased() {
-    mouseIsHeld = false;
-
-    if (cursorData.x != 0 && cursorData.y != 0) {
-        // fg_physicsInput(gameState, {
-        //     cursorR: cursorData.r
-        // }, id);
-        serverConnection.send({ type: CONN_EVENTS.clientUpdate, data: { cursorR: cursorData.r } });
-        cursorData.x = 0;
-        cursorData.y = 0;
-    }
-}
-
-function keyPressed() {
-    keys[keyCode] = true;
-}
-
-function keyReleased() {
-    keys[keyCode] = false;
-}
-
-let screenShakeTime = 0;
-
-// On physics tick, map state -> new state
-function fg_physicsTick(state) {
-    for (let i = 0; i < state.effects.length; i++) {
-        state.effects[i].time--;
-        if (state.effects[i].time <= 0) {
-            state.effects.pop(i);
-        }
-    }
+// On physics tick, modify state
+function physicsTick(state) {
 
     // Loop through all players
     for (const player of state.players) {
@@ -192,27 +116,12 @@ function fg_physicsTick(state) {
         // Bound player rotation between 0 and 2 * PI
         player.r = ((Math.PI * 4) + player.r) % (Math.PI * 2);
 
-        // Calculate angle of velocity
-        let vAngle = ((Math.PI * 2) + Math.atan2(player.vy, player.vx)) % (Math.PI * 2);
-
-        // if (player.vy ** 2 + player.vx ** 2 < 1) {
-        //     // If absolute player velocity is less than 1, flatfish
-        //     player.physics.action = 0;
-        // } else if (Math.abs(((Math.PI * 4) + player.physics.r + Math.PI / 2) % (Math.PI * 2) - vAngle) < Math.PI / 2) {
-        //     // If velocity angle pointed up down the fish, bend ends up
-        //     player.physics.action = 2;
-        // } else {
-        //     // If velocity angle pointed down on the fish, bend ends down
-        //     player.physics.action = 1;
-        // }
-
-        state.x = player.x;
-        state.y = player.y;
     }
 }
 
 // // On player input
-function fg_physicsInput(state, input, id) {
+function physicsInput(state, input, id) {
+    let effects = []
     if (!connected) return;
 
     let player = state.players.filter(player => player.id === id)[0];
@@ -243,7 +152,7 @@ function fg_physicsInput(state, input, id) {
                 player.r = (input.cursorR + Math.PI) % (Math.PI * 2);
 
                 // Add slap effect
-                state.effects.push({
+                effects.push({
                     name: "impact",
                     x: (otherPlayer.x + player.x) / 2,
                     y: (otherPlayer.y + player.y) / 2,
@@ -252,14 +161,20 @@ function fg_physicsInput(state, input, id) {
 
                 // On Player death
                 if (otherPlayer.health <= 0) {
-                    state.effects.push({
-                        time: "splat",
+                    effects.push({
+                        name: "splat",
                         x: otherPlayer.x,
                         y: otherPlayer.y,
                         color: otherPlayer.color,
                         r: player.r,
                         time: 15
                     });
+
+                    effects.push({
+                        name: "shake",
+                        time: 25,
+                        id: otherPlayer.id
+                    })
                     otherPlayer.health = 3;
                     otherPlayer.x = maps[state.map].spawnPoint[0]
                     otherPlayer.y = maps[state.map].spawnPoint[1]
@@ -267,7 +182,7 @@ function fg_physicsInput(state, input, id) {
                     otherPlayer.vy = 0
                     otherPlayer.vr = 0
                 } else {
-                    state.effects.push({
+                    effects.push({
                         name: "splat",
                         x: otherPlayer.x,
                         y: otherPlayer.y,
@@ -275,6 +190,11 @@ function fg_physicsInput(state, input, id) {
                         r: player.r,
                         time: 2
                     });
+                    effects.push({
+                        name: "shake",
+                        time: 5,
+                        id: otherPlayer.id
+                    })
                 }
 
                 pvp = true;
@@ -300,11 +220,13 @@ function fg_physicsInput(state, input, id) {
         player.r = (input.cursorR + Math.PI) % (Math.PI * 2);
 
         // Add slap effect
-        state.effects.push({
+        effects.push({
             name: "impact",
             x: player.x + dx * 15,
             y: player.y + dy * 15,
             time: 15
         });
     }
+
+    return effects
 }

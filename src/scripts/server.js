@@ -5,21 +5,23 @@ function startServer() {
 
     let gameState = {
         map: 0,
-        players: [],
-        effects: []
+        players: []
     }
+
+    let effects = []
 
     server.on('open', () => {
 
         console.log("\n            ______   __     ______     __  __        ______     ______     __    __     ______    \n           /\\  ___\\ /\\ \\   /\\  ___\\   /\\ \\_\\ \\      /\\  ___\\   /\\  __ \\   /\\ \"-./  \\   /\\  ___\\   \n           \\ \\  __\\ \\ \\ \\  \\ \\___  \\  \\ \\  __ \\     \\ \\ \\__ \\  \\ \\  __ \\  \\ \\ \\-./\\ \\  \\ \\  __\\   \n            \\ \\_\\    \\ \\_\\  \\/\\_____\\  \\ \\_\\ \\_\\     \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\ \\ \\_\\  \\ \\_____\\ \n             \\/_/     \\/_/   \\/_____/   \\/_/\\/_/      \\/_____/   \\/_/\\/_/   \\/_/  \\/_/   \\/_____/ \n                                                                                                  \n           ");
         console.log(`Room code: ${server.id}`)
+        // alert(`${location.origin}/Fishgame/src/game.html?room=${server.id}&server=0`)
 
         let connections = {}
 
         server.on("connection", (conn) => {
             console.log("Added connection " + conn.peer);
 
-            connections[conn.peer] = conn
+            connections[conn.peer] = { heartbeat: 0, connection: conn }
 
             conn.on('open', () => {
                 gameState.players.push({
@@ -37,57 +39,26 @@ function startServer() {
                 conn.on('data', (data) => {
                     switch (data.type) {
                         case CONN_EVENTS.clientUpdate:
-                            fg_physicsInput(gameState, data.data, conn.peer)
+                            effects = [...effects, ...physicsInput(gameState, data.data, conn.peer)]
+                            break;
+                        case CONN_EVENTS.heartbeat:
+                            conn.send({ type: CONN_EVENTS.heartbeatResponse })
+                            break;
+                        case CONN_EVENTS.heartbeatResponse:
+                            connections[conn.peer].heartbeat = 0
                             break;
                     }
                 })
 
                 conn.on('close', () => {
+                    console.log("Removing peer")
                     delete connections[conn.peer]
                     gameState.players = gameState.players.filter(player => player.id !== conn.peer)
                 })
 
-                conn.send({type: CONN_EVENTS.clientInit, data: gameState})
+                conn.send({ type: CONN_EVENTS.clientInit, data: gameState })
             })
         })
-
-        // // Socket handler
-        // server.on("connection", (conn) => {
-        //     // Create new Player instance if necessary
-        //     console.log(conn);
-        //     players[conn.peer] ??= Player(conn.peer, gameMap);
-        //     connections[conn.peer] = conn;
-
-        //     // Send initial world data
-        //     let initialWorldData = {
-        //         players: players,
-        //         gameMap: gameMap
-        //     }
-        //     conn.send({ type: "init", data: initialWorldData });
-
-        //     // Handle client update
-        //     conn.on('data', (message) => {
-        //         if (message.type == 'clientUpdate') {
-        //             let playerInput = message.data
-
-        //             players[conn.peer].input = playerInput;
-        //             doPhysicsInput(players[conn.peer], gameMap);
-        //         }
-        //         else if (message.type == 'disconnect') {
-        //             console.log(conn.peer + " disconnected");
-        //             delete players[conn.peer];
-        //         }
-        //         else if (message.type == 'timeSync') {
-        //             let callback = message.data
-
-        //             let currentTime = Date.now();
-        //             callback({ time: currentTime });
-        //         }
-        //         else if (message.type == 'test') {
-        //             console.log(conn.peer + " sent a test message");
-        //         }
-        //     })
-        // });
 
         // Update serverside physics
         let lastUpdate = Date.now()
@@ -96,7 +67,7 @@ function startServer() {
             deltaTime = Math.round(Date.now() / 16) - Math.round(lastUpdate / 16);
             while (deltaTime > 0) {
                 deltaTime -= 1;
-                fg_physicsTick(gameState);
+                physicsTick(gameState);
                 lastUpdate = Date.now()
             }
         }, 1000 / 60) // 60 times per second
@@ -104,9 +75,24 @@ function startServer() {
         // // Emit server update to client
         setInterval(() => {
             Object.values(connections).forEach(conn => {
-                conn.send({ type: CONN_EVENTS.serverUpdate, data: { timeStamp: lastUpdate, state: gameState } });
+                conn.connection.send({ type: CONN_EVENTS.serverUpdate, data: { timeStamp: lastUpdate, state: gameState } });
+                if (effects.length > 0)
+                    conn.connection.send({ type: CONN_EVENTS.serverEffect, data: effects })
             })
+            effects = []
         }, 1000 / 20)
+
+        setInterval(() => {
+            Object.values(connections).forEach(conn => {
+                conn.connection.send({ type: CONN_EVENTS.heartbeat })
+                conn.heartbeat++
+                if (conn.heartbeat > 5) {
+                    conn.connection.close()
+                    delete connections[conn.peer]
+                    gameState.players = gameState.players.filter(player => player.id !== conn.peer)
+                }
+            })
+        }, 1000)
 
         startClient(server.id);
     })
