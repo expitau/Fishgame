@@ -9,51 +9,48 @@ let cursorData = {
 let keys = [];
 let mouseIsHeld = false;
 
-function setupInputs() {
-    document.addEventListener("mousemove", (e) => {mouseMoved(e); mouseIsHeld && mouseDragged(e)}, false);
-    document.addEventListener("mousedown", mousePressed, false);
-    document.addEventListener("mouseup", mouseReleased, false);
-    
+function registerInputs() {
+    _p5.mouseMoved = mouseMoved;
+    _p5.mouseDragged = mouseDragged;
+    _p5.mousePressed = mousePressed;
+    _p5.doubleClicked = doubleClicked;
+    _p5.mouseReleased = mouseReleased;
+    _p5.keyPressed = keyPressed;
+    _p5.keyReleased = keyReleased;
 }
 
 function mouseMoved(e) {
-    console.log("mouseMoved")
-    let movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-    let movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
+    // let movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+    // let movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
 
-    {
-        cursorData.x += movementX;
-        cursorData.y += movementY;
+    // {
+    //     cursorData.x += movementX;
+    //     cursorData.y += movementY;
 
-        let cursorDist = (cursorData.x ** 2 + cursorData.y ** 2) ** 0.5;
-        if (cursorDist > cursorData.max) {
-            cursorData.x *= cursorData.max / cursorDist;
-            cursorData.y *= cursorData.max / cursorDist;
-        }
+    //     let cursorDist = (cursorData.x ** 2 + cursorData.y ** 2) ** 0.5;
+    //     if (cursorDist > cursorData.max) {
+    //         cursorData.x *= cursorData.max / cursorDist;
+    //         cursorData.y *= cursorData.max / cursorDist;
+    //     }
 
-        cursorData.r = Math.atan2(cursorData.x, cursorData.y);
-    }
+    //     cursorData.r = Math.atan2(cursorData.x, cursorData.y);
+    // }
 }
 
 function mouseDragged() {
-    console.log("mouseDragged")
-    if (isMobile()) {
-        let movementX = mouseX - pmouseX;
-        let movementY = mouseY - pmouseY;
+    let movementX = _p5.mouseX - _p5.pmouseX;
+    let movementY = _p5.mouseY - _p5.pmouseY;
 
-        {
-            cursorData.x += movementX;
-            cursorData.y += movementY;
+    cursorData.x += movementX;
+    cursorData.y += movementY;
 
-            let cursorDist = (cursorData.x ** 2 + cursorData.y ** 2) ** 0.5;
-            if (cursorDist > cursorData.max) {
-                cursorData.x *= cursorData.max / cursorDist;
-                cursorData.y *= cursorData.max / cursorDist;
-            }
-
-            cursorData.r = Math.atan2(cursorData.x, cursorData.y);
-        }
+    let cursorDist = (cursorData.x ** 2 + cursorData.y ** 2) ** 0.5;
+    if (cursorDist > cursorData.max) {
+        cursorData.x *= cursorData.max / cursorDist;
+        cursorData.y *= cursorData.max / cursorDist;
     }
+
+    cursorData.r = Math.atan2(cursorData.x, cursorData.y);
 }
 
 function isMobile() {
@@ -61,7 +58,6 @@ function isMobile() {
 }
 
 function mousePressed() {
-    console.log("mousePressed")
     mouseIsHeld = true;
     cursorData.x = 0;
     cursorData.y = 0;
@@ -72,12 +68,10 @@ function mousePressed() {
 }
 
 function doubleClicked() {
-    console.log("doubleClicked")
     toggleFullScreen();
 }
 
 function mouseReleased() {
-    console.log("mouseReleased")
     mouseIsHeld = false;
 
     if (cursorData.x != 0 && cursorData.y != 0) {
@@ -91,11 +85,9 @@ function mouseReleased() {
 }
 
 function keyPressed() {
-    console.log("keyPressed")
-    keys[keyCode] = true;
+    keys[_p5.keyCode] = true;
 }
 
 function keyReleased() {
-    console.log("keyReleased")
-    keys[keyCode] = false;
+    keys[_p5.keyCode] = false;
 }

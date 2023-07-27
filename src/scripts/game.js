@@ -1,7 +1,7 @@
 
 function setupGame() {
     setupGraphics(gameState);
-    setupInputs()
+    registerInputs()
 
     if (!(isMobile())) {
         document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;

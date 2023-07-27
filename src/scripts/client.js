@@ -51,7 +51,7 @@ function startClient(roomCode) {
 
         conn.on('open', () => {
             console.log("Client connected")
-            setupGame()
+            new p5(p => { window._p5 = p; p.setup = setupGame})
             serverConnection = conn
             conn.on('data', (data) => {
                 switch (data.type) {

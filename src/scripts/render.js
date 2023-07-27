@@ -1,5 +1,3 @@
-new p5(p => {window._p5 = p})
-
 // This file contains code for rendering the game
 let cnv, frame;
 
@@ -9,6 +7,25 @@ let graphicsReady = false;
 let graphics, sounds;
 let levelImage;
 let fishSheets = {};
+
+async function loadAssets() {
+
+    graphics = {
+        tileSheet: await new Promise(resolve => {_p5.loadImage('resources/tile_spritesheet.png', resolve)}),
+        fishSheet: await new Promise(resolve => {_p5.loadImage('resources/fish_spritesheet.png', resolve)}),
+        fishShadowSheet: await new Promise(resolve => {_p5.loadImage('resources/fishshadow_spritesheet.png', resolve)}),
+        slapSheet: await new Promise(resolve => {_p5.loadImage('resources/slap_spritesheet.png', resolve)}),
+        cursorSheet: await new Promise(resolve => {_p5.loadImage('resources/cursor_sheet.png', resolve)}),
+        background: await new Promise(resolve => {_p5.loadImage('resources/background.png', resolve)}),
+        iconSheet: await new Promise(resolve => {_p5.loadImage('resources/icon_spritesheet.png', resolve)}),
+    };
+    
+    sounds = {
+        bump: await new Promise(resolve => {_p5.loadSound('resources/bump.wav', resolve)}),
+        death: await new Promise(resolve => {_p5.loadSound('resources/death.wav', resolve)}),
+        hit: await new Promise(resolve => {_p5.loadSound('resources/hit.wav', resolve)}),
+    }
+}
 
 function setupGraphics(state) {
     // Create canvas
@@ -25,21 +42,11 @@ function setupGraphics(state) {
     cnv.style('display', 'block');
     cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
 
-    graphics = {
-        tileSheet: _p5.loadImage('resources/tile_spritesheet.png'),
-        fishSheet: _p5.loadImage('resources/fish_spritesheet.png'),
-        fishShadowSheet: _p5.loadImage('resources/fishshadow_spritesheet.png'),
-        slapSheet: _p5.loadImage('resources/slap_spritesheet.png'),
-        cursorSheet: _p5.loadImage('resources/cursor_sheet.png'),
-        background: _p5.loadImage('resources/background.png'),
-        iconSheet: _p5.loadImage('resources/icon_spritesheet.png', () => { graphicsReady = true; initalizeGraphics(state) })
-    };
-
-    sounds = {
-        bump: _p5.loadSound('resources/bump.wav'),
-        death: _p5.loadSound('resources/death.wav'),
-        hit: _p5.loadSound('resources/hit.wav'),
-    }
+    loadAssets().then(() => {
+        console.log("Graphics ready")
+        graphicsReady = true;
+        initalizeGraphics(state);
+    })
 }
 
 function initalizeGraphics(state) {
@@ -163,7 +170,7 @@ function renderGraphics(state) {
             return;
         }
 
-        // draw players
+        // Draw players
         for (const player of gameState.players) {
             {
                 // Create new fish based on fish hue
@@ -192,7 +199,7 @@ function renderGraphics(state) {
     // Draw background
     _p5.image(graphics.background, 0, 0, frame.width, frame.height);
 
-    // // Draw player shadows
+    // Draw player shadows
     for (const player of gameState.players) {
         {
             let vAngle = ((Math.PI * 2) + Math.atan2(player.vy, player.vx)) % (Math.PI * 2);
