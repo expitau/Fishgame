@@ -8,7 +8,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/addons/p5.sound.min.js"></script>
-    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 
     <script src="scripts/types.js"></script>
     <script src="scripts/params.js"></script>
@@ -19,8 +20,31 @@
     <script src="scripts/game.js"></script>
 </head>
 
+<script>
+    function updateJoinInfo() {
+        if (!isServer) {
+            document.getElementById("joinInfo").hidden = true
+        } else {
+            document.getElementById("joinInfo").hidden = false
+            document.getElementById("code").innerHTML = server.id;
+            var qr = qrcode(0, "M");
+            let link = "https://expitau.github.io/Fishgame/src/game.html?server=0&room=" + server.id
+            qr.addData(link);
+            qr.make()
+            let img = qr.createImgTag()
+            let qrElt = document.getElementById('qr')
+            qrElt.innerHTML = img;
+            qrElt.firstChild.style.width = "100%";
+            qrElt.firstChild.style.height = "100%";
+            qrElt.firstChild.style.imageRendering = "pixelated";
+            document.getElementById("link").href = link;
+            document.getElementById("link").innerText = link;
+        }
+    }
+</script>
+
 <body scroll="no" style="overflow: hidden">
-    <button id="settingsButton" onclick="document.getElementById('settingsDialog').showModal()"><svg
+    <button id="settingsButton" onclick="updateJoinInfo(); document.getElementById('settingsDialog').showModal()"><svg
             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
             <path fill-rule="evenodd"
                 d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 00-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 00-2.282.819l-.922 1.597a1.875 1.875 0 00.432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 000 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 00-.432 2.385l.922 1.597a1.875 1.875 0 002.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 002.28-.819l.923-1.597a1.875 1.875 0 00-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 000-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 00-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 00-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 00-1.85-1.567h-1.843zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z"
@@ -38,6 +62,15 @@
             </button>
             <h2>Settings</h2>
             <input type="text" id="nameInput" placeholder="Name" onchange="onNameChange()">
+            <br><br>
+            <div id="joinInfo">
+                <p>Share this code with your friends to play together!</p>
+                <p id="code"
+                    style="padding: 0.5rem; background-color: #F2CD72; border-radius: 0.5rem; text-align: center;">
+                </p>
+                <div id="qr" style="width: 100%"></div>
+                <a id="link" style="word-break: break-all; width: 30rem; display: block; text-align: center"></a>
+            </div>
         </div>
     </dialog>
     <div>
@@ -90,8 +123,8 @@
         z-index: 100;
         cursor: pointer;
         padding: 0.5rem
-
     }
+
     #settingsDialog button svg {
         width: 1.5rem;
         height: 1.5rem;
