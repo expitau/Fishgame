@@ -34,19 +34,20 @@ function setupGraphics(state) {
     _p5.noSmooth();
     _p5.pixelDensity(1);
 
-    // Initialize game    
-    frame = getGraphicsFrame()
-
-    // resize
-    _p5.resizeCanvas(frame.screenWidth + 300, frame.screenHeight + 300);
-    cnv.style('display', 'block');
-    cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
+    resizeCanvas()
 
     loadAssets().then(() => {
         console.log("Graphics ready")
         graphicsReady = true;
         initalizeGraphics(state);
     })
+}
+
+function resizeCanvas() {
+    frame = getGraphicsFrame()
+    _p5.resizeCanvas(frame.screenWidth + 300, frame.screenHeight + 300);
+    cnv.style('display', 'block');
+    cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
 }
 
 function initalizeGraphics(state) {
@@ -110,6 +111,27 @@ function getGraphicsFrame(width = 800, height = 600, marginRatio = 1 / 20) {
     frame.changeRatio = frame.screenWidth / frame.width;
     return frame
 }
+
+function HSBToRGB(h, s, b) {
+    s /= 100;
+    b /= 100;
+    const k = (n) => (n + h / 60) % 6;
+    const f = (n) => b * (1 - s * Math.max(0, Math.min(k(n), 4 - k(n), 1)));
+    return [255 * f(5), 255 * f(3), 255 * f(1)];
+}
+
+// convert an RGB color to HSB [0-255, 0-255, 0-255]
+function RGBToHSB(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const v = Math.max(r, g, b),
+        n = v - Math.min(r, g, b);
+    const h =
+        n === 0 ? 0 : n && v === r ? (g - b) / n : v === g ? 2 + (b - r) / n : 4 + (r - g) / n;
+    return [60 * (h < 0 ? h + 6 : h), v && (n / v) * 100, v * 100];
+}
+
 function renderGraphics(state) {
 
     function align(value) {
@@ -145,25 +167,6 @@ function renderGraphics(state) {
 
     // // Compute graphics
     {
-        function HSBToRGB(h, s, b) {
-            s /= 100;
-            b /= 100;
-            const k = (n) => (n + h / 60) % 6;
-            const f = (n) => b * (1 - s * Math.max(0, Math.min(k(n), 4 - k(n), 1)));
-            return [255 * f(5), 255 * f(3), 255 * f(1)];
-        }
-
-        // convert an RGB color to HSB [0-255, 0-255, 0-255]
-        function RGBToHSB(r, g, b) {
-            r /= 255;
-            g /= 255;
-            b /= 255;
-            const v = Math.max(r, g, b),
-                n = v - Math.min(r, g, b);
-            const h =
-                n === 0 ? 0 : n && v === r ? (g - b) / n : v === g ? 2 + (b - r) / n : 4 + (r - g) / n;
-            return [60 * (h < 0 ? h + 6 : h), v && (n / v) * 100, v * 100];
-        }
 
         if (!graphicsReady || !connected) {
             _p5.pop();
@@ -264,6 +267,9 @@ function renderGraphics(state) {
         // Draw fish
         _p5.push();
         _p5.translate(align(player.x), align(player.y));
+        _p5.fill(HSBToRGB(player.color, 100, 100));
+        _p5.textAlign(_p5.CENTER)
+        _p5.text(player.name, 0, -25);
         _p5.rotate(fishR);
         _p5.image(fishSheets[player.color], -offset, -offset, 6.25 * 11, 6.25 * 11, action * 12, fishSpriteR * 11, 11, 11);
         _p5.pop();
@@ -319,11 +325,11 @@ function renderGraphics(state) {
                     let fishColor = fishSheets[hue].get(2, 5);
                     let angle, distance, xPos, yPos;
                     for (let i = 0; i < 25; i++) {
-                        angle = random(r - PI / 10, r + PI / 10) + PI;
-                        distance = random(0, 15);
-                        xPos = Math.floor(x / 6.25 + Math.sin(angle) * distance + random(-3, 3));
-                        yPos = Math.floor(y / 6.25 + Math.cos(angle) * distance + random(-3, 3));
-                        graphics.background.set(constrain(xPos, 0, 127), yPos, fishColor);
+                        angle = _p5.random(r - Math.PI / 10, r + Math.PI / 10) + Math.PI;
+                        distance = _p5.random(0, 15);
+                        xPos = Math.floor(x / 6.25 + Math.sin(angle) * distance + _p5.random(-3, 3));
+                        yPos = Math.floor(y / 6.25 + Math.cos(angle) * distance + _p5.random(-3, 3));
+                        graphics.background.set(_p5.constrain(xPos, 0, 127), yPos, fishColor);
                     }
                     graphics.background.updatePixels();
                     // sounds.hit.play();

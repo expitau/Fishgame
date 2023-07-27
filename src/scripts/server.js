@@ -33,7 +33,8 @@ function startServer() {
                     vy: 0,
                     vr: 0,
                     health: 3,
-                    color: Math.floor(Math.random() * 360)
+                    color: Math.floor(Math.random() * 360),
+                    name: ''
                 })
 
                 conn.on('data', (data) => {
@@ -46,6 +47,9 @@ function startServer() {
                             break;
                         case CONN_EVENTS.heartbeatResponse:
                             connections[conn.peer].heartbeat = 0
+                            break;
+                        case CONN_EVENTS.nameChange:
+                            gameState.players.find(player => player.id === conn.peer).name = data.data
                             break;
                     }
                 })

@@ -8,6 +8,7 @@ let cursorData = {
 };
 let keys = [];
 let mouseIsHeld = false;
+let displayName = "";
 
 function registerInputs() {
     _p5.mouseMoved = mouseMoved;
@@ -17,24 +18,19 @@ function registerInputs() {
     _p5.mouseReleased = mouseReleased;
     _p5.keyPressed = keyPressed;
     _p5.keyReleased = keyReleased;
+    _p5.windowResized = windowResized;
+}
+
+function windowResized() {
+    resizeCanvas()
+}
+
+function onNameChange() {
+    displayName = document.getElementById("nameInput").value;
+    serverConnection.send({ type: CONN_EVENTS.nameChange, data: displayName });
 }
 
 function mouseMoved(e) {
-    // let movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-    // let movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
-
-    // {
-    //     cursorData.x += movementX;
-    //     cursorData.y += movementY;
-
-    //     let cursorDist = (cursorData.x ** 2 + cursorData.y ** 2) ** 0.5;
-    //     if (cursorDist > cursorData.max) {
-    //         cursorData.x *= cursorData.max / cursorDist;
-    //         cursorData.y *= cursorData.max / cursorDist;
-    //     }
-
-    //     cursorData.r = Math.atan2(cursorData.x, cursorData.y);
-    // }
 }
 
 function mouseDragged() {
@@ -68,7 +64,7 @@ function mousePressed() {
 }
 
 function doubleClicked() {
-    toggleFullScreen();
+    _p5.fullscreen(!_p5.fullscreen());
 }
 
 function mouseReleased() {
