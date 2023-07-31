@@ -28,10 +28,14 @@ function windowResized() {
 function onSettingsChange() {
     displayName = document.getElementById("nameInput").value;
     displayColor = document.getElementById("colorInput").value;
-    colorInputDisplay = document.getElementById("colorInputDisplay");
-    console.log((() => "rgb(" + HSBToRGB(displayColor, 100, 100).join(", ") + ")")())
-    colorInputDisplay.style.backgroundColor = (() => "rgb(" + HSBToRGB(displayColor, 100, 100).join(", ") + ")")();
+    updateColorDisplay()
     serverConnection.send({ type: CONN_EVENTS.metaDataChange, data: {name: displayName, color: displayColor} });
+}
+
+function updateColorDisplay() {
+    displayColor = document.getElementById("colorInput").value;
+    colorInputDisplay = document.getElementById("colorInputDisplay");
+    colorInputDisplay.style.backgroundColor = (() => "rgb(" + HSBToRGB(displayColor, 100, 100).join(", ") + ")")();
 }
 
 function mouseMoved(e) {

@@ -63,8 +63,7 @@
             <h2>Settings</h2>
             <input type="text" id="nameInput" placeholder="Name" onchange="onSettingsChange()">
             <br>
-            <div style="padding: 1rem 0rem; height: 2rem; display: flex; flex-direction: row; align-items: center;"><div id="colorInputDisplay" style="border-radius: 0.5rem; padding: 0.5rem; background-color: white;">Color</div><input type="range" id="colorInput" min="0" max="360" onchange="onSettingsChange()"></div>
-            <br><br>
+            <div style="padding: 1rem 0rem; height: 2rem; display: flex; flex-direction: row; align-items: center;"><div id="colorInputDisplay" style="border-radius: 0.5rem; padding: 0.5rem; background-color: white;">Color</div><input type="range" id="colorInput" min="0" max="360" oninput="updateColorDisplay()" onchange="onSettingsChange()"></div>
             <div id="joinInfo">
                 <p>Share this code with your friends to play together!</p>
                 <p id="code"
