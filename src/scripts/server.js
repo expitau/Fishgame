@@ -2,6 +2,7 @@ let server;
 
 function startServer() {
     server = new Peer()
+    let lastServerUpdate;
 
     let gameState = {
         map: 0,
@@ -65,21 +66,21 @@ function startServer() {
         })
 
         // Update serverside physics
-        let lastUpdate = Date.now()
+        let lastServerUpdate = Date.now()
         let deltaTime = 0;
         setInterval(() => {
-            deltaTime = Math.round(Date.now() / 16) - Math.round(lastUpdate / 16);
+            deltaTime = Math.round(Date.now() / 16) - Math.round(lastServerUpdate / 16);
             while (deltaTime > 0) {
                 deltaTime -= 1;
                 physicsTick(gameState);
-                lastUpdate = Date.now()
+                lastServerUpdate = Date.now()
             }
         }, 1000 / 60) // 60 times per second
 
         // // Emit server update to client
         setInterval(() => {
             Object.values(connections).forEach(conn => {
-                conn.connection.send({ type: CONN_EVENTS.serverUpdate, data: { timeStamp: lastUpdate, state: gameState } });
+                conn.connection.send({ type: CONN_EVENTS.serverUpdate, data: { timeStamp: lastServerUpdate, state: gameState } });
                 if (effects.length > 0)
                     conn.connection.send({ type: CONN_EVENTS.serverEffect, data: effects })
             })

@@ -3,35 +3,6 @@ let id
 
 let connected = false;
 
-let maps = [
-    {
-        currentMap: 0,
-        colliders: "#$X",
-        tilemap: [
-            "                ",
-            "      0S        ",
-            "   ___[]___     ",
-            "   ########     ",
-            "   $          3E",
-            "             _[]",
-            "E     ____   ###",
-            "]_    ####   $$$",
-            "##              ",
-            "$$  10    24 *  ",
-            "$$__[]____[]_c__",
-            "$$##############"
-        ],
-        spawnPoint: [
-            375,
-            75
-        ],
-        width: 16,
-        height: 12,
-        pixelSize: 6.25,
-        tileSize: 50
-    }
-]
-
 let gameState = {
     map: 0
 }
@@ -62,7 +33,7 @@ function startClient(roomCode) {
                     case CONN_EVENTS.serverUpdate:
                         gameState = data.data.state
                         lastUpdate = data.data.timeStamp
-                        timeOffset = Date.now() - lastUpdate;
+                        timeOffset = 0.7 * timeOffset + 0.3 * (Date.now() - lastUpdate);
                         break;
                     case CONN_EVENTS.heartbeatResponse:
                         serverHeartbeat = 0
@@ -99,4 +70,40 @@ function syncedTime() {
 
 if (!isServer) {
     startClient(roomCode)
+}
+
+
+function setupGame() {
+    setupGraphics(gameState);
+    registerInputs()
+
+    if (!(isMobile())) {
+        document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;
+        document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
+    }
+
+    function renderLoop() {
+        // Handle Input
+        {
+
+            if (keys[27] || keys[80]) {
+                document.exitPointerLock();
+            }
+        }
+        renderGraphics(gameState);
+        window.requestAnimationFrame(renderLoop)
+    }
+    window.requestAnimationFrame(renderLoop)
+
+
+    setInterval(() => {
+        let deltaTime = Math.round(syncedTime() / 16) - Math.round(lastUpdate / 16);
+        while (deltaTime > 0) {
+            deltaTime -= 1;
+            if (connected) {
+                physicsTick(gameState);
+            }
+            lastUpdate = syncedTime()
+        }
+    }, 1000 / 60) // 60 times per second
 }

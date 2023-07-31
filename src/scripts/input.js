@@ -71,10 +71,7 @@ function mouseReleased() {
     mouseIsHeld = false;
 
     if (cursorData.x != 0 && cursorData.y != 0) {
-        // physicsInput(gameState, {
-        //     cursorR: cursorData.r
-        // }, id);
-        serverConnection.send({ type: CONN_EVENTS.clientUpdate, data: { cursorR: cursorData.r } });
+        serverConnection.send({ type: CONN_EVENTS.clientUpdate, data: { cursorR: cursorData.r }, time: syncedTime() });
         cursorData.x = 0;
         cursorData.y = 0;
     }
