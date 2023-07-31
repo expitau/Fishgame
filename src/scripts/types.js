@@ -5,5 +5,7 @@ let CONN_EVENTS = {
     "heartbeat": 3,
     "heartbeatResponse": 4,
     "serverEffect": 5,
-    "nameChange": 6,
+    "metaDataChange": 6,
 }
+
+let SERVER_PREFIX = "fishgame-"

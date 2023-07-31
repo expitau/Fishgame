@@ -25,9 +25,13 @@ function windowResized() {
     resizeCanvas()
 }
 
-function onNameChange() {
+function onSettingsChange() {
     displayName = document.getElementById("nameInput").value;
-    serverConnection.send({ type: CONN_EVENTS.nameChange, data: displayName });
+    displayColor = document.getElementById("colorInput").value;
+    colorInputDisplay = document.getElementById("colorInputDisplay");
+    console.log((() => "rgb(" + HSBToRGB(displayColor, 100, 100).join(", ") + ")")())
+    colorInputDisplay.style.backgroundColor = (() => "rgb(" + HSBToRGB(displayColor, 100, 100).join(", ") + ")")();
+    serverConnection.send({ type: CONN_EVENTS.metaDataChange, data: {name: displayName, color: displayColor} });
 }
 
 function mouseMoved(e) {

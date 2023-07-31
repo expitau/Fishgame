@@ -26,9 +26,9 @@
             document.getElementById("joinInfo").hidden = true
         } else {
             document.getElementById("joinInfo").hidden = false
-            document.getElementById("code").innerHTML = server.id;
+            document.getElementById("code").innerHTML = serverId;
             var qr = qrcode(0, "M");
-            let link = "https://expitau.github.io/Fishgame/src/game.html?server=0&room=" + server.id
+            let link = "https://expitau.github.io/Fishgame/src/game.html?room=" + serverId
             qr.addData(link);
             qr.make()
             let img = qr.createImgTag()
@@ -61,15 +61,17 @@
                 </svg>
             </button>
             <h2>Settings</h2>
-            <input type="text" id="nameInput" placeholder="Name" onchange="onNameChange()">
+            <input type="text" id="nameInput" placeholder="Name" onchange="onSettingsChange()">
+            <br>
+            <div style="padding: 1rem 0rem; height: 2rem; display: flex; flex-direction: row; align-items: center;"><div id="colorInputDisplay" style="border-radius: 0.5rem; padding: 0.5rem; background-color: white;">Color</div><input type="range" id="colorInput" min="0" max="360" onchange="onSettingsChange()"></div>
             <br><br>
             <div id="joinInfo">
                 <p>Share this code with your friends to play together!</p>
                 <p id="code"
-                    style="padding: 0.5rem; background-color: #F2CD72; border-radius: 0.5rem; text-align: center;">
+                    style="font-size: large; padding: 0.5rem; background-color: #F2CD72; border-radius: 0.5rem; text-align: center;">
                 </p>
                 <div id="qr" style="width: 100%"></div>
-                <a id="link" style="word-break: break-all; width: 30rem; display: block; text-align: center"></a>
+                <a id="link" style="width: 30rem; display: block; text-align: center"></a>
             </div>
         </div>
     </dialog>

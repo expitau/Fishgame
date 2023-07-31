@@ -1,7 +1,20 @@
 let server;
+let serverId; 
 
 function startServer() {
-    server = new Peer()
+    function generateServerID() {
+        let result = '';
+        let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+        for (let i = 0; i < 4; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return result;
+    }
+
+    serverId = generateServerID();
+    server = new Peer(SERVER_PREFIX + serverId)
     let lastServerUpdate;
 
     let gameState = {
@@ -49,8 +62,10 @@ function startServer() {
                         case CONN_EVENTS.heartbeatResponse:
                             connections[conn.peer].heartbeat = 0
                             break;
-                        case CONN_EVENTS.nameChange:
-                            gameState.players.find(player => player.id === conn.peer).name = data.data
+                        case CONN_EVENTS.metaDataChange:
+                            player = gameState.players.find(player => player.id === conn.peer)
+                            player.name = data.data.name
+                            player.color = data.data.color
                             break;
                     }
                 })
@@ -99,7 +114,7 @@ function startServer() {
             })
         }, 1000)
 
-        startClient(server.id);
+        startClient(serverId);
     })
 }
 

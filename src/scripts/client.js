@@ -18,7 +18,7 @@ function startClient(roomCode) {
     client.on('open', (clientId) => {
         id = clientId
         console.log("Client connecting...")
-        let conn = client.connect(roomCode)
+        let conn = client.connect(SERVER_PREFIX + roomCode)
 
         conn.on('open', () => {
             console.log("Client connected")
