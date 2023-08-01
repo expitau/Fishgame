@@ -47,10 +47,10 @@ function startServer() {
         let processQueue = savedInput.filter(x => x.time >= lastTime).sort((a, b) => a.time - b.time)
         for (let input of processQueue) {
             state = computePartialPhysics(state, lastTime, input.time);
-            console.log("Processing input", input);
             input.state = state;
             let newEffects = [];
             ({ state, effects: newEffects } = physicsInput(state, input.type, input.data))
+
             if (!input.effected) {
                 effects = [...effects, ...newEffects]
                 input.effected = true
@@ -72,19 +72,15 @@ function startServer() {
         }
 
         function saveInput(time) {
-            console.log("Saving input", time, structuredClone(gameState), type, data)
             savedInput.push({ time: time, state: structuredClone(gameState), type: type, data: data, effected: false })
         }
 
         // If no saved input, rollback as far as possible
         if (savedInput.length == 0) {
-            console.log("No saved inputs")
-
             time = Date.now()
             saveInput(Date.now())
 
         } else if (savedInput.filter(input => input.time < time).length == 0) {
-            console.log(`No saved input for time`, time)
 
             let lastInput = savedInput.sort((a, b) => a.time - b.time)[0]
             time = lastInput.time
@@ -99,7 +95,7 @@ function startServer() {
             // Rollback to last known correct state
             rollback(lastInput)
         }
-        console.log(time)
+        savedInput = savedInput.filter(x => x.time >= Date.now() - 10000)
         return computePhysics(gameState, time)
     }
 
@@ -108,13 +104,13 @@ function startServer() {
     server.on('open', () => {
 
         console.log("\n            ______   __     ______     __  __        ______     ______     __    __     ______    \n           /\\  ___\\ /\\ \\   /\\  ___\\   /\\ \\_\\ \\      /\\  ___\\   /\\  __ \\   /\\ \"-./  \\   /\\  ___\\   \n           \\ \\  __\\ \\ \\ \\  \\ \\___  \\  \\ \\  __ \\     \\ \\ \\__ \\  \\ \\  __ \\  \\ \\ \\-./\\ \\  \\ \\  __\\   \n            \\ \\_\\    \\ \\_\\  \\/\\_____\\  \\ \\_\\ \\_\\     \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\ \\ \\_\\  \\ \\_____\\ \n             \\/_/     \\/_/   \\/_____/   \\/_/\\/_/      \\/_____/   \\/_/\\/_/   \\/_/  \\/_/   \\/_____/ \n                                                                                                  \n           ");
-        console.log(`Room code: ${server.id}`)
+        console.log(`[server] Room code: ${server.id}`)
         // alert(`${location.origin}/Fishgame/src/game.html?room=${server.id}&server=0`)
 
         let connections = {}
 
         server.on("connection", (conn) => {
-            console.log("Added connection " + conn.peer);
+            console.log("[server] Added connection " + conn.peer);
 
             connections[conn.peer] = { heartbeat: 0, connection: conn }
 
@@ -124,7 +120,7 @@ function startServer() {
                 conn.on('data', (data) => {
                     switch (data.type) {
                         case CONN_EVENTS.clientUpdate:
-                            ({ state: newState, effects: newEffects } = serverInput(Date.now(), INPUT_TYPES.move, { input: data.data, id: conn.peer }))
+                            ({ state: newState, effects: newEffects } = serverInput(data.time, INPUT_TYPES.move, { input: data.data, id: conn.peer }))
                             effects = [...effects, ...newEffects]
                             gameState = newState
                             break;
@@ -154,7 +150,7 @@ function startServer() {
         // Update serverside physics
         setInterval(() => {
             ({ state: gameState } = computePhysics(gameState, lastTickUpdate))
-        }, 1000 / 60) // 60 times per second
+        }, 1000 / 20) // 60 times per second
 
         // Emit server update to client
         setInterval(() => {
@@ -164,7 +160,7 @@ function startServer() {
                     conn.connection.send({ type: CONN_EVENTS.serverEffect, data: effects })
             })
             effects = []
-        }, 1000 / 20)
+        }, 1000 / 10)
 
         setInterval(() => {
             Object.values(connections).forEach(conn => {
@@ -177,6 +173,10 @@ function startServer() {
                 }
             })
         }, 1000)
+
+        setInterval(() => {
+            gameState = serverInput(Date.now(), INPUT_TYPES.cache, {}).state
+        }, 1000 / 0.5)
 
         startClient(serverId);
     })

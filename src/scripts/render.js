@@ -37,7 +37,7 @@ function setupGraphics(state) {
     resizeCanvas()
 
     loadAssets().then(() => {
-        console.log("Graphics ready")
+        console.log("[client] Graphics ready")
         graphicsReady = true;
         initalizeGraphics(state);
     })

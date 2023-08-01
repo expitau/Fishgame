@@ -231,7 +231,7 @@ function physicsInput(state, type, data) {
     } else if (type == INPUT_TYPES.connect) {
         let id = data.id
         let color = data.color
-        console.log(`Connecting player ${id}}`)
+        console.log(`[server] Adding player ${id}}`)
         state.players ??= []
         state.players.push({
             id: id,
@@ -247,7 +247,7 @@ function physicsInput(state, type, data) {
         })
     } else if (type == INPUT_TYPES.disconnect) {
         let id = data.id
-        console.log(`Disconnecting player ${id}}`)
+        console.log(`[server] Removing player ${id}}`)
         state.players = state.players.filter(player => player.id !== id)
     } else if (type == INPUT_TYPES.settings) {
         player = state.players.find(player => player.id === data.id)
@@ -255,6 +255,7 @@ function physicsInput(state, type, data) {
         let color = data.color;
         player.name = name;
         player.color = color
+    } else if (type == INPUT_TYPES.cache) {
     }
 
     return { state, effects }

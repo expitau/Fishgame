@@ -17,11 +17,11 @@ function startClient(roomCode) {
 
     client.on('open', (clientId) => {
         id = clientId
-        console.log("Client connecting...")
+        console.log("[client] connecting...")
         let conn = client.connect(SERVER_PREFIX + roomCode)
 
         conn.on('open', () => {
-            console.log("Client connected")
+            console.log("[client] connected")
             new p5(p => { window._p5 = p; p.setup = setupGame})
             serverConnection = conn
             conn.on('data', (data) => {
