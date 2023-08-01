@@ -238,8 +238,6 @@ function renderGraphics(state) {
     {
         let player = gameState.players.filter(player => player.id === id)[0];
         if (player) {
-            console.log(player.health)
-            console.log(gameState.players)
             // Health bar
             for (let i = 0; i < 3; i++) {
                 _p5.image(graphics.iconSheet, align((maps[state.map].width * 8 - (i + 1) * 8) * maps[state.map].pixelSize), align(maps[state.map].pixelSize), 6.25 * 7, 6.25 * 7, 0 * 8, ((player.health > i) ? 0 : 1) * 8, 7, 7);

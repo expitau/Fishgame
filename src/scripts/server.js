@@ -124,7 +124,6 @@ function startServer() {
                 conn.on('data', (data) => {
                     switch (data.type) {
                         case CONN_EVENTS.clientUpdate:
-                            console.log("Client update");
                             ({ state: newState, effects: newEffects } = serverInput(Date.now(), INPUT_TYPES.move, { input: data.data, id: conn.peer }))
                             effects = [...effects, ...newEffects]
                             gameState = newState
@@ -136,8 +135,9 @@ function startServer() {
                             connections[conn.peer].heartbeat = 0
                             break;
                         case CONN_EVENTS.metaDataChange:
-                            console.log("Client metadata")
-                                ({ state: newState, effects: newEffects } = serverInput(Date.now(), INPUT_TYPES.move, { name: data.name, color: data.color, id: conn.peer }))
+                            ({ state: newState, effects: newEffects } = serverInput(Date.now(), INPUT_TYPES.settings, { name: data.data.name, color: data.data.color, id: conn.peer }))
+                            effects = [...effects, ...newEffects]
+                            gameState = newState
                             break;
                     }
                 })

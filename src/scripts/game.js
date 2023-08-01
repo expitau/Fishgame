@@ -250,7 +250,7 @@ function physicsInput(state, type, data) {
         console.log(`Disconnecting player ${id}}`)
         state.players = state.players.filter(player => player.id !== id)
     } else if (type == INPUT_TYPES.settings) {
-        player = gameState.players.find(player => player.id === data.id)
+        player = state.players.find(player => player.id === data.id)
         let name = data.name;
         let color = data.color;
         player.name = name;
