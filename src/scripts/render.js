@@ -11,19 +11,19 @@ let fishSheets = {};
 async function loadAssets() {
 
     graphics = {
-        tileSheet: await new Promise(resolve => {_p5.loadImage('resources/tile_spritesheet.png', resolve)}),
-        fishSheet: await new Promise(resolve => {_p5.loadImage('resources/fish_spritesheet.png', resolve)}),
-        fishShadowSheet: await new Promise(resolve => {_p5.loadImage('resources/fishshadow_spritesheet.png', resolve)}),
-        slapSheet: await new Promise(resolve => {_p5.loadImage('resources/slap_spritesheet.png', resolve)}),
-        cursorSheet: await new Promise(resolve => {_p5.loadImage('resources/cursor_sheet.png', resolve)}),
-        background: await new Promise(resolve => {_p5.loadImage('resources/background.png', resolve)}),
-        iconSheet: await new Promise(resolve => {_p5.loadImage('resources/icon_spritesheet.png', resolve)}),
+        tileSheet: await new Promise(resolve => { _p5.loadImage('resources/tile_spritesheet.png', resolve) }),
+        fishSheet: await new Promise(resolve => { _p5.loadImage('resources/fish_spritesheet.png', resolve) }),
+        fishShadowSheet: await new Promise(resolve => { _p5.loadImage('resources/fishshadow_spritesheet.png', resolve) }),
+        slapSheet: await new Promise(resolve => { _p5.loadImage('resources/slap_spritesheet.png', resolve) }),
+        cursorSheet: await new Promise(resolve => { _p5.loadImage('resources/cursor_sheet.png', resolve) }),
+        background: await new Promise(resolve => { _p5.loadImage('resources/background.png', resolve) }),
+        iconSheet: await new Promise(resolve => { _p5.loadImage('resources/icon_spritesheet.png', resolve) }),
     };
-    
+
     sounds = {
-        bump: await new Promise(resolve => {_p5.loadSound('resources/bump.wav', resolve)}),
-        death: await new Promise(resolve => {_p5.loadSound('resources/death.wav', resolve)}),
-        hit: await new Promise(resolve => {_p5.loadSound('resources/hit.wav', resolve)}),
+        bump: await new Promise(resolve => { _p5.loadSound('resources/bump.wav', resolve) }),
+        death: await new Promise(resolve => { _p5.loadSound('resources/death.wav', resolve) }),
+        hit: await new Promise(resolve => { _p5.loadSound('resources/hit.wav', resolve) }),
     }
 }
 
@@ -237,9 +237,13 @@ function renderGraphics(state) {
 
     {
         let player = gameState.players.filter(player => player.id === id)[0];
-        // Health bar
-        for (let i = 0; i < 3; i++) {
-            _p5.image(graphics.iconSheet, align((maps[state.map].width * 8 - (i + 1) * 8) * maps[state.map].pixelSize), align(maps[state.map].pixelSize), 6.25 * 7, 6.25 * 7, 0 * 8, ((player.health > i) ? 0 : 1) * 8, 7, 7);
+        if (player) {
+            console.log(player.health)
+            console.log(gameState.players)
+            // Health bar
+            for (let i = 0; i < 3; i++) {
+                _p5.image(graphics.iconSheet, align((maps[state.map].width * 8 - (i + 1) * 8) * maps[state.map].pixelSize), align(maps[state.map].pixelSize), 6.25 * 7, 6.25 * 7, 0 * 8, ((player.health > i) ? 0 : 1) * 8, 7, 7);
+            }
         }
     }
 

@@ -50,6 +50,7 @@ function getCollisionArea(gameMap, x, y) {
 
 // On physics tick, modify state
 function physicsTick(state) {
+    state = structuredClone(state)
 
     // Loop through all players
     for (const player of state.players) {
@@ -111,116 +112,150 @@ function physicsTick(state) {
         player.r = ((Math.PI * 4) + player.r) % (Math.PI * 2);
 
     }
+
+    return { state }
 }
 
 // On player input
-function physicsInput(state, input, id) {
+function physicsInput(state, type, data) {
+    state = structuredClone(state)
     let effects = []
-    if (!connected) return;
 
-    let player = state.players.filter(player => player.id === id)[0];
+    if (type == INPUT_TYPES.move) {
+        let input = data.input;
+        let id = data.id;
 
-    // Break cursor into x,y components
-    let dx = Math.sin(input.cursorR);
-    let dy = Math.cos(input.cursorR);
-    let pvp = false;
+        let player = state.players.filter(player => player.id === id)[0];
 
-    // If player can hit a player
-    for (let otherPlayer of state.players) {
-        if (otherPlayer.id !== player.id) {
-            if (((player.x + dx * 60 - otherPlayer.x) ** 2 + (player.y + dy * 60 - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize ||
-                ((player.x - otherPlayer.x) ** 2 + (player.y - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize) {
-                // Set hit power
-                let power = 7;
+        // Break cursor into x,y components
+        let dx = Math.sin(input.cursorR);
+        let dy = Math.cos(input.cursorR);
+        let pvp = false;
 
-                // Apply new player velocities
-                player.vx = -power * dx;
-                player.vy = -power * dy;
-                player.vr = 0.2 * (player.vx > 0 ? 1 : -1);
-                otherPlayer.vx = power * dx;
-                otherPlayer.vy = power * dy;
-                otherPlayer.vr = -player.vr;
-                otherPlayer.health--;
+        // If player can hit a player
+        for (let otherPlayer of state.players) {
+            if (otherPlayer.id !== player.id) {
+                if (((player.x + dx * 60 - otherPlayer.x) ** 2 + (player.y + dy * 60 - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize ||
+                    ((player.x - otherPlayer.x) ** 2 + (player.y - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize) {
+                    // Set hit power
+                    let power = 7;
 
-                // Update player rotation to point of contact
-                player.r = (input.cursorR + Math.PI) % (Math.PI * 2);
+                    // Apply new player velocities
+                    player.vx = -power * dx;
+                    player.vy = -power * dy;
+                    player.vr = 0.2 * (player.vx > 0 ? 1 : -1);
+                    otherPlayer.vx = power * dx;
+                    otherPlayer.vy = power * dy;
+                    otherPlayer.vr = -player.vr;
+                    otherPlayer.health--;
 
-                // Add slap effect
-                effects.push({
-                    name: "impact",
-                    x: (otherPlayer.x + player.x) / 2,
-                    y: (otherPlayer.y + player.y) / 2,
-                    time: 15
-                });
+                    // Update player rotation to point of contact
+                    player.r = (input.cursorR + Math.PI) % (Math.PI * 2);
 
-                // On Player death
-                if (otherPlayer.health <= 0) {
+                    // Add slap effect
                     effects.push({
-                        name: "splat",
-                        x: otherPlayer.x,
-                        y: otherPlayer.y,
-                        color: otherPlayer.color,
-                        r: player.r,
+                        name: "impact",
+                        x: (otherPlayer.x + player.x) / 2,
+                        y: (otherPlayer.y + player.y) / 2,
                         time: 15
                     });
 
-                    effects.push({
-                        name: "shake",
-                        time: 25,
-                        id: otherPlayer.id
-                    })
-                    otherPlayer.health = 3;
-                    otherPlayer.x = maps[state.map].spawnPoint[0]
-                    otherPlayer.y = maps[state.map].spawnPoint[1]
-                    otherPlayer.vx = 0
-                    otherPlayer.vy = 0
-                    otherPlayer.vr = 0
-                } else {
-                    effects.push({
-                        name: "splat",
-                        x: otherPlayer.x,
-                        y: otherPlayer.y,
-                        color: otherPlayer.color,
-                        r: player.r,
-                        time: 2
-                    });
-                    effects.push({
-                        name: "shake",
-                        time: 5,
-                        id: otherPlayer.id
-                    })
-                }
+                    // On Player death
+                    if (otherPlayer.health <= 0) {
+                        effects.push({
+                            name: "splat",
+                            x: otherPlayer.x,
+                            y: otherPlayer.y,
+                            color: otherPlayer.color,
+                            r: player.r,
+                            time: 15
+                        });
 
-                pvp = true;
+                        effects.push({
+                            name: "shake",
+                            time: 25,
+                            id: otherPlayer.id
+                        })
+                        otherPlayer.health = 3;
+                        otherPlayer.x = maps[state.map].spawnPoint[0]
+                        otherPlayer.y = maps[state.map].spawnPoint[1]
+                        otherPlayer.vx = 0
+                        otherPlayer.vy = 0
+                        otherPlayer.vr = 0
+                    } else {
+                        effects.push({
+                            name: "splat",
+                            x: otherPlayer.x,
+                            y: otherPlayer.y,
+                            color: otherPlayer.color,
+                            r: player.r,
+                            time: 2
+                        });
+                        effects.push({
+                            name: "shake",
+                            time: 5,
+                            id: otherPlayer.id
+                        })
+                    }
+
+                    pvp = true;
+                }
             }
         }
+
+        // If player can hit a tile
+        if (!pvp && getCollisionArea(maps[state.map], player.x + dx * 60, player.y + dy * 60)) {
+            // Set hit power
+            let power = 7;
+
+            // Calculate what factor of new movement to conserved momentum to use on both the x and y axis
+            let xFactor = Math.min(Math.max(Math.abs((-power * dx) / player.vx), 0.01), 0.99);
+            let yFactor = Math.min(Math.max(Math.abs((-power * dy) / player.vy), 0.01), 0.99);
+
+            // Apply new player velocities
+            player.vx = (-power * dx) * xFactor + player.vx * (1 - xFactor);
+            player.vy = (-power * dy) * yFactor + player.vy * (1 - yFactor);
+            player.vr = 0.2 * (player.vx > 0 ? 1 : -1);
+
+            // Update player rotation to point of contact
+            player.r = (input.cursorR + Math.PI) % (Math.PI * 2);
+
+            // Add slap effect
+            effects.push({
+                name: "impact",
+                x: player.x + dx * 15,
+                y: player.y + dy * 15,
+                time: 15
+            });
+        }
+    } else if (type == INPUT_TYPES.connect) {
+        let id = data.id
+        let color = data.color
+        console.log(`Connecting player ${id}}`)
+        state.players ??= []
+        state.players.push({
+            id: id,
+            x: maps[gameState.map].spawnPoint[0],
+            y: maps[gameState.map].spawnPoint[1],
+            r: 0,
+            vx: 0,
+            vy: 0,
+            vr: 0,
+            health: 3,
+            color: color,
+            name: ''
+        })
+    } else if (type == INPUT_TYPES.disconnect) {
+        let id = data.id
+        console.log(`Disconnecting player ${id}}`)
+        state.players = state.players.filter(player => player.id !== id)
+    } else if (type == INPUT_TYPES.settings) {
+        player = gameState.players.find(player => player.id === data.id)
+        let name = data.name;
+        let color = data.color;
+        player.name = name;
+        player.color = color
     }
 
-    // If player can hit a tile
-    if (!pvp && getCollisionArea(maps[state.map], player.x + dx * 60, player.y + dy * 60)) {
-        // Set hit power
-        let power = 7;
-
-        // Calculate what factor of new movement to conserved momentum to use on both the x and y axis
-        let xFactor = Math.min(Math.max(Math.abs((-power * dx) / player.vx), 0.01), 0.99);
-        let yFactor = Math.min(Math.max(Math.abs((-power * dy) / player.vy), 0.01), 0.99);
-
-        // Apply new player velocities
-        player.vx = (-power * dx) * xFactor + player.vx * (1 - xFactor);
-        player.vy = (-power * dy) * yFactor + player.vy * (1 - yFactor);
-        player.vr = 0.2 * (player.vx > 0 ? 1 : -1);
-
-        // Update player rotation to point of contact
-        player.r = (input.cursorR + Math.PI) % (Math.PI * 2);
-
-        // Add slap effect
-        effects.push({
-            name: "impact",
-            x: player.x + dx * 15,
-            y: player.y + dy * 15,
-            time: 15
-        });
-    }
-
-    return effects
+    return { state, effects }
 }

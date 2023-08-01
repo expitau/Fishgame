@@ -1,5 +1,5 @@
 let server;
-let serverId; 
+let serverId;
 
 function startServer() {
     function generateServerID() {
@@ -14,12 +14,93 @@ function startServer() {
     }
 
     serverId = generateServerID();
-    server = new Peer(SERVER_PREFIX + serverId)
-    let lastServerUpdate;
+    server = new Peer(SERVER_PREFIX + serverId);
 
+    let lastInputUpdate;
+
+    let savedInput = []
+
+    let lastTickUpdate = Date.now();
     let gameState = {
         map: 0,
         players: []
+    }
+
+
+    // Compute all physics from state from time until now, with inputs
+    function computePhysics(state, time) {
+        let effects = []
+
+        function computePartialPhysics(state, timeA, timeB) {
+            let deltaFrames = Math.round(timeB / 16) - Math.round(timeA / 16);
+            while (deltaFrames > 0) {
+                deltaFrames -= 1;
+                state = physicsTick(state).state;
+            }
+            return state
+        }
+
+        // Last known correct state
+        let lastTime = time;
+
+        // Compute all physics from last known correct state until first input after lastTime
+        let processQueue = savedInput.filter(x => x.time >= lastTime).sort((a, b) => a.time - b.time)
+        for (let input of processQueue) {
+            state = computePartialPhysics(state, lastTime, input.time);
+            console.log("Processing input", input);
+            input.state = state;
+            let newEffects = [];
+            ({ state, effects: newEffects } = physicsInput(state, input.type, input.data))
+            if (!input.effected) {
+                effects = [...effects, ...newEffects]
+                input.effected = true
+            }
+            lastTime = input.time
+        }
+        state = computePartialPhysics(state, lastTime, Date.now())
+        lastTickUpdate = Date.now()
+        return { state, effects }
+    }
+
+    // Server specific rollback handling
+    function serverInput(time, type, data) {
+
+        function rollback(input) {
+            lastTickUpdate = input.time
+            time = input.time
+            gameState = input.state
+        }
+
+        function saveInput(time) {
+            console.log("Saving input", time, structuredClone(gameState), type, data)
+            savedInput.push({ time: time, state: structuredClone(gameState), type: type, data: data, effected: false })
+        }
+
+        // If no saved input, rollback as far as possible
+        if (savedInput.length == 0) {
+            console.log("No saved inputs")
+
+            time = Date.now()
+            saveInput(Date.now())
+
+        } else if (savedInput.filter(input => input.time < time).length == 0) {
+            console.log(`No saved input for time`, time)
+
+            let lastInput = savedInput.sort((a, b) => a.time - b.time)[0]
+            time = lastInput.time
+
+            saveInput(lastInput.time)
+            rollback(lastInput)
+        } else {
+            saveInput(time)
+
+            let lastInput = savedInput.filter(input => input.time < time).sort((a, b) => a.time - b.time).slice(-1)[0]
+
+            // Rollback to last known correct state
+            rollback(lastInput)
+        }
+        console.log(time)
+        return computePhysics(gameState, time)
     }
 
     let effects = []
@@ -38,23 +119,15 @@ function startServer() {
             connections[conn.peer] = { heartbeat: 0, connection: conn }
 
             conn.on('open', () => {
-                gameState.players.push({
-                    id: conn.peer,
-                    x: maps[gameState.map].spawnPoint[0],
-                    y: maps[gameState.map].spawnPoint[1],
-                    r: 0,
-                    vx: 0,
-                    vy: 0,
-                    vr: 0,
-                    health: 3,
-                    color: Math.floor(Math.random() * 360),
-                    name: ''
-                })
+                gameState = serverInput(Date.now(), INPUT_TYPES.connect, { id: conn.peer, color: Math.floor(Math.random() * 360) }).state
 
                 conn.on('data', (data) => {
                     switch (data.type) {
                         case CONN_EVENTS.clientUpdate:
-                            effects = [...effects, ...physicsInput(gameState, data.data, conn.peer)]
+                            console.log("Client update");
+                            ({ state: newState, effects: newEffects } = serverInput(Date.now(), INPUT_TYPES.move, { input: data.data, id: conn.peer }))
+                            effects = [...effects, ...newEffects]
+                            gameState = newState
                             break;
                         case CONN_EVENTS.heartbeat:
                             conn.send({ type: CONN_EVENTS.heartbeatResponse })
@@ -63,17 +136,15 @@ function startServer() {
                             connections[conn.peer].heartbeat = 0
                             break;
                         case CONN_EVENTS.metaDataChange:
-                            player = gameState.players.find(player => player.id === conn.peer)
-                            player.name = data.data.name
-                            player.color = data.data.color
+                            console.log("Client metadata")
+                                ({ state: newState, effects: newEffects } = serverInput(Date.now(), INPUT_TYPES.move, { name: data.name, color: data.color, id: conn.peer }))
                             break;
                     }
                 })
 
                 conn.on('close', () => {
-                    console.log("Removing peer")
                     delete connections[conn.peer]
-                    gameState.players = gameState.players.filter(player => player.id !== conn.peer)
+                    gameState = serverInput(Date.now(), INPUT_TYPES.disconnect, { id: conn.peer }).state
                 })
 
                 conn.send({ type: CONN_EVENTS.clientInit, data: gameState })
@@ -81,21 +152,14 @@ function startServer() {
         })
 
         // Update serverside physics
-        let lastServerUpdate = Date.now()
-        let deltaTime = 0;
         setInterval(() => {
-            deltaTime = Math.round(Date.now() / 16) - Math.round(lastServerUpdate / 16);
-            while (deltaTime > 0) {
-                deltaTime -= 1;
-                physicsTick(gameState);
-                lastServerUpdate = Date.now()
-            }
+            ({ state: gameState } = computePhysics(gameState, lastTickUpdate))
         }, 1000 / 60) // 60 times per second
 
-        // // Emit server update to client
+        // Emit server update to client
         setInterval(() => {
             Object.values(connections).forEach(conn => {
-                conn.connection.send({ type: CONN_EVENTS.serverUpdate, data: { timeStamp: lastServerUpdate, state: gameState } });
+                conn.connection.send({ type: CONN_EVENTS.serverUpdate, data: { timeStamp: lastTickUpdate, state: gameState } });
                 if (effects.length > 0)
                     conn.connection.send({ type: CONN_EVENTS.serverEffect, data: effects })
             })

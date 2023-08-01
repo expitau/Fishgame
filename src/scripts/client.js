@@ -101,7 +101,7 @@ function setupGame() {
         while (deltaTime > 0) {
             deltaTime -= 1;
             if (connected) {
-                physicsTick(gameState);
+                gameState = physicsTick(gameState).state;
             }
             lastUpdate = syncedTime()
         }

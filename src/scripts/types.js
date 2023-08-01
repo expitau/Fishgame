@@ -9,3 +9,11 @@ let CONN_EVENTS = {
 }
 
 let SERVER_PREFIX = "fishgame-"
+
+let INPUT_TYPES = {
+    "cache": 0,
+    "move": 1,
+    "connect": 2,
+    "disconnect": 3,
+    "settings": 4
+}
