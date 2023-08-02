@@ -179,7 +179,9 @@ function startServer() {
             gameState = serverInput(Date.now(), INPUT_TYPES.cache, {}).state
         }, 1000 / 0.5)
 
-        startClient(serverId);
+        if (isClient) {
+            startClient(serverId);
+        }
     })
 }
 

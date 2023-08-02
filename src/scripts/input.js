@@ -79,7 +79,7 @@ function mouseReleased() {
     mouseIsHeld = false;
 
     if (cursorData.x != 0 && cursorData.y != 0) {
-        gameState = physicsInput(gameState, INPUT_TYPES.move, { input: { cursorR: cursorData.r }, id: client.id }).state;
+        // gameState = physicsInput(gameState, INPUT_TYPES.move, { input: { cursorR: cursorData.r }, id: client.id }).state;
         serverConnection.send({ type: CONN_EVENTS.clientUpdate, data: { cursorR: cursorData.r }, time: syncedTime() });
         cursorData.x = 0;
         cursorData.y = 0;

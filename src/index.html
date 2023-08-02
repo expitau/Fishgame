@@ -22,9 +22,9 @@
     <div style="display: flex; flex-direction: column; align-items: center;">
         <h1>Fish game</h1>
         <input id="room" placeholder="Room id" oninput="onRoomInput(this.value)"></input>
-        <button id="join" disabled onclick="location.href = 'game.html?server=0&room=' + document.getElementById('room').value">Join</button>
+        <button id="join" disabled onclick="location.href = 'game.html?m=2&room=' + document.getElementById('room').value.toUpperCase()">Join</button>
         <p>OR</p>
-        <button onclick="location.href = 'game.html?server=1'">Create</button>
+        <button onclick="location.href = 'game.html?m=3'">Create</button>
     </div>
 </body>
 

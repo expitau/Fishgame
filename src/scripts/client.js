@@ -68,7 +68,7 @@ function syncedTime() {
     return Date.now() - timeOffset
 }
 
-if (!isServer) {
+if (isClient && !isServer) {
     startClient(roomCode)
 }
 
