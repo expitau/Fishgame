@@ -47,7 +47,7 @@ function startServer() {
         let processQueue = savedInput.filter(x => x.time >= lastTime).sort((a, b) => a.time - b.time)
         for (let input of processQueue) {
             state = computePartialPhysics(state, lastTime, input.time);
-            input.state = state;
+            input.state = structuredClone(state);
             let newEffects = [];
             ({ state, effects: newEffects } = physicsInput(state, input.type, input.data))
 
@@ -64,11 +64,12 @@ function startServer() {
 
     // Server specific rollback handling
     function serverInput(time, type, data) {
+        console.log(`Handling server input ${Date.now() - time}ms early`)
 
         function rollback(input) {
             lastTickUpdate = input.time
             time = input.time
-            gameState = input.state
+            gameState = structuredClone(input.state)
         }
 
         function saveInput(time) {
@@ -90,7 +91,7 @@ function startServer() {
         } else {
             saveInput(time)
 
-            let lastInput = savedInput.filter(input => input.time < time).sort((a, b) => a.time - b.time).slice(-1)[0]
+            let lastInput = savedInput.filter(input => input.time < time).sort((a, b) => b.time - a.time)[0]
 
             // Rollback to last known correct state
             rollback(lastInput)
