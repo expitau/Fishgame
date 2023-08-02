@@ -64,7 +64,7 @@ function startServer() {
 
     // Server specific rollback handling
     function serverInput(time, type, data) {
-        console.log(`Handling server input ${Date.now() - time}ms early`)
+        console.log(`[server] Handling server input ${Date.now() - time}ms early`)
 
         function rollback(input) {
             lastTickUpdate = input.time
