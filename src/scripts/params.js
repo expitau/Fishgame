@@ -8,8 +8,9 @@ if (params.get('m')) {
     isServer = mode % 2 == 1;
     isClient = Math.floor(mode / 2) % 2 == 1;
 } else {
-    window.location.href = 'index.html'
+    isClient = true
 }
+
 {
     let mustConnect = isClient && !isServer
 
