@@ -84,6 +84,10 @@ textarea:focus, input:focus{
 	gap: var(--standard-gap);
 }
 
+.no-wrap {
+   white-space: nowrap;
+}
+
 .standard-button {
    background-color: var(--selected-color);
    color: #ffffff;

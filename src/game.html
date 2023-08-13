@@ -101,7 +101,7 @@
     const onLoad = () => {
         if(serverId !== undefined && serverId !== '') {
             const loadingText = document.getElementById('loadingText');
-            loadingText.innerHTML = `${isServer ? 'Starting server' : 'Connecting to...'}  <br><div class="info">${serverId}</div>`;
+            loadingText.innerHTML = `<div class="no-wrap">${isServer ? 'Starting server' : 'Connecting to...'}</div><div class="info">${serverId}</div>`;
         }
     }
 
