@@ -8,7 +8,8 @@ let cursorData = {
 };
 let keys = [];
 let mouseIsHeld = false;
-let displayName = "";
+let displayName = '';
+let displayColor = Math.floor(Math.random() * 360);
 
 function registerInputs() {
     _p5.mouseMoved = mouseMoved;
@@ -26,16 +27,25 @@ function windowResized() {
 }
 
 function onSettingsChange() {
-    displayName = document.getElementById("nameInput").value;
-    displayColor = document.getElementById("colorInput").value;
+    displayName = document.getElementById('nameInput').value;
+    displayColor = document.getElementById('colorInput').value;
     updateColorDisplay()
-    serverConnection.send({ type: CONN_EVENTS.metaDataChange, data: {name: displayName, color: displayColor} });
+    serverConnection.send({ 
+        type: CONN_EVENTS.metaDataChange, 
+        data: {
+            name: displayName, 
+            color: displayColor
+        } 
+    });
 }
 
+
 function updateColorDisplay() {
-    displayColor = document.getElementById("colorInput").value;
-    colorInputDisplay = document.getElementById("colorInputDisplay");
-    colorInputDisplay.style.backgroundColor = (() => "rgb(" + HSBToRGB(displayColor, 100, 100).join(", ") + ")")();
+    const colorSlider = document.getElementById('colorInput');
+    colorInputDisplay = document.getElementById('colorInputDisplay');
+    const colorString = (() => 'rgb(' + HSBToRGB(colorSlider.value, 100, 100).join(', ') + ')')();
+    colorInputDisplay.style.color = colorString;
+    colorSlider.style['accent-color'] = colorString;
 }
 
 function mouseMoved(e) {

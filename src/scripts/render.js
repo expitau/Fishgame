@@ -31,7 +31,7 @@ function setupGraphics(state) {
     resizeCanvas()
 
     loadAssets().then(() => {
-        console.log("[client] Graphics ready")
+        console.log('[client] Graphics ready')
         graphicsReady = true;
         initalizeGraphics(state);
     })
@@ -45,7 +45,7 @@ function resizeCanvas() {
 }
 
 function initalizeGraphics(state) {
-    let spritemap = { "0": [5, 1], "1": [0, 0], "2": [1, 0], "3": [2, 0], "4": [3, 0], "[": [0, 1], "*": [0, 2], "]": [1, 1], "c": [1, 2], "#": [2, 1], "_": [2, 2], "%": [3, 1], "S": [4, 0], "$": [4, 1], "E": [5, 0] }
+    let spritemap = { '0': [5, 1], '1': [0, 0], '2': [1, 0], '3': [2, 0], '4': [3, 0], '[': [0, 1], '*': [0, 2], ']': [1, 1], 'c': [1, 2], '#': [2, 1], '_': [2, 2], '%': [3, 1], 'S': [4, 0], '$': [4, 1], 'E': [5, 0] }
     levelImage = _p5.createImage(maps[state.map].width * 8, maps[state.map].height * 8);
     levelImage.loadPixels();
     // graphics.tileSheet.loadPixels();
@@ -56,11 +56,11 @@ function initalizeGraphics(state) {
                 if (x >= 0 && x < map.width && y >= 0 && y < map.height) {
                     return map.tilemap[y].charAt(x);
                 }
-                return "X";
+                return 'X';
             }
             let spriteSymbol = getTile(maps[state.map], i, j);
 
-            if (spriteSymbol === " ") {
+            if (spriteSymbol === ' ') {
                 continue;
             }
 
@@ -149,11 +149,11 @@ function renderGraphics(state) {
 
         // Create and render frame
         {
-            _p5.background("#dbba67");
+            _p5.background('#dbba67');
             _p5.push();
             _p5.translate(150 + screenShakeMap[0] * frame.changeRatio, 150 + screenShakeMap[1] * frame.changeRatio);
             _p5.scale(frame.changeRatio);
-            _p5.fill("#b09554");
+            _p5.fill('#b09554');
             _p5.noStroke();
             _p5.rect(-maps[state.map].pixelSize, -maps[state.map].pixelSize, frame.width + maps[state.map].pixelSize * 2, frame.height + maps[state.map].pixelSize * 2);
         }
@@ -309,12 +309,12 @@ function renderGraphics(state) {
             switch (graphicsEffects[i].name) {
 
                 // White circle on hit object
-                case "impact":
+                case 'impact':
                     _p5.image(graphics.slapSheet, align(graphicsEffects[i].x) - 6.25 * 4, align(graphicsEffects[i].y) - 6.25 * 4, 50, 50, ((4 - Math.floor(graphicsEffects[i].time / 4)) % 2) * 9, Math.floor((4 - Math.floor(graphicsEffects[i].time / 4)) / 2) * 9, 8, 8)
                     break;
 
-                // Splatter "paint" on hit or death
-                case "splat":
+                // Splatter 'paint' on hit or death
+                case 'splat':
                     let [x, y, hue, r] = [graphicsEffects[i].x, graphicsEffects[i].y, graphicsEffects[i].color, graphicsEffects[i].r]
                     graphics.background.loadPixels();
                     fishSheets[hue].loadPixels();
@@ -331,7 +331,7 @@ function renderGraphics(state) {
                     break;
 
                 // Screen shake
-                case "shake":
+                case 'shake':
                     if (graphicsEffects[i].id == id) {
                         screenShakeTime = graphicsEffects[i].time;
                     }

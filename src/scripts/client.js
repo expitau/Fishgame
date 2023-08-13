@@ -29,6 +29,7 @@ function startClient(roomCode) {
                     case CONN_EVENTS.clientInit:
                         gameState = data.data
                         connected = true
+                        sendClientPlayerData();
                         break;
                     case CONN_EVENTS.serverUpdate:
                         gameState = data.data.state
@@ -72,6 +73,27 @@ if (isClient && !isServer) {
     startClient(roomCode)
 }
 
+function sendClientPlayerData(){
+    let searchParams = new URLSearchParams(window.location.search)
+    if (searchParams.get('name')) {
+        displayName = searchParams.get('name');
+    }
+
+    if(displayName !== ''){
+        serverConnection.send({ 
+            type: CONN_EVENTS.metaDataChange, 
+            data: {
+                name: displayName, 
+                color: displayColor
+            } 
+        });
+    }
+}
+
+function renderLoop() {
+    renderGraphics(gameState);
+    window.requestAnimationFrame(renderLoop)
+}
 
 function setupGame() {
     setupGraphics(gameState);
@@ -82,17 +104,6 @@ function setupGame() {
         document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
     }
 
-    function renderLoop() {
-        // Handle Input
-        {
-
-            if (keys[27] || keys[80]) {
-                document.exitPointerLock();
-            }
-        }
-        renderGraphics(gameState);
-        window.requestAnimationFrame(renderLoop)
-    }
     window.requestAnimationFrame(renderLoop)
 
 

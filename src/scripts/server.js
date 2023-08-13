@@ -16,8 +16,6 @@ function startServer() {
     serverId = generateServerID();
     server = new Peer(SERVER_PREFIX + serverId);
 
-    let lastInputUpdate;
-
     let savedInput = []
 
     let lastTickUpdate = Date.now();
@@ -104,14 +102,14 @@ function startServer() {
 
     server.on('open', () => {
 
-        console.log("\n            ______   __     ______     __  __        ______     ______     __    __     ______    \n           /\\  ___\\ /\\ \\   /\\  ___\\   /\\ \\_\\ \\      /\\  ___\\   /\\  __ \\   /\\ \"-./  \\   /\\  ___\\   \n           \\ \\  __\\ \\ \\ \\  \\ \\___  \\  \\ \\  __ \\     \\ \\ \\__ \\  \\ \\  __ \\  \\ \\ \\-./\\ \\  \\ \\  __\\   \n            \\ \\_\\    \\ \\_\\  \\/\\_____\\  \\ \\_\\ \\_\\     \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\ \\ \\_\\  \\ \\_____\\ \n             \\/_/     \\/_/   \\/_____/   \\/_/\\/_/      \\/_____/   \\/_/\\/_/   \\/_/  \\/_/   \\/_____/ \n                                                                                                  \n           ");
+        console.log('\n            ______   __     ______     __  __        ______     ______     __    __     ______    \n           /\\  ___\\ /\\ \\   /\\  ___\\   /\\ \\_\\ \\      /\\  ___\\   /\\  __ \\   /\\ \'-./  \\   /\\  ___\\   \n           \\ \\  __\\ \\ \\ \\  \\ \\___  \\  \\ \\  __ \\     \\ \\ \\__ \\  \\ \\  __ \\  \\ \\ \\-./\\ \\  \\ \\  __\\   \n            \\ \\_\\    \\ \\_\\  \\/\\_____\\  \\ \\_\\ \\_\\     \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\ \\ \\_\\  \\ \\_____\\ \n             \\/_/     \\/_/   \\/_____/   \\/_/\\/_/      \\/_____/   \\/_/\\/_/   \\/_/  \\/_/   \\/_____/ \n                                                                                                  \n           ');
         console.log(`[server] Room code: ${server.id}`)
         // alert(`${location.origin}/Fishgame/src/game.html?room=${server.id}&server=0`)
 
         let connections = {}
 
-        server.on("connection", (conn) => {
-            console.log("[server] Added connection " + conn.peer);
+        server.on('connection', (conn) => {
+            console.log('[server] Added connection ' + conn.peer);
 
             connections[conn.peer] = { heartbeat: 0, connection: conn }
 
