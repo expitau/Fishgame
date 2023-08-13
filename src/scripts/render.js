@@ -41,7 +41,7 @@ function resizeCanvas() {
     frame = getGraphicsFrame()
     _p5.resizeCanvas(frame.screenWidth + 300, frame.screenHeight + 300);
     cnv.style('display', 'block');
-    cnv.position(frame.originX - 150, frame.originY - 150, 'absolute');
+    cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
 
     const iconBar = document.getElementById('primary-icon-bar');
     if(frame.originX - 100 > 5) {
