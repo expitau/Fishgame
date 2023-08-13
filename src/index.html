@@ -13,7 +13,7 @@
 
         <div class="menu-list">
             <input type="text" class="standard-text-input" id="nameInput" placeholder="Name" maxlength="15"></input>
-            <input type="text" class="standard-text-input" id="roomInput" placeholder="Room Code" oninput="onRoomInput(this.value)" maxlength="4"></input>
+            <input type="text" class="standard-text-input" id="roomInput" placeholder="Room Code" onfocus="this.value = '';" oninput="onRoomInput(this.value)" maxlength="4"></input>
 
             <div class="menu-group">
                 <button class="standard-button" id="hostButton" onclick="createGame()">Host</button>

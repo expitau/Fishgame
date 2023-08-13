@@ -168,11 +168,24 @@ function renderGraphics(state) {
         }
 
         // Draw players
+
+        // Remove any unused fish sprite sheets from memory
+        const playerColors = gameState.players.map((player) => player.color.toString());
+
+        for (let fishColorSheet in fishSheets) {
+            if (fishSheets.hasOwnProperty(fishColorSheet)) {
+                if(!playerColors.includes(fishColorSheet)){
+                    console.log('removed color:' + fishColorSheet);
+                    delete fishSheets[fishColorSheet];
+                }
+            }
+        }
+          
+        // Create new fish sprite sheets based of fish hue if one does not exist
         for (const player of gameState.players) {
             {
-                // Create new fish based on fish hue
-                let tempFishSheet;
                 if (fishSheets[player.color] === undefined) {
+                    let tempFishSheet;
                     tempFishSheet = _p5.createImage(graphics.fishSheet.width, graphics.fishSheet.height);
                     tempFishSheet.loadPixels();
                     graphics.fishSheet.loadPixels();
