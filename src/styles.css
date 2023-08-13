@@ -43,9 +43,6 @@ textarea:focus, input:focus{
 	flex-direction: column;
 	width: 100%;
 	text-align: center;
-	position: absolute;
-	top: 40%;
-	transform: translateY(-50%);
 }
 
 .menu-title {
@@ -106,8 +103,8 @@ textarea:focus, input:focus{
 
 .standard-modal {
    display: flex;
-   padding: 40px;
-   padding-top: 15px;
+   padding: 30px;
+   padding-top: 10px;
 	flex-direction: column;
    background-color: var(--background-color);
 }
