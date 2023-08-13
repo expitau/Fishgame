@@ -4,7 +4,7 @@ let cnv, frame;
 const PIXELSIZE = 6.25;
 
 let graphicsReady = false;
-let graphics, sounds;
+let graphics;
 let levelImage;
 let fishSheets = {};
 
@@ -19,12 +19,6 @@ async function loadAssets() {
         background: await new Promise(resolve => { _p5.loadImage('resources/background.png', resolve) }),
         iconSheet: await new Promise(resolve => { _p5.loadImage('resources/icon_spritesheet.png', resolve) }),
     };
-
-    sounds = {
-        bump: await new Promise(resolve => { _p5.loadSound('resources/bump.wav', resolve) }),
-        death: await new Promise(resolve => { _p5.loadSound('resources/death.wav', resolve) }),
-        hit: await new Promise(resolve => { _p5.loadSound('resources/hit.wav', resolve) }),
-    }
 }
 
 function setupGraphics(state) {
@@ -334,7 +328,6 @@ function renderGraphics(state) {
                         graphics.background.set(_p5.constrain(xPos, 0, 127), yPos, fishColor);
                     }
                     graphics.background.updatePixels();
-                    // sounds.hit.play();
                     break;
 
                 // Screen shake
