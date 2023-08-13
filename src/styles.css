@@ -89,7 +89,7 @@ textarea:focus, input:focus{
 }
 
 .hidden {
-   display: none;
+   display: none !important;
 }
 
 .standard-button {
@@ -161,6 +161,7 @@ textarea:focus, input:focus{
    position: fixed;
    display: flex;
    flex-direction: column;
+   transform-origin: top left;
    top: 0px;
    left: 0px;
    background: none;

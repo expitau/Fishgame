@@ -44,19 +44,19 @@ function resizeCanvas() {
     cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
 
     const iconBar = document.getElementById('primary-icon-bar');
+    iconBar.classList.remove('hidden');
+    iconBar.style.position = 'fixed';
+    iconBar.style.display = 'flex';
     if(frame.originX - 100 > 5) {
-        iconBar.style.display = 'flex';
         iconBar.style['flex-direction'] = 'column';
-        iconBar.style.left = frame.originX - 100 + 'px';
+        iconBar.style.left = frame.originX - (frame.screenWidth / 20) * 1.8 + 'px';
         iconBar.style.top = frame.originY + 'px';
-        iconBar.style.position = 'fixed';
     } else {
-        iconBar.style.display = 'flex';
         iconBar.style['flex-direction'] = 'row';
         iconBar.style.left = frame.originX + 'px';
-        iconBar.style.top = frame.originY - 100 + 'px';
-        iconBar.style.position = 'fixed';
+        iconBar.style.top = frame.originY - (frame.screenWidth / 20) * 1.8 + 'px';
     }
+    iconBar.style.scale = frame.screenWidth / 10 + '%';
 }
 
 function toggleFullscreen(){
