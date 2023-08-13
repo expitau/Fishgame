@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <title>Trout Bout!</title>
 </head>
-<body>
+<body onload="onLoad()">
     <div class="menu-container">
         <h1 class="menu-title">Trout Bout</h1>
 
@@ -16,7 +16,7 @@
             <input type="text" class="standard-text-input" id="roomInput" placeholder="Room Code" oninput="onRoomInput(this.value)" maxlength="4"></input>
 
             <div class="menu-group">
-                <button class="standard-button" onclick="createGame()">Host</button>
+                <button class="standard-button" id="hostButton" onclick="createGame()">Host</button>
                 <p class="bold">|</p>
                 <button class="standard-button" id="joinButton" disabled onclick="joinGame()">Join</button>
             </div>
@@ -26,8 +26,8 @@
 
 <script>
     const onRoomInput = (text) => {
-        const button = document.getElementById('joinButton');
-        button.disabled = text.length !== 4;
+        document.getElementById('joinButton').disabled = text.length !== 4;
+        document.getElementById('hostButton').disabled = text.length > 0;
 
         if(text.length > 0){
             document.getElementById('roomInput').classList.add('uppercase');
@@ -35,6 +35,19 @@
             document.getElementById('roomInput').classList.remove('uppercase');
         }
     }
+
+    const onLoad = () => {
+        let URLparams = new URLSearchParams(window.location.search)
+        const nameInput = document.getElementById('nameInput');
+        const roomInput = document.getElementById('roomInput');
+        if (URLparams.get('name')){
+            nameInput.value = URLparams.get('name');
+        }
+        if (URLparams.get('room')) {
+            roomInput.value = URLparams.get('room');
+            onRoomInput(roomInput.value);
+        }
+    };
 
     const joinGame = () => {
         const roomCode = document.getElementById('roomInput').value.toUpperCase();

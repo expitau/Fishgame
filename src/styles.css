@@ -138,8 +138,10 @@ textarea:focus, input:focus{
    gap: var(--standard-gap);
 }
 
-#settingsButton {
+.icon-bar {
    position: absolute;
+   display: flex;
+   flex-direction: column;
    top: 0px;
    left: 0px;
    background: none;
@@ -147,12 +149,24 @@ textarea:focus, input:focus{
    z-index: 100;
    padding: 1rem;
    cursor: pointer;
+   gap: var(--standard-gap)
+}
+
+.icon-button {
+   background: none;
+   border: none;
+   cursor: pointer;
 }
 
 .icon {
    width: 2.5rem;
    height: 2.5rem;
    color: var(--dark-brown);
+}
+
+.icon-thick {
+   stroke: var(--dark-brown);
+   stroke-width: 2px;
 }
 
 .exit-modal-button {
@@ -164,6 +178,4 @@ textarea:focus, input:focus{
    z-index: 100;
    cursor: pointer;
    padding: 1rem;
-   stroke: var(--dark-brown);
-   stroke-width: 2px;
 }

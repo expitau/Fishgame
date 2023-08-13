@@ -11,20 +11,13 @@ if (params.get('m')) {
     isClient = true
 }
 
-{
-    let mustConnect = isClient && !isServer
+let mustConnect = isClient && !isServer
 
-    if (mustConnect && params.get("room") && params.get("room").toUpperCase() == params.get("room")) {
+if (isClient && !isServer) {
+    if (params.get("room")) {
         // Room code valid
         roomCode = params.get("room")
-
-    } else if (mustConnect && params.get("room")) {
-        // Room code invalid
-        roomCode = params.get("room").toUpperCase()
-        params.set("room", roomCode)
-        window.location.href = `?${params}`
-
-    } else if (mustConnect) {
+    } else {
         // Must connect, but no room code
         window.location.href = 'index.html'
     }
