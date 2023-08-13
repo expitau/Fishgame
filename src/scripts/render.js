@@ -41,7 +41,36 @@ function resizeCanvas() {
     frame = getGraphicsFrame()
     _p5.resizeCanvas(frame.screenWidth + 300, frame.screenHeight + 300);
     cnv.style('display', 'block');
-    cnv.position(frame.originX - 150, frame.originY - 150, 'fixed');
+    cnv.position(frame.originX - 150, frame.originY - 150, 'absolute');
+
+    const iconBar = document.getElementById('primary-icon-bar');
+    if(frame.originX - 100 > 5) {
+        iconBar.style['flex-direction'] = 'column';
+        iconBar.style.left = frame.originX - 100 + 'px';
+        iconBar.style.top = frame.originY + 'px';
+        iconBar.style.display = 'flex';
+    } else {
+        iconBar.style['flex-direction'] = 'row';
+        iconBar.style.left = frame.originX + 'px';
+        iconBar.style.top = frame.originY - 100 + 'px';
+        iconBar.style.display = 'flex';
+    }
+}
+
+function toggleFullscreen(){
+    _p5.fullscreen(!_p5.fullscreen());
+    if(isMobile()){
+        screen.orientation.lock('landscape');
+    }
+    resizeCanvas();
+    
+    if(_p5.fullscreen()){
+        document.getElementById('fullscreenOnIcon').classList.add('hidden');
+        document.getElementById('fullscreenOffIcon').classList.remove('hidden');
+    }else{
+        document.getElementById('fullscreenOffIcon').classList.add('hidden');
+        document.getElementById('fullscreenOnIcon').classList.remove('hidden');
+    }
 }
 
 function initalizeGraphics(state) {

@@ -81,9 +81,7 @@ function mousePressed() {
 }
 
 function doubleClicked() {
-    _p5.fullscreen(!_p5.fullscreen());
-    screen.orientation.lock('landscape');
-    resizeCanvas();
+    toggleFullscreen();
 }
 
 function mouseReleased() {

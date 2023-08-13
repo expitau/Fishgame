@@ -21,7 +21,17 @@
 </head>
 
 <body scroll="no" style="overflow: hidden" onload="onLoad()">
-    <div class="icon-bar">
+    <div id="primary-icon-bar" class="icon-bar">
+        <button class="icon-button icon-thick" onclick="toggleFullscreen()">
+            <svg id="fullscreenOffIcon" class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="-5 -5 25 25">
+                <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>
+            </svg>
+
+            <svg id="fullscreenOnIcon" class="icon hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="-5 -5 25 25">
+                <path d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5zM0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zm10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4z"/>
+            </svg>
+        </button>
+
         <button class="icon-button" onclick="openSettings()">
             <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path fill-rule="evenodd"
@@ -29,11 +39,11 @@
                     clip-rule="evenodd" />
             </svg>
         </button>
-    
+
         <button class="icon-button icon-thick" onclick="returnToLobby()">
             <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
                 <path fill-rule="evenodd" d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5ZM10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5Z"/>
-              </svg>
+            </svg>
         </button>
     </div>
 
@@ -92,7 +102,7 @@
 
     const serverTimedOut = () => {
         const loadingText = document.getElementById('loadingText');
-        loadingText.innerText = `Server not found.`;
+        loadingText.innerText = `Unable to ${isServer ? 'start' : 'find'} Server.`;
         setTimeout(() => {
             returnToLobby();
         }, 1300);
