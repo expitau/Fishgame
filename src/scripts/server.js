@@ -4,7 +4,7 @@ let serverId;
 function startServer() {
     function generateServerID() {
         let result = '';
-        let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ123456789';
 
         for (let i = 0; i < 4; i++) {
             result += characters.charAt(Math.floor(Math.random() * characters.length));
