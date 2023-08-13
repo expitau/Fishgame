@@ -150,84 +150,68 @@ function renderGraphics(state) {
         }
     }
 
-    // // Compute graphics
-    {
+    // Compute graphics
+    if (!graphicsReady || !connected) {
+        _p5.pop();
+        return;
+    }
 
-        if (!graphicsReady || !connected) {
-            _p5.pop();
-            return;
-        }
+    // Remove any unused fish sprite sheets from memory
+    const playerColors = gameState.players.map((player) => player.color.toString());
 
-        // Draw players
-
-        // Remove any unused fish sprite sheets from memory
-        const playerColors = gameState.players.map((player) => player.color.toString());
-
-        for (let fishColorSheet in fishSheets) {
-            if (fishSheets.hasOwnProperty(fishColorSheet)) {
-                if(!playerColors.includes(fishColorSheet)){
-                    console.log('removed color:' + fishColorSheet);
-                    delete fishSheets[fishColorSheet];
-                }
+    for (let fishColorSheet in fishSheets) {
+        if (fishSheets.hasOwnProperty(fishColorSheet)) {
+            if(!playerColors.includes(fishColorSheet)){
+                console.log('removed color:' + fishColorSheet);
+                delete fishSheets[fishColorSheet];
             }
         }
-          
-        // Create new fish sprite sheets based of fish hue if one does not exist
-        for (const player of gameState.players) {
-            {
-                if (fishSheets[player.color] === undefined) {
-                    let tempFishSheet;
-                    tempFishSheet = _p5.createImage(graphics.fishSheet.width, graphics.fishSheet.height);
-                    tempFishSheet.loadPixels();
-                    graphics.fishSheet.loadPixels();
-                    for (let i = 0; i < graphics.fishSheet.width; i++) {
-                        for (let j = 0; j < graphics.fishSheet.height; j++) {
-                            let pixel = (i + graphics.fishSheet.width * j) * 4;
-                            if (graphics.fishSheet.pixels[pixel + 3] > 100) {
-                                let hsbPixel = RGBToHSB(graphics.fishSheet.pixels[pixel], graphics.fishSheet.pixels[pixel + 1], graphics.fishSheet.pixels[pixel + 2]);
-                                let rgbPixel = HSBToRGB((hsbPixel[0] + player.color) % 360, hsbPixel[1], hsbPixel[2]);
-                                tempFishSheet.set(i, j, _p5.color(rgbPixel[0], rgbPixel[1], rgbPixel[2], 255));
-                            }
-                        }
+    }
+    
+    let playerSpriteInfo = {};
+
+    // Create new fish sprite sheets based of fish hue if one does not exist
+    for (let playerIndex = 0; playerIndex < gameState.players.length; playerIndex ++) {
+        const player = gameState.players[playerIndex];
+        if (fishSheets[player.color] === undefined) {
+            let tempFishSheet;
+            tempFishSheet = _p5.createImage(graphics.fishSheet.width, graphics.fishSheet.height);
+            tempFishSheet.loadPixels();
+            graphics.fishSheet.loadPixels();
+            for (let i = 0; i < graphics.fishSheet.width; i++) {
+                for (let j = 0; j < graphics.fishSheet.height; j++) {
+                    let pixel = (i + graphics.fishSheet.width * j) * 4;
+                    if (graphics.fishSheet.pixels[pixel + 3] > 100) {
+                        let hsbPixel = RGBToHSB(graphics.fishSheet.pixels[pixel], graphics.fishSheet.pixels[pixel + 1], graphics.fishSheet.pixels[pixel + 2]);
+                        let rgbPixel = HSBToRGB((hsbPixel[0] + player.color) % 360, hsbPixel[1], hsbPixel[2]);
+                        tempFishSheet.set(i, j, _p5.color(rgbPixel[0], rgbPixel[1], rgbPixel[2], 255));
                     }
-                    tempFishSheet.updatePixels();
-                    fishSheets[player.color] = tempFishSheet;
                 }
             }
+            tempFishSheet.updatePixels();
+            fishSheets[player.color] = tempFishSheet;
         }
+
+        const angle = ((Math.PI * 2) + Math.atan2(player.vy, player.vx)) % (Math.PI * 2);
+        playerSpriteInfo[playerIndex] = {
+            action: (player.vy ** 2 + player.vx ** 2 < 1) ? 0 : (Math.abs(((Math.PI * 4) + player.r + Math.PI / 2) % (Math.PI * 2) - angle) < Math.PI / 2) ? 2 : 1,
+            direction: (Math.floor(((2 * player.r) / Math.PI) + 1 / 4) * (Math.PI / 2)) % (Math.PI * 2),
+            rotationSprite:  ((player.r / Math.PI + 1 / 8) % (1 / 2)) > (1 / 4)
+        };
     }
 
     // Draw background
     _p5.image(graphics.background, 0, 0, frame.width, frame.height);
 
     // Draw player shadows
-    for (const player of gameState.players) {
-        {
-            let vAngle = ((Math.PI * 2) + Math.atan2(player.vy, player.vx)) % (Math.PI * 2);
-            let action = 0
-            if (player.vy ** 2 + player.vx ** 2 < 1) {
-                // If absolute player velocity is less than 1, flatfish
-                action = 0;
-            } else if (Math.abs(((Math.PI * 4) + player.r + Math.PI / 2) % (Math.PI * 2) - vAngle) < Math.PI / 2) {
-                // If velocity angle pointed up down the fish, bend ends up
-                action = 2;
-            } else {
-                // If velocity angle pointed down on the fish, bend ends down
-                action = 1;
-            }
-            // Calculate fish pos/rot
-            let offset = 5 * (6.25);
-
-            let fishR = (Math.floor(((2 * player.r) / Math.PI) + 1 / 4) * (Math.PI / 2)) % (Math.PI * 2);
-            let fishSpriteR = ((player.r / Math.PI + 1 / 8) % (1 / 2)) > (1 / 4);
-
-            // Display shadow
-            _p5.push();
-            _p5.translate(align(player.x + 6.25), align(player.y + 6.25 * 3));
-            _p5.rotate(fishR);
-            _p5.image(graphics.fishShadowSheet, -offset, -offset, 6.25 * 11, 6.25 * 11, action * 12, fishSpriteR * 11, 11, 11);
-            _p5.pop();
-        }
+    for (let playerIndex = 0; playerIndex < gameState.players.length; playerIndex ++) {
+        const player = gameState.players[playerIndex];
+        const playerInfo = playerSpriteInfo[playerIndex];
+        _p5.push();
+        _p5.translate(align(player.x + 6.25), align(player.y + 6.25 * 3));
+        _p5.rotate(playerInfo.direction);
+        _p5.image(graphics.fishShadowSheet, -5 * 6.25, -5 * 6.25, 6.25 * 11, 6.25 * 11, playerInfo.action * 12, playerInfo.rotationSprite * 11, 11, 11);
+        _p5.pop();
     }
 
     // Draw level
@@ -244,103 +228,80 @@ function renderGraphics(state) {
     }
 
     // Display fish
-    for (const player of gameState.players) {
-        let vAngle = ((Math.PI * 2) + Math.atan2(player.vy, player.vx)) % (Math.PI * 2);
-        let action = 0
-        if (player.vy ** 2 + player.vx ** 2 < 1) {
-            // If absolute player velocity is less than 1, flatfish
-            action = 0;
-        } else if (Math.abs(((Math.PI * 4) + player.r + Math.PI / 2) % (Math.PI * 2) - vAngle) < Math.PI / 2) {
-            // If velocity angle pointed up down the fish, bend ends up
-            action = 2;
-        } else {
-            // If velocity angle pointed down on the fish, bend ends down
-            action = 1;
-        }
-
-        // Calculate fish pos/rot
-        let offset = 5 * (6.25);
-
-        let fishR = (Math.floor(((2 * player.r) / Math.PI) + 1 / 4) * (Math.PI / 2)) % (Math.PI * 2);
-        let fishSpriteR = ((player.r / Math.PI + 1 / 8) % (1 / 2)) > (1 / 4);
-
-        // Draw fish
+    for (let playerIndex = 0; playerIndex < gameState.players.length; playerIndex ++) {
+        const player = gameState.players[playerIndex];
+        const playerInfo = playerSpriteInfo[playerIndex];        
         _p5.push();
         _p5.translate(align(player.x), align(player.y));
         _p5.fill(HSBToRGB(player.color, 100, 100));
         _p5.textAlign(_p5.CENTER)
+        _p5.textSize(35);
         _p5.text(player.name, 0, -25);
-        _p5.rotate(fishR);
-        _p5.image(fishSheets[player.color], -offset, -offset, 6.25 * 11, 6.25 * 11, action * 12, fishSpriteR * 11, 11, 11);
+        _p5.rotate(playerInfo.direction);
+        _p5.image(fishSheets[player.color], -5 * 6.25, -5 * 6.25, 6.25 * 11, 6.25 * 11, playerInfo.action * 12, playerInfo.rotationSprite * 11, 11, 11);
         _p5.pop();
     }
 
-
     // Draw cursor when mouse is held
-    {
-        if (mouseIsHeld) {
-            let player = gameState.players.filter(player => player.id === id)[0];
-            if (cursorData.x !== 0 && cursorData.y !== 0) {
-                let cursorX = align(player.x) + Math.sin(cursorData.r) * cursorData.display;
-                let cursorY = align(player.y) + Math.cos(cursorData.r) * cursorData.display;
-                let pvp = false;
+    if (mouseIsHeld) {
+        let player = gameState.players.filter(player => player.id === id)[0];
+        if (cursorData.x !== 0 && cursorData.y !== 0) {
+            let cursorX = align(player.x) + Math.sin(cursorData.r) * cursorData.display;
+            let cursorY = align(player.y) + Math.cos(cursorData.r) * cursorData.display;
+            let pvp = false;
 
-                // check if you can attack another player
-                for (const otherPlayer of gameState.players) {
-                    if (otherPlayer.id !== id) {
-                        if (((player.x + Math.sin(cursorData.r) * cursorData.display - otherPlayer.x) ** 2 + (player.y + Math.cos(cursorData.r) * cursorData.display - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize || ((player.x - otherPlayer.x) ** 2 + (player.y - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize) {
-                            pvp = true;
-                        }
+            // check if you can attack another player
+            for (const otherPlayer of gameState.players) {
+                if (otherPlayer.id !== id) {
+                    if (((player.x + Math.sin(cursorData.r) * cursorData.display - otherPlayer.x) ** 2 + (player.y + Math.cos(cursorData.r) * cursorData.display - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize || ((player.x - otherPlayer.x) ** 2 + (player.y - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize) {
+                        pvp = true;
                     }
                 }
-
-
-                _p5.image(graphics.cursorSheet, align(cursorX) - 6.25 * 2, align(cursorY) - 6.25 * 2, 6.25 * 5, 6.25 * 5, (pvp ? 0 : !getCollisionArea(maps[state.map], cursorX, cursorY)) * 6, pvp * 6, 5, 5);
             }
+
+
+            _p5.image(graphics.cursorSheet, align(cursorX) - 6.25 * 2, align(cursorY) - 6.25 * 2, 6.25 * 5, 6.25 * 5, (pvp ? 0 : !getCollisionArea(maps[state.map], cursorX, cursorY)) * 6, pvp * 6, 5, 5);
         }
     }
 
     // Draw effects
-    {
+    for (let i = 0; i < graphicsEffects.length; i++) {
+        graphicsEffects[i].time--;
+        if (graphicsEffects[i].time <= 0) {
+            graphicsEffects.pop(i);
+            i--;
+            continue;
+        }
+        switch (graphicsEffects[i].name) {
 
-        for (let i = 0; i < graphicsEffects.length; i++) {
-            graphicsEffects[i].time--;
-            if (graphicsEffects[i].time <= 0) {
-                graphicsEffects.pop(i);
-                i--;
-                continue;
-            }
-            switch (graphicsEffects[i].name) {
+            // White circle on hit object
+            case 'impact':
+                _p5.image(graphics.slapSheet, align(graphicsEffects[i].x) - 6.25 * 4, align(graphicsEffects[i].y) - 6.25 * 4, 50, 50, ((4 - Math.floor(graphicsEffects[i].time / 4)) % 2) * 9, Math.floor((4 - Math.floor(graphicsEffects[i].time / 4)) / 2) * 9, 8, 8)
+                break;
 
-                // White circle on hit object
-                case 'impact':
-                    _p5.image(graphics.slapSheet, align(graphicsEffects[i].x) - 6.25 * 4, align(graphicsEffects[i].y) - 6.25 * 4, 50, 50, ((4 - Math.floor(graphicsEffects[i].time / 4)) % 2) * 9, Math.floor((4 - Math.floor(graphicsEffects[i].time / 4)) / 2) * 9, 8, 8)
-                    break;
+            // Splatter 'paint' on hit or death
+            case 'splat':
+                let [x, y, hue, r] = [graphicsEffects[i].x, graphicsEffects[i].y, graphicsEffects[i].color, graphicsEffects[i].r]
+                graphics.background.loadPixels();
+                fishSheets[hue].loadPixels();
+                let fishColor = fishSheets[hue].get(2, 5);
+                let angle, distance, xPos, yPos;
+                for (let i = 0; i < 25; i++) {
+                    angle = _p5.random(r - Math.PI / 10, r + Math.PI / 10) + Math.PI;
+                    distance = _p5.random(0, 15);
+                    xPos = Math.floor(x / 6.25 + Math.sin(angle) * distance + _p5.random(-3, 3));
+                    yPos = Math.floor(y / 6.25 + Math.cos(angle) * distance + _p5.random(-3, 3));
+                    graphics.background.set(_p5.constrain(xPos, 0, 127), yPos, fishColor);
+                }
+                graphics.background.updatePixels();
+                break;
 
-                // Splatter 'paint' on hit or death
-                case 'splat':
-                    let [x, y, hue, r] = [graphicsEffects[i].x, graphicsEffects[i].y, graphicsEffects[i].color, graphicsEffects[i].r]
-                    graphics.background.loadPixels();
-                    fishSheets[hue].loadPixels();
-                    let fishColor = fishSheets[hue].get(2, 5);
-                    let angle, distance, xPos, yPos;
-                    for (let i = 0; i < 25; i++) {
-                        angle = _p5.random(r - Math.PI / 10, r + Math.PI / 10) + Math.PI;
-                        distance = _p5.random(0, 15);
-                        xPos = Math.floor(x / 6.25 + Math.sin(angle) * distance + _p5.random(-3, 3));
-                        yPos = Math.floor(y / 6.25 + Math.cos(angle) * distance + _p5.random(-3, 3));
-                        graphics.background.set(_p5.constrain(xPos, 0, 127), yPos, fishColor);
-                    }
-                    graphics.background.updatePixels();
-                    break;
-
-                // Screen shake
-                case 'shake':
-                    if (graphicsEffects[i].id == id) {
-                        screenShakeTime = graphicsEffects[i].time;
-                    }
-                    break;
-            }
+            // Screen shake
+            case 'shake':
+                if (graphicsEffects[i].id == id) {
+                    screenShakeTime = graphicsEffects[i].time;
+                }
+                break;
         }
     }
     _p5.pop();
