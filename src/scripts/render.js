@@ -50,10 +50,10 @@ function resizeCanvas() {
     if(frame.originX - 100 > 5) {
         iconBar.style['flex-direction'] = 'column';
         iconBar.style.left = frame.originX - (frame.screenWidth / 16) * 1.8 + 'px';
-        iconBar.style.top = frame.originY - (frame.screenWidth / 16) * 0.6 + 'px';
+        iconBar.style.top = frame.originY - (frame.screenWidth / 16) * 0.2 + 'px';
     } else {
         iconBar.style['flex-direction'] = 'row';
-        iconBar.style.left = frame.originX - (frame.screenWidth / 16) * 0.7 + 'px';
+        iconBar.style.left = frame.originX - (frame.screenWidth / 16) * 0.3 + 'px';
         iconBar.style.top = frame.originY - (frame.screenWidth / 16) * 1.7 + 'px';
     }
     iconBar.style.scale = frame.screenWidth / 8 + '%';
