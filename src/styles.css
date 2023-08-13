@@ -55,7 +55,7 @@ textarea:focus, input:focus{
 
 .menu-list {
    display: flex;
-   width: min(380px, 85%);
+   width: min(380px, 90%);
    align-self: center;
    flex-direction: column;
 	align-items: center;
@@ -103,8 +103,8 @@ textarea:focus, input:focus{
 
 .standard-modal {
    display: flex;
-   padding: 30px;
-   padding-top: 10px;
+   padding: 20px;
+   padding-top: 5px;
 	flex-direction: column;
    background-color: var(--background-color);
 }
@@ -130,7 +130,7 @@ textarea:focus, input:focus{
 .card {
    background-color: #c0a152;
 	display: flex;
-   width: min(380px, 85%);
+   width: min(380px, 90%);
    padding: 20px;
    border-radius: 0.5rem; 
 	align-self: center;
