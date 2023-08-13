@@ -5,7 +5,6 @@ const PIXELSIZE = 6.25;
 
 let graphicsReady = false;
 let graphics;
-let levelImage;
 let fishSheets = {};
 
 async function loadAssets() {
@@ -18,6 +17,7 @@ async function loadAssets() {
         cursorSheet: await new Promise(resolve => { _p5.loadImage('resources/cursor_sheet.png', resolve) }),
         background: await new Promise(resolve => { _p5.loadImage('resources/background.png', resolve) }),
         iconSheet: await new Promise(resolve => { _p5.loadImage('resources/icon_spritesheet.png', resolve) }),
+        levelImage: await new Promise(resolve => { _p5.loadImage('resources/levelImage.png', resolve) }),
     };
 }
 
@@ -33,7 +33,6 @@ function setupGraphics(state) {
     loadAssets().then(() => {
         console.log('[client] Graphics ready')
         graphicsReady = true;
-        initalizeGraphics(state);
     })
 }
 
@@ -73,45 +72,6 @@ function toggleFullscreen(){
         document.getElementById('fullscreenOffIcon').classList.add('hidden');
         document.getElementById('fullscreenOnIcon').classList.remove('hidden');
     }
-}
-
-function initalizeGraphics(state) {
-    let spritemap = { '0': [5, 1], '1': [0, 0], '2': [1, 0], '3': [2, 0], '4': [3, 0], '[': [0, 1], '*': [0, 2], ']': [1, 1], 'c': [1, 2], '#': [2, 1], '_': [2, 2], '%': [3, 1], 'S': [4, 0], '$': [4, 1], 'E': [5, 0] }
-    levelImage = _p5.createImage(maps[state.map].width * 8, maps[state.map].height * 8);
-    levelImage.loadPixels();
-    // graphics.tileSheet.loadPixels();
-    for (let i = 0; i < maps[state.map].width; i++) {
-        for (let j = 0; j < maps[state.map].height; j++) {
-            // Get tile sprite
-            function getTile(map, x, y) {
-                if (x >= 0 && x < map.width && y >= 0 && y < map.height) {
-                    return map.tilemap[y].charAt(x);
-                }
-                return 'X';
-            }
-            let spriteSymbol = getTile(maps[state.map], i, j);
-
-            if (spriteSymbol === ' ') {
-                continue;
-            }
-
-            // Draw tiles
-            for (let px = 0; px < 8; px++) {
-                for (let py = 0; py < 8; py++) {
-                    let pixelColor = graphics.tileSheet.get(1 + spritemap[spriteSymbol][0] * 10 + px, 1 + spritemap[spriteSymbol][1] * 10 + py);
-                    if (_p5.alpha(pixelColor) > 10) {
-                        // draw sprite pixel
-                        levelImage.set(i * 8 + px, j * 8 + py, pixelColor);
-                    }
-                    if (_p5.alpha(pixelColor) > 200 && i * 8 + px + 1 < maps[state.map].width * 8 && j * 8 + py + 1 < maps[state.map].height * 8) {
-                        // draw shadow pixel
-                        levelImage.set(i * 8 + px + 1, j * 8 + py + 1, _p5.color(0, 0, 0, 47));
-                    }
-                }
-            }
-        }
-    }
-    levelImage.updatePixels();
 }
 
 function getGraphicsFrame(width = 800, height = 600, marginRatio = 1 / 20) {
@@ -271,7 +231,7 @@ function renderGraphics(state) {
     }
 
     // Draw level
-    _p5.image(levelImage, 0, 0, maps[state.map].width * 50, maps[state.map].height * 50);
+    _p5.image(graphics.levelImage, 0, 0, maps[state.map].width * 50, maps[state.map].height * 50);
 
     {
         let player = gameState.players.filter(player => player.id === id)[0];
