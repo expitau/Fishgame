@@ -158,7 +158,7 @@ textarea:focus, input:focus{
 }
 
 .icon-bar {
-   position: absolute;
+   position: fixed;
    display: none;
    flex-direction: column;
    top: 0px;

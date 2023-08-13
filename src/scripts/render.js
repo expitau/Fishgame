@@ -45,15 +45,17 @@ function resizeCanvas() {
 
     const iconBar = document.getElementById('primary-icon-bar');
     if(frame.originX - 100 > 5) {
+        iconBar.style.display = 'flex';
         iconBar.style['flex-direction'] = 'column';
         iconBar.style.left = frame.originX - 100 + 'px';
         iconBar.style.top = frame.originY + 'px';
-        iconBar.style.display = 'flex';
+        iconBar.style.position = 'fixed';
     } else {
+        iconBar.style.display = 'flex';
         iconBar.style['flex-direction'] = 'row';
         iconBar.style.left = frame.originX + 'px';
         iconBar.style.top = frame.originY - 100 + 'px';
-        iconBar.style.display = 'flex';
+        iconBar.style.position = 'fixed';
     }
 }
 
