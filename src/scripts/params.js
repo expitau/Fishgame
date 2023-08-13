@@ -1,6 +1,6 @@
 let isServer = false;
 let isClient = false;
-let roomCode;
+let serverId;
 let params = new URLSearchParams(window.location.search)
 
 if (params.get('m')) {
@@ -16,7 +16,7 @@ let mustConnect = isClient && !isServer
 if (isClient && !isServer) {
     if (params.get("room")) {
         // Room code valid
-        roomCode = params.get("room")
+        serverId = params.get("room")
     } else {
         // Must connect, but no room code
         window.location.href = 'index.html'

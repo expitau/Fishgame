@@ -1,5 +1,4 @@
 let server;
-let serverId;
 
 function startServer() {
     function generateServerID() {

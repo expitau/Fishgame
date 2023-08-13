@@ -20,44 +20,7 @@
     <script src="scripts/game.js"></script>
 </head>
 
-<script>
-    function updateJoinInfo() {
-        document.getElementById('joinInfo').hidden = false
-        document.getElementById('code').innerHTML = `Room Code: ${serverId}`;
-        var qr = qrcode(0, 'M');
-        let link = 'https://expitau.github.io/Fishgame/src/game.html?room=' + serverId
-        qr.addData(link);
-        qr.make()
-        let img = qr.createImgTag()
-        let qrElt = document.getElementById('qr')
-        qrElt.innerHTML = img;
-        qrElt.firstChild.style.width = '100%';
-        qrElt.firstChild.style.height = '100%';
-        qrElt.firstChild.style.imageRendering = 'pixelated';
-        qrElt.firstChild.style['border-radius'] = '0.5rem';
-    }
-
-    const openSettings = () => {
-        settingsOpen = true;
-        mouseIsHeld = false;
-        document.getElementById('nameInput').value = displayName;
-        document.getElementById('colorInput').value = displayColor;
-        updateColorDisplay();
-        updateJoinInfo();
-        document.getElementById('settingsModal').showModal();
-    }
-
-    const closeSettings = () => {
-        settingsOpen = false;
-        document.getElementById('settingsModal').close();
-    }
-
-    const returnToLobby = () => {
-        location.href = 'index.html' + location.search;
-    }
-</script>
-
-<body scroll="no" style="overflow: hidden">
+<body scroll="no" style="overflow: hidden" onload="onLoad()">
     <div class="icon-bar">
         <button class="icon-button" onclick="openSettings()">
             <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -103,7 +66,62 @@
         </div>
     </dialog>
     <div>
+        <div id="loading" class="menu-container">
+            <h2 id="loadingText" class="center">Loading...</h2>
+        </div>
         <main id="main"></main>
     </div>
 </body>
+
+<script>
+    function updateJoinInfo() {
+        document.getElementById('joinInfo').hidden = false
+        document.getElementById('code').innerHTML = `Room Code: ${serverId}`;
+        var qr = qrcode(0, 'M');
+        let link = 'https://expitau.github.io/Fishgame/src/game.html?room=' + serverId;
+        qr.addData(link);
+        qr.make()
+        let img = qr.createImgTag()
+        let qrElt = document.getElementById('qr')
+        qrElt.innerHTML = img;
+        qrElt.firstChild.style.width = '100%';
+        qrElt.firstChild.style.height = '100%';
+        qrElt.firstChild.style.imageRendering = 'pixelated';
+        qrElt.firstChild.style['border-radius'] = '0.5rem';
+    }
+
+    const serverTimedOut = () => {
+        const loadingText = document.getElementById('loadingText');
+        loadingText.innerText = `Server not found.`;
+        setTimeout(() => {
+            returnToLobby();
+        }, 1300);
+    }
+
+    const onLoad = () => {
+        if(serverId !== undefined && serverId !== '') {
+            const loadingText = document.getElementById('loadingText');
+            loadingText.innerHTML = `${isServer ? 'Starting server' : 'Connecting to...'}  <br><div class="info">${serverId}</div>`;
+        }
+    }
+
+    const openSettings = () => {
+        settingsOpen = true;
+        mouseIsHeld = false;
+        document.getElementById('nameInput').value = displayName;
+        document.getElementById('colorInput').value = displayColor;
+        updateColorDisplay();
+        updateJoinInfo();
+        document.getElementById('settingsModal').showModal();
+    }
+
+    const closeSettings = () => {
+        settingsOpen = false;
+        document.getElementById('settingsModal').close();
+    }
+
+    function returnToLobby() {
+        location.href = 'index.html' + location.search;
+    }
+</script>
 </html>

@@ -68,6 +68,7 @@ function isMobile() {
 }
 
 function mousePressed() {
+    _p5.cursor(_p5.ARROW);
     if(settingsOpen) return;
 
     mouseIsHeld = true;
@@ -85,7 +86,7 @@ function doubleClicked() {
 
 function mouseReleased() {
     if(settingsOpen) return;
-    
+
     mouseIsHeld = false;
 
     if (cursorData.x != 0 && cursorData.y != 0) {

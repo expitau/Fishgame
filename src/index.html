@@ -13,7 +13,7 @@
 
         <div class="menu-list">
             <input type="text" class="standard-text-input" id="nameInput" placeholder="Name" maxlength="15"></input>
-            <input type="text" class="standard-text-input" id="roomInput" placeholder="Room Code" onfocus="this.value = '';" oninput="onRoomInput(this.value)" maxlength="4"></input>
+            <input type="text" class="standard-text-input" id="roomInput" placeholder="Room Code" onfocus="clearInput(this)" oninput="onRoomInput(this.value)" maxlength="4"></input>
 
             <div class="menu-group">
                 <button class="standard-button" id="hostButton" onclick="createGame()">Host</button>
@@ -36,6 +36,11 @@
         }
     }
 
+    const clearInput = (inputObject) => {
+        inputObject.value = ''; 
+        onRoomInput(inputObject.value)
+    }
+
     const onLoad = () => {
         let URLparams = new URLSearchParams(window.location.search)
         const nameInput = document.getElementById('nameInput');
@@ -50,9 +55,9 @@
     };
 
     const joinGame = () => {
-        const roomCode = document.getElementById('roomInput').value.toUpperCase();
+        const serverId = document.getElementById('roomInput').value.toUpperCase();
         const name = document.getElementById('nameInput').value;
-        location.href = 'game.html?room=' + roomCode + '&name=' + name;
+        location.href = 'game.html?room=' + serverId + '&name=' + name;
     }
 
     const createGame = () => {

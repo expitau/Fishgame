@@ -32,6 +32,14 @@ h2 {
    margin: 16px;
 }
 
+.center {
+   margin: 0;
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+}
+
 textarea:focus, input:focus{
    outline-style: solid;
    outline-width: medium;
@@ -148,7 +156,6 @@ textarea:focus, input:focus{
    border: none;
    z-index: 100;
    padding: 1rem;
-   cursor: pointer;
    gap: var(--standard-gap)
 }
 
