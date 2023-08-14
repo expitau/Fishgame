@@ -208,7 +208,7 @@ function renderGraphics(state) {
         const player = gameState.players[playerIndex];
         const playerInfo = playerSpriteInfo[playerIndex];
         _p5.push();
-        _p5.translate(align(player.x + 6.25), align(player.y + 6.25 * 3));
+        _p5.translate(Math.floor(player.x + 6.25), Math.floor(player.y + 6.25 * 3));
         _p5.rotate(playerInfo.direction);
         _p5.image(graphics.fishShadowSheet, -5 * 6.25, -5 * 6.25, 6.25 * 11, 6.25 * 11, playerInfo.action * 12, playerInfo.rotationSprite * 11, 11, 11);
         _p5.pop();
@@ -232,11 +232,16 @@ function renderGraphics(state) {
         const player = gameState.players[playerIndex];
         const playerInfo = playerSpriteInfo[playerIndex];        
         _p5.push();
-        _p5.translate(align(player.x), align(player.y));
-        _p5.fill(HSBToRGB(player.color, 100, 100));
-        _p5.textAlign(_p5.CENTER)
-        _p5.textSize(35);
-        _p5.text(player.name, 0, -25);
+        _p5.translate(Math.floor(player.x), Math.floor(player.y));
+        if(player.name != ''){
+            _p5.fill(255, 255, 255, 160);
+            const nameWidth = _p5.textWidth(player.name) + 7;
+            _p5.rect(-nameWidth, -54, nameWidth * 2, 28, 20);
+            _p5.textAlign(_p5.CENTER)
+            _p5.textSize(25);
+            _p5.fill(HSBToRGB(player.color, 100, 100));
+            _p5.text(player.name, 0, -30);
+        }
         _p5.rotate(playerInfo.direction);
         _p5.image(fishSheets[player.color], -5 * 6.25, -5 * 6.25, 6.25 * 11, 6.25 * 11, playerInfo.action * 12, playerInfo.rotationSprite * 11, 11, 11);
         _p5.pop();
@@ -258,7 +263,6 @@ function renderGraphics(state) {
                     }
                 }
             }
-
 
             _p5.image(graphics.cursorSheet, align(cursorX) - 6.25 * 2, align(cursorY) - 6.25 * 2, 6.25 * 5, 6.25 * 5, (pvp ? 0 : !getCollisionArea(maps[state.map], cursorX, cursorY)) * 6, pvp * 6, 5, 5);
         }
