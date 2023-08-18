@@ -250,9 +250,9 @@ function renderGraphics(state) {
     // Draw cursor when mouse is held
     if (mouseIsHeld) {
         let player = gameState.players.filter(player => player.id === id)[0];
-        if (cursorData.x !== 0 && cursorData.y !== 0) {
-            let cursorX = align(player.x) + Math.sin(cursorData.r) * cursorData.display;
-            let cursorY = align(player.y) + Math.cos(cursorData.r) * cursorData.display;
+        if (cursorData.x !== 0 || cursorData.y !== 0) {
+            let cursorX = player.x + Math.sin(cursorData.r) * cursorData.display;
+            let cursorY = player.y + Math.cos(cursorData.r) * cursorData.display;
             let pvp = false;
 
             // check if you can attack another player
@@ -264,7 +264,7 @@ function renderGraphics(state) {
                 }
             }
 
-            _p5.image(graphics.cursorSheet, align(cursorX) - 6.25 * 2, align(cursorY) - 6.25 * 2, 6.25 * 5, 6.25 * 5, (pvp ? 0 : !getCollisionArea(maps[state.map], cursorX, cursorY)) * 6, pvp * 6, 5, 5);
+            _p5.image(graphics.cursorSheet, cursorX - 6.25 * 2, cursorY - 6.25 * 2, 6.25 * 5, 6.25 * 5, (pvp ? 0 : !getSlapArea(maps[state.map], cursorX, cursorY)) * 6, pvp * 6, 5, 5);
         }
     }
 
@@ -280,15 +280,23 @@ function renderGraphics(state) {
 
             // White circle on hit object
             case 'impact':
-                _p5.image(graphics.slapSheet, align(graphicsEffects[i].x) - 6.25 * 4, align(graphicsEffects[i].y) - 6.25 * 4, 50, 50, ((4 - Math.floor(graphicsEffects[i].time / 4)) % 2) * 9, Math.floor((4 - Math.floor(graphicsEffects[i].time / 4)) / 2) * 9, 8, 8)
+                _p5.image(
+                    graphics.slapSheet, 
+                    graphicsEffects[i].x - 6.25 * 4, 
+                    graphicsEffects[i].y - 6.25 * 4, 50, 50, 
+                    ((4 - Math.floor(graphicsEffects[i].time / 4)) % 2) * 9,
+                    Math.floor((4 - Math.floor(graphicsEffects[i].time / 4)) / 2) * 9, 
+                    8, 
+                    8
+                )
                 break;
 
             // Splatter 'paint' on hit or death
             case 'splat':
-                let [x, y, hue, r] = [graphicsEffects[i].x, graphicsEffects[i].y, graphicsEffects[i].color, graphicsEffects[i].r]
+                const [x, y, hue, r] = [graphicsEffects[i].x, graphicsEffects[i].y, graphicsEffects[i].color, graphicsEffects[i].r];
                 graphics.background.loadPixels();
                 fishSheets[hue].loadPixels();
-                let fishColor = fishSheets[hue].get(2, 5);
+                const fishColor = fishSheets[hue].get(2, 5);
                 let angle, distance, xPos, yPos;
                 for (let i = 0; i < 25; i++) {
                     angle = _p5.random(r - Math.PI / 10, r + Math.PI / 10) + Math.PI;

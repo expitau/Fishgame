@@ -2,20 +2,21 @@
 let maps = [
     {
         currentMap: 0,
-        colliders: "#$X",
+        movementColliders: "#",
+        slapColliders: "+#",
         tilemap: [
             "                ",
-            "      0S        ",
-            "   ___[]___     ",
+            "       +        ",
+            "      ++        ",
             "   ########     ",
-            "   $          3E",
-            "             _[]",
-            "E     ____   ###",
-            "]_    ####   $$$",
+            "   #          ++",
+            "              ++",
+            "+            ###",
+            "+     ####   ###",
             "##              ",
-            "$$  10    24 *  ",
-            "$$__[]____[]_c__",
-            "$$##############"
+            "##  +     ++ +  ",
+            "##  ++    ++ +  ",
+            "################"
         ],
         spawnPoint: [
             375,
@@ -33,14 +34,14 @@ function getCurrentTile(gameMap, x, y) {
     if (0 < x && x < gameMap.width * gameMap.tileSize && 0 < y && y < gameMap.height * gameMap.tileSize) {
         return gameMap.tilemap[Math.floor(y / gameMap.tileSize)].charAt(Math.floor(x / gameMap.tileSize));
     }
-    return "X";
+    return "#";
 }
 
 // Read tiles on tilemap in a small rectangular cluster [world coordinates] 
-function getCollisionArea(gameMap, x, y) {
+function getSlapArea(gameMap, x, y) {
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
-            if (gameMap.colliders.includes(getCurrentTile(gameMap, x + i * gameMap.tileSize * 0.3, y + j * gameMap.tileSize * 0.3))) {
+            if (gameMap.slapColliders.includes(getCurrentTile(gameMap, x + i * gameMap.tileSize * 0.3, y + j * gameMap.tileSize * 0.3))) {
                 return true;
             }
         }
@@ -67,7 +68,7 @@ function physicsTick(state) {
         let newPosY = player.y + player.vy;
 
         //Test for x coordinate collisions
-        if (!maps[state.map].colliders.includes(getCurrentTile(maps[state.map], newPosX + ((newPosX > player.x) ? 1 : -1) * maps[state.map].pixelSize, player.y))) {
+        if (!maps[state.map].movementColliders.includes(getCurrentTile(maps[state.map], newPosX + ((newPosX > player.x) ? 1 : -1) * maps[state.map].pixelSize, player.y))) {
             // On no collision, update player position
             player.x = newPosX;
         } else {
@@ -79,7 +80,7 @@ function physicsTick(state) {
         }
 
         //Test for y coordinate collision
-        if (!maps[state.map].colliders.includes(getCurrentTile(maps[state.map], player.x, newPosY + ((newPosY > player.y) ? 1 : -1) * maps[state.map].pixelSize))) {
+        if (!maps[state.map].movementColliders.includes(getCurrentTile(maps[state.map], player.x, newPosY + ((newPosY > player.y) ? 1 : -1) * maps[state.map].pixelSize))) {
             // On no collision, update player position
             player.y = newPosY;
         } else {
@@ -204,7 +205,7 @@ function physicsInput(state, type, data) {
         }
 
         // If player can hit a tile
-        if (!pvp && getCollisionArea(maps[state.map], player.x + dx * 60, player.y + dy * 60)) {
+        if (!pvp && getSlapArea(maps[state.map], player.x + dx * 60, player.y + dy * 60)) {
             // Set hit power
             let power = 7;
 
