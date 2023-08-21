@@ -20,3 +20,6 @@ export function RGBToHSB(r, g, b) {
 export function isMobile() {
   return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
 }
+
+// eslint-disable-next-line no-bitwise
+export const round = (n) => (n + (n > 0 ? 0.5 : -0.5)) << 0;

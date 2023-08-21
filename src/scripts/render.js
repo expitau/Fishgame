@@ -1,6 +1,8 @@
 import { getSlapArea, maps } from './map.js';
 import { cursorData } from './playerInput.js';
-import { HSBToRGB, RGBToHSB, isMobile } from './utilities.js';
+import {
+  HSBToRGB, RGBToHSB, isMobile, round,
+} from './utilities.js';
 
 // This file contains code for rendering the game
 let cnv;
@@ -17,7 +19,6 @@ export async function setupGraphics(_q5) {
   q5 = _q5;
   cnv = q5.createCanvas(0, 0);
   q5.pixelDensity(1);
-  q5.noSmooth();
 
   resizeCanvas(q5);
   await loadAssets(q5);
@@ -212,7 +213,7 @@ export function renderGraphics(clientContext) {
     const player = clientContext.state.players[playerIndex];
     const playerInfo = playerSpriteInfo[playerIndex];
     q5.push();
-    q5.translate(Math.floor(player.x + pixelSize), Math.floor(player.y + pixelSize * 3));
+    q5.translate(round(player.x + pixelSize), round(player.y + pixelSize * 3));
     q5.rotate(playerInfo.direction);
     q5.image(
       graphics.fishShadowSheet,
@@ -259,7 +260,7 @@ export function renderGraphics(clientContext) {
     const player = clientContext.state.players[playerIndex];
     const playerInfo = playerSpriteInfo[playerIndex];
     q5.push();
-    q5.translate(Math.floor(player.x), Math.floor(player.y));
+    q5.translate(round(player.x), round(player.y));
     if (player.name !== '') {
       q5.fill(255, 255, 255, 160);
       q5.textAlign(q5.CENTER);

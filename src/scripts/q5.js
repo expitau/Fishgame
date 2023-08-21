@@ -36,12 +36,8 @@ export function Q5(scope) {
   function graphics(scope) {
     const $ = (scope == 'global' ? window : this);
     $.canvas = document.createElement('canvas');
+    $.backdrop = document.getElementById('main');
     const ctx = $.canvas.getContext('2d', { willReadFrequently: true });
-    ctx.imageSmoothingEnabled = false;
-    ctx.webkitImageSmoothingEnabled = false;
-    ctx.mozImageSmoothingEnabled = false;
-    ctx.msImageSmoothingEnabled = false;
-    ctx.oImageSmoothingEnabled = false;
 
     $.width = 100;
     $.height = 100;
@@ -50,10 +46,10 @@ export function Q5(scope) {
 
     if (scope != 'offscreen') {
       if (document.body) {
-        document.body.appendChild($.canvas);
+        $.backdrop.appendChild($.canvas);
       } else {
         window.addEventListener('load', () => {
-          document.body.appendChild($.canvas);
+          $.backdrop.appendChild($.canvas);
         });
       }
     }
@@ -262,16 +258,20 @@ export function Q5(scope) {
     // CANVAS
     //= ===============================================================
 
-    $.createCanvas = function (width, height) {
-      $.width = width;
-      $.height = height;
-      $.canvas.width = width;
-      $.canvas.height = height;
+    $.noSmooth = function () {
       ctx.imageSmoothingEnabled = false;
       ctx.webkitImageSmoothingEnabled = false;
       ctx.mozImageSmoothingEnabled = false;
       ctx.msImageSmoothingEnabled = false;
       ctx.oImageSmoothingEnabled = false;
+    };
+
+    $.createCanvas = function (width, height) {
+      $.width = width;
+      $.height = height;
+      $.canvas.width = width;
+      $.canvas.height = height;
+      $.noSmooth();
       defaultStyle();
       return $.canvas;
     };
@@ -281,11 +281,7 @@ export function Q5(scope) {
       $.height = height;
       $.canvas.width = width;
       $.canvas.height = height;
-      ctx.imageSmoothingEnabled = false;
-      ctx.webkitImageSmoothingEnabled = false;
-      ctx.mozImageSmoothingEnabled = false;
-      ctx.msImageSmoothingEnabled = false;
-      ctx.oImageSmoothingEnabled = false;
+      $.noSmooth();
     };
 
     $.createGraphics = $.createImage = function (width, height) {
@@ -993,9 +989,6 @@ export function Q5(scope) {
     $.popMatrix = $.pop = function () {
       ctx.restore();
     };
-    $.noSmooth = function () {
-      ctx.imageSmoothingEnabled = false;
-    };
 
     //= ===============================================================
     // IMAGING
@@ -1031,12 +1024,6 @@ export function Q5(scope) {
         ctx.drawImage(drawable, dx, dy, dWidth, dHeight);
         reset();
         return;
-      }
-      if (!sWidth) {
-        sWidth = drawable.width;
-      }
-      if (!sHeight) {
-        sHeight = drawable.height;
       }
       ctx.drawImage(drawable, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
       reset();
@@ -1935,7 +1922,7 @@ export function Q5(scope) {
       }
     }, 1);
 
-    window.addEventListener('mousemove', (event) => {
+    $.backdrop.addEventListener('mousemove', (event) => {
       $.pmouseX = $.mouseX;
       $.pmouseY = $.mouseY;
       $.mouseX = event.offsetX;
@@ -1947,7 +1934,7 @@ export function Q5(scope) {
         $._mouseMovedFn(event);
       }
     });
-    window.addEventListener('mousedown', (event) => {
+    $.backdrop.addEventListener('mousedown', (event) => {
       $.pmouseX = $.mouseX;
       $.pmouseY = $.mouseY;
       $.mouseX = event.offsetX;
@@ -1956,7 +1943,7 @@ export function Q5(scope) {
       $.mouseButton = [$.LEFT, $.CENTER, $.RIGHT][event.button];
       $._mousePressedFn(event);
     });
-    window.addEventListener('mouseup', (event) => {
+    $.backdrop.addEventListener('mouseup', (event) => {
       $.pmouseX = $.mouseX;
       $.pmouseY = $.mouseY;
       $.mouseX = event.offsetX;
@@ -1964,7 +1951,7 @@ export function Q5(scope) {
       $.mouseIsPressed = false;
       $._mouseReleasedFn(event);
     });
-    window.addEventListener('click', (event) => {
+    $.backdrop.addEventListener('click', (event) => {
       $.pmouseX = $.mouseX;
       $.pmouseY = $.mouseY;
       $.mouseX = event.offsetX;
@@ -1973,9 +1960,11 @@ export function Q5(scope) {
       $._mouseClickedFn(event);
       $.mouseIsPressed = false;
     });
+
     window.addEventListener('resize', () => {
       $._windowResizedFn();
     });
+
     window.addEventListener('keydown', (event) => {
       $.keyIsPressed = true;
       $.key = event.key;
@@ -1997,7 +1986,7 @@ export function Q5(scope) {
       return !!keysHeld[x];
     };
 
-    window.addEventListener('touchstart', (event) => {
+    $.backdrop.addEventListener('touchstart', (event) => {
       $.pmouseX = $.mouseX;
       $.pmouseY = $.mouseY;
       $.mouseX = event.touches[0].clientX;
@@ -2007,7 +1996,7 @@ export function Q5(scope) {
       $._mousePressedFn(event);
       event.preventDefault();
     });
-    window.addEventListener('touchmove', (event) => {
+    $.backdrop.addEventListener('touchmove', (event) => {
       $.pmouseX = $.mouseX;
       $.pmouseY = $.mouseY;
       $.mouseX = event.touches[0].clientX;
@@ -2017,7 +2006,7 @@ export function Q5(scope) {
       $._mouseDraggedFn(event);
       event.preventDefault();
     });
-    window.addEventListener('touchend', (event) => {
+    $.backdrop.addEventListener('touchend', (event) => {
       $.mouseIsPressed = true;
       $._mouseReleasedFn(event);
       event.preventDefault();

@@ -13,6 +13,12 @@
 </head>
 
 <body scroll="no" style="overflow: hidden">
+    <div>
+        <div id="loading" class="menu-container">
+            <h2 id="loadingText" class="center">Loading...</h2>
+        </div>
+        <main id="main"></main>
+    </div>
     <div id="primary-icon-bar" class="hidden icon-bar">
         <button class="icon-button icon-thick" onclick="toggleFullscreen()">
             <svg id="fullscreenOffIcon" class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="-5 -5 25 25">
@@ -67,11 +73,5 @@
             </div>
         </div>
     </dialog>
-    <div>
-        <div id="loading" class="menu-container">
-            <h2 id="loadingText" class="center">Loading...</h2>
-        </div>
-        <main id="main"></main>
-    </div>
 </body>
 </html>
