@@ -1997,70 +1997,30 @@ export function Q5(scope) {
       return !!keysHeld[x];
     };
 
-    function getTouchInfo(touch) {
-      const rect = $.canvas.getBoundingClientRect();
-      const sx = $.canvas.scrollWidth / $.width || 1;
-      const sy = $.canvas.scrollHeight / $.height || 1;
-      return {
-        x: (touch.clientX - rect.left) / sx,
-        y: (touch.clientY - rect.top) / sy,
-        id: touch.identifier,
-      };
-    }
-    function isTouchUnaware() {
-      return $._touchStarted.isPlaceHolder
-        && $._touchMoved.isPlaceHolder
-        && $._touchEnded.isPlaceHolder;
-    }
     window.addEventListener('touchstart', (event) => {
-      $.touches = event.touches.map(getTouchInfo);
-      if (isTouchUnaware()) {
-        $.pmouseX = $.mouseX;
-        $.pmouseY = $.mouseY;
-        $.mouseX = $.touches[0].x;
-        $.mouseY = $.touches[0].y;
-        $.mouseIsPressed = true;
-        $.mouseButton = $.LEFT;
-        if (!$._mousePressedFn(event)) {
-          event.preventDefault();
-        }
-      }
-      if (!$._touchStartedFn(event)) {
-        event.preventDefault();
-      }
+      $.pmouseX = $.mouseX;
+      $.pmouseY = $.mouseY;
+      $.mouseX = event.touches[0].clientX;
+      $.mouseY = event.touches[0].clientY;
+      $.mouseIsPressed = true;
+      $.mouseButton = $.LEFT;
+      $._mousePressedFn(event);
+      event.preventDefault();
     });
     window.addEventListener('touchmove', (event) => {
-      $.touches = event.touches.map(getTouchInfo);
-      if (isTouchUnaware()) {
-        $.pmouseX = $.mouseX;
-        $.pmouseY = $.mouseY;
-        $.mouseX = $.touches[0].x;
-        $.mouseY = $.touches[0].y;
-        $.mouseIsPressed = true;
-        $.mouseButton = $.LEFT;
-        if (!$._mouseDraggedFn(event)) {
-          event.preventDefault();
-        }
-      }
-      if (!$._touchMovedFn(event)) {
-        event.preventDefault();
-      }
+      $.pmouseX = $.mouseX;
+      $.pmouseY = $.mouseY;
+      $.mouseX = event.touches[0].clientX;
+      $.mouseY = event.touches[0].clientY;
+      $.mouseIsPressed = true;
+      $.mouseButton = $.LEFT;
+      $._mouseDraggedFn(event);
+      event.preventDefault();
     });
-    window.addEventListener('touchcancel', (event) => {
-      $.touches = event.touches.map(getTouchInfo);
-      if (isTouchUnaware()) {
-        $.pmouseX = $.mouseX;
-        $.pmouseY = $.mouseY;
-        $.mouseX = $.touches[0].x;
-        $.mouseY = $.touches[0].y;
-        $.mouseIsPressed = false;
-        if (!$._mouseReleasedFn(event)) {
-          event.preventDefault();
-        }
-      }
-      if (!$._touchEndedFn(event)) {
-        event.preventDefault();
-      }
+    window.addEventListener('touchend', (event) => {
+      $.mouseIsPressed = true;
+      $._mouseReleasedFn(event);
+      event.preventDefault();
     });
 
     $.hasSensorPermission = ((!window.DeviceOrientationEvent) && (!window.DeviceMotionEvent)) || !(DeviceOrientationEvent.requestPermission || DeviceMotionEvent.requestPermission);
