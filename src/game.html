@@ -7,20 +7,12 @@
     <title>Trout Bout!</title>
     <link rel="stylesheet" href="styles.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-
-    <script src="scripts/types.js"></script>
-    <script src="scripts/params.js"></script>
-    <script src="scripts/server.js"></script>
-    <script src="scripts/client.js"></script>
-    <script src="scripts/render.js"></script>
-    <script src="scripts/input.js"></script>
-    <script src="scripts/game.js"></script>
+    <script type="module" src="scripts/createGame.js"></script>
 </head>
 
-<body scroll="no" style="overflow: hidden" onload="onLoad()">
+<body scroll="no" style="overflow: hidden">
     <div id="primary-icon-bar" class="hidden icon-bar">
         <button class="icon-button icon-thick" onclick="toggleFullscreen()">
             <svg id="fullscreenOffIcon" class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="-5 -5 25 25">
@@ -82,56 +74,4 @@
         <main id="main"></main>
     </div>
 </body>
-
-<script>
-    function updateJoinInfo() {
-        document.getElementById('joinInfo').hidden = false
-        document.getElementById('code').innerHTML = `Room Code: ${serverId}`;
-        var qr = qrcode(0, 'M');
-        let link = 'https://expitau.github.io/Fishgame/src/game.html?room=' + serverId;
-        qr.addData(link);
-        qr.make()
-        let img = qr.createImgTag()
-        let qrElt = document.getElementById('qr')
-        qrElt.innerHTML = img;
-        qrElt.firstChild.style.width = '100%';
-        qrElt.firstChild.style.height = '100%';
-        qrElt.firstChild.style.imageRendering = 'pixelated';
-        qrElt.firstChild.style['border-radius'] = '0.5rem';
-    }
-
-    const serverTimedOut = () => {
-        const loadingText = document.getElementById('loadingText');
-        loadingText.innerText = `Unable to ${isServer ? 'start' : 'find'} Server.`;
-        setTimeout(() => {
-            returnToLobby();
-        }, 1300);
-    }
-
-    const onLoad = () => {
-        if(serverId !== undefined && serverId !== '') {
-            const loadingText = document.getElementById('loadingText');
-            loadingText.innerHTML = `<div class="no-wrap">${isServer ? 'Starting server' : 'Connecting to...'}</div><div class="info">${serverId}</div>`;
-        }
-    }
-
-    const openSettings = () => {
-        settingsOpen = true;
-        mouseIsHeld = false;
-        document.getElementById('nameInput').value = displayName;
-        document.getElementById('colorInput').value = displayColor;
-        updateColorDisplay();
-        updateJoinInfo();
-        document.getElementById('settingsModal').showModal();
-    }
-
-    const closeSettings = () => {
-        settingsOpen = false;
-        document.getElementById('settingsModal').close();
-    }
-
-    function returnToLobby() {
-        location.href = 'index.html' + location.search;
-    }
-</script>
 </html>
