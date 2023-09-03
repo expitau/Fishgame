@@ -1,5 +1,6 @@
 import { getCurrentTile, getSlapArea, maps } from './map.js';
 import { INPUT_TYPES } from './types.js';
+import { cursorData } from './playerInput.js';
 
 // On physics tick, modify state
 export function physicsTick(initialState) {
@@ -110,7 +111,7 @@ export function physicsInput(initialState, type, data) {
       const dx = Math.sin(data.input.cursorR);
       const dy = Math.cos(data.input.cursorR);
 
-      const slapRange = 7 * maps[state.map].pixelSize;
+      const { pixelSize } = maps[state.map];
 
       let pvp = false;
 
@@ -118,7 +119,7 @@ export function physicsInput(initialState, type, data) {
       // eslint-disable-next-line no-restricted-syntax
       for (const otherPlayer of state.players) {
         if (otherPlayer.id !== player.id) {
-          if (withinDistance(player, otherPlayer, dx * 60, dy * 60, slapRange) || withinDistance(player, otherPlayer, 0, 0, slapRange)) {
+          if (canSlapPlayer(player, otherPlayer, dx, dy, pixelSize)) {
             applySlapMovement(player, 7, data.input.cursorR);
             applySlapMovement(otherPlayer, 7, Math.PI + data.input.cursorR);
             otherPlayer.health -= 1;
@@ -191,6 +192,10 @@ function applySlapMovement(player, power, angle) {
 
   // Update player rotation to point of contact
   player.r = (angle + Math.PI) % (Math.PI * 2);
+}
+
+export function canSlapPlayer(player, otherPlayer, dx, dy, pixelSize) {
+  return withinDistance(player, otherPlayer, dx * cursorData.display, dy * cursorData.display, 7) || withinDistance(player, otherPlayer, 0, 0, 7 * pixelSize);
 }
 
 function withinDistance(player1, player2, offsetX, offsetY, distance) {

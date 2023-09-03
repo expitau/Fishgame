@@ -1,5 +1,6 @@
 import { getSlapArea, maps } from './map.js';
 import { cursorData } from './playerInput.js';
+import { canSlapPlayer } from './physics.js';
 import {
   HSBToRGB, RGBToHSB, isMobile, round,
 } from './utilities.js';
@@ -139,61 +140,78 @@ export function renderGraphics(clientContext) {
   const { pixelSize, width: mapWidth, height: mapHeight } = maps[clientContext.state.map];
   const currentPlayer = clientContext.state.players.filter((p) => p.id === clientContext.clientId)[0];
 
-  function align(value) {
-    return Math.floor(value / pixelSize) * pixelSize;
-  }
-
-  // Screenshake
-  let screenShakeMap = [];
-  if (screenShakeTime > 0) {
-    screenShakeTime -= 1;
-    screenShakeMap = [
-      ((Math.random() > 0.5) ? -1 : 1) * pixelSize,
-      ((Math.random() > 0.5) ? -1 : 1) * pixelSize,
-    ];
-  } else {
-    screenShakeMap = [0, 0];
-  }
-
-  // Create and render frame
-  q5.background('#dbba67');
-  q5.push();
-  q5.translate(150 + screenShakeMap[0] * frame.changeRatio, 150 + screenShakeMap[1] * frame.changeRatio);
-  q5.scale(frame.changeRatio);
-  q5.fill('#b09554');
-  q5.noStroke();
-  q5.rect(-pixelSize, -pixelSize, frame.width + pixelSize * 2, frame.height + pixelSize * 2);
+  displayFrame(pixelSize);
 
   // Remove any unused fish sprite sheets from memory
   const unusedPlayerColors = clientContext.state.players
     .filter((player) => ((player.color === null) ? false : !Object.keys(fishSheets).includes(player.color.toString())));
 
   for (let colorIndex = 0; colorIndex < unusedPlayerColors.length; colorIndex += 1) {
-    console.log(`removed color:${unusedPlayerColors[colorIndex]}`);
     delete fishSheets[unusedPlayerColors[colorIndex]];
   }
 
-  const playerSpriteInfo = {};
+  // Pre-compute fish sprite info so that it can be reused in multiple places
+  const playerSpriteInfo = preComputeFishInfo(clientContext);
 
-  // Create new fish sprite sheets based of fish hue if one does not exist
+  // Draw player shadows
+  for (let playerIndex = 0; playerIndex < clientContext.state.players.length; playerIndex += 1) {
+    displayFishShadow(clientContext.state.players[playerIndex], playerSpriteInfo[playerIndex], pixelSize);
+  }
+
+  // Draw foreground
+  q5.image(graphics.levelImage, 0, 0, mapWidth * 50, mapHeight * 50);
+
+  // Health bar
+  if (currentPlayer !== undefined) {
+    displayHealth(currentPlayer.health, clientContext);
+  }
+
+  // Display players
+  for (let playerIndex = 0; playerIndex < clientContext.state.players.length; playerIndex += 1) {
+    displayFish(clientContext.state.players[playerIndex], playerSpriteInfo[playerIndex], pixelSize);
+  }
+
+  // Draw cursor when mouse is held
+  if (currentPlayer !== undefined && cursorData.active && (cursorData.x !== 0 || cursorData.y !== 0)) {
+    displayCursor(currentPlayer, clientContext);
+  }
+
+  // Draw effects
+  handleGraphicEffects(pixelSize, clientContext);
+  q5.pop();
+}
+
+function displayFrame(pixelSize) {
+  const screenShake = getScreenShake(pixelSize);
+  q5.background('#dbba67');
+  q5.push();
+  q5.translate(150 + screenShake[0] * frame.changeRatio, 150 + screenShake[1] * frame.changeRatio);
+  q5.scale(frame.changeRatio);
+  q5.fill('#b09554');
+  q5.noStroke();
+  q5.rect(-pixelSize, -pixelSize, frame.width + pixelSize * 2, frame.height + pixelSize * 2);
+  q5.image(graphics.background, 0, 0, frame.width, frame.height);
+}
+
+function handleGraphicEffects(pixelSize, clientContext) {
+  for (let i = 0; i < graphicsEffects.length; i += 1) {
+    graphicsEffects[i].time -= 1;
+    if (graphicsEffects[i].time <= 0) {
+      graphicsEffects.pop(i);
+      i -= 1;
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    displayEffect(graphicsEffects[i], pixelSize, clientContext);
+  }
+}
+
+function preComputeFishInfo(clientContext) {
+  const playerSpriteInfo = {};
   for (let playerIndex = 0; playerIndex < clientContext.state.players.length; playerIndex += 1) {
     const player = clientContext.state.players[playerIndex];
     if (fishSheets[player.color] === undefined) {
-      const tempFishSheet = q5.createImage(graphics.fishSheet.width, graphics.fishSheet.height);
-      tempFishSheet.loadPixels();
-      graphics.fishSheet.loadPixels();
-      for (let i = 0; i < graphics.fishSheet.width; i += 1) {
-        for (let j = 0; j < graphics.fishSheet.height; j += 1) {
-          const pixel = (i + graphics.fishSheet.width * j) * 4;
-          if (graphics.fishSheet.pixels[pixel + 3] > 100) {
-            const hsbPixel = RGBToHSB(graphics.fishSheet.pixels[pixel], graphics.fishSheet.pixels[pixel + 1], graphics.fishSheet.pixels[pixel + 2]);
-            const rgbPixel = HSBToRGB((hsbPixel[0] + player.color) % 360, hsbPixel[1], hsbPixel[2]);
-            tempFishSheet.set(i, j, q5.color(rgbPixel[0], rgbPixel[1], rgbPixel[2]));
-          }
-        }
-      }
-      tempFishSheet.updatePixels();
-      fishSheets[player.color] = tempFishSheet;
+      fishSheets[player.color] = createNewFishSheet(player.color);
     }
 
     const angle = ((Math.PI * 2) + Math.atan2(player.vy, player.vx)) % (Math.PI * 2);
@@ -204,147 +222,158 @@ export function renderGraphics(clientContext) {
       rotationSprite: ((player.r / Math.PI + 1 / 8) % (1 / 2)) > (1 / 4),
     };
   }
+  return playerSpriteInfo;
+}
 
-  // Draw background
-  q5.image(graphics.background, 0, 0, frame.width, frame.height);
+function getScreenShake(pixelSize) {
+  if (screenShakeTime > 0) {
+    screenShakeTime -= 1;
+    return [
+      ((Math.random() > 0.5) ? -1 : 1) * pixelSize,
+      ((Math.random() > 0.5) ? -1 : 1) * pixelSize,
+    ];
+  }
+  return [0, 0];
+}
 
-  // Draw player shadows
+function displayCursor(player, clientContext) {
+  const { pixelSize } = maps[clientContext.state.map];
+  const cursorX = player.x + Math.sin(cursorData.r) * cursorData.display - pixelSize * 2;
+  const cursorY = player.y + Math.cos(cursorData.r) * cursorData.display - pixelSize * 2;
+  let pvp = false;
+
+  // check if you can attack another player
   for (let playerIndex = 0; playerIndex < clientContext.state.players.length; playerIndex += 1) {
-    const player = clientContext.state.players[playerIndex];
-    const playerInfo = playerSpriteInfo[playerIndex];
-    q5.push();
-    q5.translate(round(player.x + pixelSize), round(player.y + pixelSize * 3));
-    q5.rotate(playerInfo.direction);
-    q5.image(
-      graphics.fishShadowSheet,
-      -5 * pixelSize,
-      -5 * pixelSize,
-      pixelSize * 11,
-      pixelSize * 11,
-      playerInfo.action * 12,
-      playerInfo.rotationSprite * 11,
-      11,
-      11,
-    );
-    q5.pop();
+    const otherPlayer = clientContext.state.players[playerIndex];
+    if (otherPlayer.id !== clientContext.clientId) {
+      if (canSlapPlayer(player, otherPlayer, Math.sin(cursorData.r), Math.cos(cursorData.r), pixelSize)) {
+        pvp = true;
+      }
+    }
   }
 
-  // Draw level
-  q5.image(graphics.levelImage, 0, 0, mapWidth * 50, mapHeight * 50);
+  q5.image(
+    graphics.cursorSheet,
+    cursorX,
+    cursorY,
+    pixelSize * 5,
+    pixelSize * 5,
+    (pvp ? 0 : !getSlapArea(maps[clientContext.state.map], cursorX, cursorY)) * 6,
+    pvp * 6,
+    5,
+    5,
+  );
+}
 
-  if (!currentPlayer) {
-    // console.log('players: ');
-    // console.log(state.players);
-    // console.log(`clientId:${clientId}`);
-    q5.pop();
-    return;
-  }
-
-  // Health bar
+function displayHealth(currentHealth, clientContext) {
+  const { pixelSize, width } = maps[clientContext.state.map];
   for (let i = 0; i < 3; i += 1) {
     q5.image(
       graphics.iconSheet,
-      align((mapWidth * 8 - (i + 1) * 8) * pixelSize),
+      (width * 8 - (i + 1) * 8) * pixelSize,
       pixelSize,
       pixelSize * 7,
       pixelSize * 7,
       0,
-      ((currentPlayer.health > i) ? 0 : 1) * 8,
+      ((currentHealth > i) ? 0 : 1) * 8,
       7,
       7,
     );
   }
+}
 
-  // Display fish
-  for (let playerIndex = 0; playerIndex < clientContext.state.players.length; playerIndex += 1) {
-    const player = clientContext.state.players[playerIndex];
-    const playerInfo = playerSpriteInfo[playerIndex];
-    q5.push();
-    q5.translate(round(player.x), round(player.y));
-    if (player.name !== '') {
-      q5.fill(255, 255, 255, 160);
-      q5.textAlign(q5.CENTER);
-      q5.textSize(25);
-      const nameWidth = q5.textWidth(player.name) + 27;
-      q5.rect(-nameWidth / 2, -54, nameWidth, 28, 20);
-      const playerColor = HSBToRGB(player.color, 100, 100);
-      q5.fill(q5.color(playerColor[0], playerColor[1], playerColor[2]));
-      q5.text(player.name, 0, -30);
-    }
-    q5.rotate(playerInfo.direction);
-    q5.image(
-      fishSheets[player.color],
-      -5 * pixelSize,
-      -5 * pixelSize,
-      pixelSize * 11,
-      pixelSize * 11,
-      playerInfo.action * 12,
-      playerInfo.rotationSprite * 11,
-      11,
-      11,
-    );
-    q5.pop();
-  }
-
-  // Draw cursor when mouse is held
-  if (cursorData.active) {
-    if (cursorData.x !== 0 || cursorData.y !== 0) {
-      const cursorX = currentPlayer.x + Math.sin(cursorData.r) * cursorData.display;
-      const cursorY = currentPlayer.y + Math.cos(cursorData.r) * cursorData.display;
-      let pvp = false;
-
-      // check if you can attack another player
-      for (let playerIndex = 0; playerIndex < clientContext.state.players.length; playerIndex += 1) {
-        const otherPlayer = clientContext.state.players[playerIndex];
-        if (otherPlayer.id !== clientContext.clientId) {
-          if (((currentPlayer.x + Math.sin(cursorData.r) * cursorData.display - otherPlayer.x) ** 2 + (currentPlayer.y + Math.cos(cursorData.r) * cursorData.display - otherPlayer.y) ** 2) ** 0.5 < 7 * pixelSize || ((currentPlayer.x - otherPlayer.x) ** 2 + (currentPlayer.y - otherPlayer.y) ** 2) ** 0.5 < 7 * pixelSize) {
-            pvp = true;
-          }
-        }
-      }
-
-      q5.image(graphics.cursorSheet, cursorX - pixelSize * 2, cursorY - pixelSize * 2, pixelSize * 5, pixelSize * 5, (pvp ? 0 : !getSlapArea(maps[clientContext.state.map], cursorX, cursorY)) * 6, pvp * 6, 5, 5);
-    }
-  }
-
-  // Draw effects
-  for (let i = 0; i < graphicsEffects.length; i += 1) {
-    graphicsEffects[i].time -= 1;
-    if (graphicsEffects[i].time <= 0) {
-      graphicsEffects.pop(i);
-      i -= 1;
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-    switch (graphicsEffects[i].name) {
-      // White circle on hit object
-      case 'impact':
-        q5.image(
-          graphics.slapSheet,
-          graphicsEffects[i].x - pixelSize * 4,
-          graphicsEffects[i].y - pixelSize * 4,
-          50,
-          50,
-          ((4 - Math.floor(graphicsEffects[i].time / 4)) % 2) * 9,
-          Math.floor((4 - Math.floor(graphicsEffects[i].time / 4)) / 2) * 9,
-          8,
-          8,
-        );
-        break;
-
-        // Splatter 'paint' on hit or death
-      case 'splat':
-        createSplatter(graphicsEffects[i].x, graphicsEffects[i].y, graphicsEffects[i].color, graphicsEffects[i].r, pixelSize);
-        break;
-
-        // Screen shake
-      case 'shake':
-        if (graphicsEffects[i].id === clientContext.clientId) {
-          screenShakeTime = graphicsEffects[i].time;
-        }
-        break;
-      default: break;
-    }
-  }
+function displayFishShadow(player, playerInfo, pixelSize) {
+  q5.push();
+  q5.translate(round(player.x + pixelSize), round(player.y + pixelSize * 3));
+  q5.rotate(playerInfo.direction);
+  q5.image(
+    graphics.fishShadowSheet,
+    -5 * pixelSize,
+    -5 * pixelSize,
+    pixelSize * 11,
+    pixelSize * 11,
+    playerInfo.action * 12,
+    playerInfo.rotationSprite * 11,
+    11,
+    11,
+  );
   q5.pop();
+}
+
+function displayFish(player, playerInfo, pixelSize) {
+  q5.push();
+  q5.translate(round(player.x), round(player.y));
+  if (player.name !== '') {
+    q5.fill(255, 255, 255, 160);
+    q5.textAlign(q5.CENTER);
+    q5.textSize(25);
+    const nameWidth = q5.textWidth(player.name) + 27;
+    q5.rect(-nameWidth / 2, -54, nameWidth, 28, 20);
+    const playerColor = HSBToRGB(player.color, 100, 100);
+    q5.fill(q5.color(playerColor[0], playerColor[1], playerColor[2]));
+    q5.text(player.name, 0, -30);
+  }
+  q5.rotate(playerInfo.direction);
+  q5.image(
+    fishSheets[player.color],
+    -5 * pixelSize,
+    -5 * pixelSize,
+    pixelSize * 11,
+    pixelSize * 11,
+    playerInfo.action * 12,
+    playerInfo.rotationSprite * 11,
+    11,
+    11,
+  );
+  q5.pop();
+}
+
+function displayEffect(graphicsEffect, pixelSize, clientContext) {
+  switch (graphicsEffect.name) {
+    // White circle on hit object
+    case 'impact':
+      q5.image(
+        graphics.slapSheet,
+        graphicsEffect.x - pixelSize * 4,
+        graphicsEffect.y - pixelSize * 4,
+        50,
+        50,
+        ((4 - Math.floor(graphicsEffect.time / 4)) % 2) * 9,
+        Math.floor((4 - Math.floor(graphicsEffect.time / 4)) / 2) * 9,
+        8,
+        8,
+      );
+      break;
+
+      // Splatter 'paint' on hit or death
+    case 'splat':
+      createSplatter(graphicsEffect.x, graphicsEffect.y, graphicsEffect.color, graphicsEffect.r, pixelSize);
+      break;
+
+      // Screen shake
+    case 'shake':
+      if (graphicsEffect.id === clientContext.clientId) {
+        screenShakeTime = graphicsEffect.time;
+      }
+      break;
+    default: break;
+  }
+}
+
+function createNewFishSheet(color) {
+  const tempFishSheet = q5.createImage(graphics.fishSheet.width, graphics.fishSheet.height);
+  tempFishSheet.loadPixels();
+  graphics.fishSheet.loadPixels();
+  for (let i = 0; i < graphics.fishSheet.width; i += 1) {
+    for (let j = 0; j < graphics.fishSheet.height; j += 1) {
+      const pixel = (i + graphics.fishSheet.width * j) * 4;
+      if (graphics.fishSheet.pixels[pixel + 3] > 100) {
+        const hsbPixel = RGBToHSB(graphics.fishSheet.pixels[pixel], graphics.fishSheet.pixels[pixel + 1], graphics.fishSheet.pixels[pixel + 2]);
+        const rgbPixel = HSBToRGB((hsbPixel[0] + color) % 360, hsbPixel[1], hsbPixel[2]);
+        tempFishSheet.set(i, j, q5.color(rgbPixel[0], rgbPixel[1], rgbPixel[2]));
+      }
+    }
+  }
+  tempFishSheet.updatePixels();
+  return tempFishSheet;
 }
