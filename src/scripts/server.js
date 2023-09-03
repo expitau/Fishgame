@@ -17,16 +17,19 @@ export function startServer(server) {
   server.on('connection', (conn) => {
     console.log(`[server] Added connection ${conn.peer}`);
 
-    connections[conn.peer] = { heartbeat: 0, connection: conn };
-
     conn.on('open', () => {
-      gameState = serverInput(Date.now(), INPUT_TYPES.connect, { id: conn.peer }).state;
+      conn.send({ type: CONN_EVENTS.clientInit, data: gameState });
 
       conn.on('data', (data) => {
         let inputResponse;
         switch (data.type) {
+          case CONN_EVENTS.clientResponse:
+            inputResponse = serverInput(Date.now(), INPUT_TYPES.connect, { name: data.data.name, color: data.data.color, id: conn.peer });
+            effects = [...effects, ...inputResponse.effects];
+            gameState = inputResponse.state;
+            connections[conn.peer] = { heartbeat: 0, connection: conn };
+            break;
           case CONN_EVENTS.clientUpdate:
-            // eslint-disable-next-line no-case-declarations
             inputResponse = serverInput(data.time, INPUT_TYPES.move, { input: data.data, id: conn.peer });
             effects = [...effects, ...inputResponse.effects];
             gameState = inputResponse.state;
@@ -50,8 +53,6 @@ export function startServer(server) {
         delete connections[conn.peer];
         gameState = serverInput(Date.now(), INPUT_TYPES.disconnect, { id: conn.peer }).state;
       });
-
-      conn.send({ type: CONN_EVENTS.clientInit, data: gameState });
     });
   });
 

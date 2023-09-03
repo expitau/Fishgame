@@ -7,7 +7,7 @@ export function getParamData() {
 
   const playerMetadata = {
     name: '',
-    startingColor: Math.floor(Math.random() * 360),
+    color: Math.floor(Math.random() * 360),
   };
 
   if (params.get('m')) {

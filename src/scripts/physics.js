@@ -74,142 +74,125 @@ export function physicsInput(initialState, type, data) {
   const state = structuredClone(initialState);
   const effects = [];
 
-  if (type === INPUT_TYPES.move) {
-    const { input } = data;
-    const { id } = data;
+  switch (type) {
+    case INPUT_TYPES.connect: {
+      console.log(`[server] Adding player ${data.id}}`);
+      state.players ??= [];
+      state.players.push({
+        id: data.id,
+        x: maps[state.map].spawnPoint[0],
+        y: maps[state.map].spawnPoint[1],
+        r: 0,
+        vx: 0,
+        vy: 0,
+        vr: 0,
+        health: 3,
+        color: data.color ?? 0,
+        name: data.name ?? '',
+      });
+      break;
+    }
+    case INPUT_TYPES.disconnect:
+      console.log(`[server] Removing player ${data.id}}`);
+      state.players = state.players.filter((player) => player.id !== data.id);
+      break;
+    case INPUT_TYPES.settings: {
+      const player = state.players.find((p) => p.id === data.id);
+      if (player === undefined) break;
+      player.name = data.name ?? '';
+      player.color = data.color ?? 0;
+      break;
+    }
+    case INPUT_TYPES.move: {
+      const player = state.players.find((p) => p.id === data.id);
 
-    const player = state.players.filter((p) => p.id === id)[0];
+      // Break cursor into x,y components
+      const dx = Math.sin(data.input.cursorR);
+      const dy = Math.cos(data.input.cursorR);
 
-    // Break cursor into x,y components
-    const dx = Math.sin(input.cursorR);
-    const dy = Math.cos(input.cursorR);
-    let pvp = false;
+      const slapRange = 7 * maps[state.map].pixelSize;
 
-    // If player can hit a player
-    // eslint-disable-next-line no-restricted-syntax
-    for (const otherPlayer of state.players) {
-      if (otherPlayer.id !== player.id) {
-        if (((player.x + dx * 60 - otherPlayer.x) ** 2 + (player.y + dy * 60 - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize
-                    || ((player.x - otherPlayer.x) ** 2 + (player.y - otherPlayer.y) ** 2) ** 0.5 < 7 * maps[state.map].pixelSize) {
-          // Set hit power
-          const power = 7;
+      let pvp = false;
 
-          // Apply new player velocities
-          player.vx = -power * dx;
-          player.vy = -power * dy;
-          player.vr = 0.2 * (player.vx > 0 ? 1 : -1);
-          otherPlayer.vx = power * dx;
-          otherPlayer.vy = power * dy;
-          otherPlayer.vr = -player.vr;
-          otherPlayer.health -= 1;
+      // If player can hit a player
+      // eslint-disable-next-line no-restricted-syntax
+      for (const otherPlayer of state.players) {
+        if (otherPlayer.id !== player.id) {
+          if (withinDistance(player, otherPlayer, dx * 60, dy * 60, slapRange) || withinDistance(player, otherPlayer, 0, 0, slapRange)) {
+            applySlapMovement(player, 7, data.input.cursorR);
+            applySlapMovement(otherPlayer, 7, Math.PI + data.input.cursorR);
+            otherPlayer.health -= 1;
 
-          // Update player rotation to point of contact
-          player.r = (input.cursorR + Math.PI) % (Math.PI * 2);
-
-          // Add slap effect
-          effects.push({
-            name: 'impact',
-            x: (otherPlayer.x + player.x) / 2,
-            y: (otherPlayer.y + player.y) / 2,
-            time: 15,
-          });
-
-          // On Player death
-          if (otherPlayer.health <= 0) {
+            // Add slap effect
             effects.push({
-              name: 'splat',
-              x: otherPlayer.x,
-              y: otherPlayer.y,
-              color: otherPlayer.color,
-              r: player.r,
-              time: 15,
+              name: 'impact', x: (otherPlayer.x + player.x) / 2, y: (otherPlayer.y + player.y) / 2, time: 15,
             });
 
-            effects.push({
-              name: 'shake',
-              time: 25,
-              id: otherPlayer.id,
-            });
-            otherPlayer.health = 3;
-            [otherPlayer.x, otherPlayer.y] = maps[state.map].spawnPoint;
-            otherPlayer.vx = 0;
-            otherPlayer.vy = 0;
-            otherPlayer.vr = 0;
-          } else {
-            effects.push({
-              name: 'splat',
-              x: otherPlayer.x,
-              y: otherPlayer.y,
-              color: otherPlayer.color,
-              r: player.r,
-              time: 2,
-            });
-            effects.push({
-              name: 'shake',
-              time: 5,
-              id: otherPlayer.id,
-            });
+            // On Player death
+            if (otherPlayer.health <= 0) {
+              effects.push({
+                name: 'splat', x: otherPlayer.x, y: otherPlayer.y, color: otherPlayer.color, r: player.r, time: 15,
+              });
+
+              effects.push({
+                name: 'shake', id: otherPlayer.id, time: 25,
+              });
+
+              otherPlayer.health = 3;
+              [otherPlayer.x, otherPlayer.y] = maps[state.map].spawnPoint;
+              otherPlayer.vx = 0;
+              otherPlayer.vy = 0;
+              otherPlayer.vr = 0;
+            } else {
+              effects.push({
+                name: 'splat', x: otherPlayer.x, y: otherPlayer.y, color: otherPlayer.color, r: player.r, time: 2,
+              });
+              effects.push({
+                name: 'shake', id: otherPlayer.id, time: 5,
+              });
+            }
+            pvp = true;
           }
-          pvp = true;
         }
       }
+
+      // If player can hit a tile
+      if (!pvp && getSlapArea(maps[state.map], player.x + dx * 60, player.y + dy * 60)) {
+        applySlapMovement(player, 7, data.input.cursorR);
+
+        // Add slap effect
+        effects.push({
+          name: 'impact', x: player.x + dx * 15, y: player.y + dy * 15, time: 15,
+        });
+      }
+      break;
     }
-
-    // If player can hit a tile
-    if (!pvp && getSlapArea(maps[state.map], player.x + dx * 60, player.y + dy * 60)) {
-      // Set hit power
-      const power = 7;
-
-      // Calculate what factor of new movement to conserved momentum to use on both the x and y axis
-      const xFactor = Math.min(Math.max(Math.abs((-power * dx) / player.vx), 0.01), 0.99);
-      const yFactor = Math.min(Math.max(Math.abs((-power * dy) / player.vy), 0.01), 0.99);
-
-      // Apply new player velocities
-      player.vx = (-power * dx) * xFactor + player.vx * (1 - xFactor);
-      player.vy = (-power * dy) * yFactor + player.vy * (1 - yFactor);
-      player.vr = 0.2 * (player.vx > 0 ? 1 : -1);
-
-      // Update player rotation to point of contact
-      player.r = (input.cursorR + Math.PI) % (Math.PI * 2);
-
-      // Add slap effect
-      effects.push({
-        name: 'impact',
-        x: player.x + dx * 15,
-        y: player.y + dy * 15,
-        time: 15,
-      });
-    }
-  } else if (type === INPUT_TYPES.connect) {
-    const { id } = data;
-    console.log(`[server] Adding player ${id}}`);
-    state.players ??= [];
-    state.players.push({
-      id,
-      x: maps[state.map].spawnPoint[0],
-      y: maps[state.map].spawnPoint[1],
-      r: 0,
-      vx: 0,
-      vy: 0,
-      vr: 0,
-      health: 3,
-      color: 0,
-      name: '',
-    });
-  } else if (type === INPUT_TYPES.disconnect) {
-    const { id } = data;
-    console.log(`[server] Removing player ${id}}`);
-    state.players = state.players.filter((player) => player.id !== id);
-  } else if (type === INPUT_TYPES.settings) {
-    const player = state.players.find((p) => p.id === data.id);
-    const { name, color } = data;
-    if (player !== undefined) {
-      player.name = name ?? '';
-      player.color = color ?? 0;
-    }
-  } else if (type === INPUT_TYPES.cache) {
-    // no side effects, just stores state and effects
+    case INPUT_TYPES.cache: default:
+      // no side effects, just stores state and effects
+      break;
   }
 
   return { state, effects };
+}
+
+function applySlapMovement(player, power, angle) {
+  // Calculate component directions
+  const dx = Math.sin(angle);
+  const dy = Math.cos(angle);
+
+  // Calculate what factor of new movement to conserved momentum to use on both the x and y axis
+  const xFactor = Math.min(Math.max(Math.abs((-power * dx) / player.vx), 0.01), 0.99);
+  const yFactor = Math.min(Math.max(Math.abs((-power * dy) / player.vy), 0.01), 0.99);
+
+  // Apply new player velocities
+  player.vx = (-power * dx) * xFactor + player.vx * (1 - xFactor);
+  player.vy = (-power * dy) * yFactor + player.vy * (1 - yFactor);
+  player.vr = 0.2 * (player.vx > 0 ? 1 : -1);
+
+  // Update player rotation to point of contact
+  player.r = (angle + Math.PI) % (Math.PI * 2);
+}
+
+function withinDistance(player1, player2, offsetX, offsetY, distance) {
+  return ((player1.x + offsetX - player2.x) ** 2 + (player1.y + offsetY - player2.y) ** 2) < distance ** 2;
 }

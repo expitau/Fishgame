@@ -9,11 +9,12 @@ export const createGame = () => {
 
   if (params.serverId === undefined || params.serverId === '') {
     window.location.href = 'index.html';
-  } else {
-    const loadingText = document.getElementById('loadingText');
-    const titleText = params.isServer ? 'Starting server' : 'Connecting to...';
-    loadingText.innerHTML = `<div class="no-wrap">${titleText}</div><div class="info">${params.serverId}</div>`;
+    return;
   }
+
+  const loadingText = document.getElementById('loadingText');
+  const titleText = params.isServer ? 'Starting server' : 'Connecting to...';
+  loadingText.innerHTML = `<div class="no-wrap">${titleText}</div><div class="info">${params.serverId}</div>`;
 
   if (params.isServer) {
     const server = new Peer(SERVER_PREFIX + params.serverId);

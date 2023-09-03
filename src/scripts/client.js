@@ -74,7 +74,7 @@ export function startClient(serverId, isServer, playerMetadata) {
             clientContext.state = data.data;
             clientContext.connected = true;
             conn.send({
-              type: CONN_EVENTS.metaDataChange,
+              type: CONN_EVENTS.clientResponse,
               data: {
                 name: playerMetadata.name,
                 color: playerMetadata.color,

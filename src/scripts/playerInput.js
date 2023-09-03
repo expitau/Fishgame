@@ -1,5 +1,4 @@
-import { physicsInput } from './physics.js';
-import { CONN_EVENTS, INPUT_TYPES } from './types.js';
+import { CONN_EVENTS } from './types.js';
 
 export const cursorData = {
   r: 0,
@@ -14,7 +13,6 @@ export const cursorData = {
 export function setupPlayerInput(clientContext, q5) {
   function sendInput() {
     if (cursorData.x !== 0 || cursorData.y !== 0) {
-      clientContext.state = physicsInput(clientContext.state, INPUT_TYPES.move, { input: { cursorR: cursorData.r }, id: clientContext.clientId }).state;
       clientContext.sendEvent(CONN_EVENTS.clientUpdate, { cursorR: cursorData.r });
       cursorData.x = 0;
       cursorData.y = 0;

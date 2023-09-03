@@ -6,6 +6,7 @@ export const CONN_EVENTS = {
   heartbeatResponse: 4,
   serverEffect: 5,
   metaDataChange: 6,
+  clientResponse: 7,
 };
 
 export const SERVER_PREFIX = 'fishgame-';
