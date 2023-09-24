@@ -1,6 +1,8 @@
 # Trout Bout
 
-# About
+**[Play Here](https://expitau.github.io/Fishgame)**
+
+## About
 Trout Bout is a chaotic fast-paced physics based fish-fighting game!
 This game's server is entirely Peer-To-Peer, which means that there is no setup reuired to instantly host servers and play online
 with your friends. It can be played with as many players as the host's internet connection and device can support.
