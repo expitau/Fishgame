@@ -3,7 +3,7 @@
 Trout Bout is a chaotic fast-paced physics based fish-fighting game!
 This game's server is entirely Peer-To-Peer, which means that there is no setup reuired to instantly host servers and play online
 with your friends. It can be played with as many players as the host's internet connection and device can support.
-Developed collaboratively by [@Reumarks](https://github.com/reumarks) and [@Expitau](https://github.com/expitau-dev)
+Developed collaboratively by [@Reumarks](https://github.com/reumarks) and [@Expitau](https://github.com/expitau-dev).
 
 <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/22671898/260339595-45259d5f-fb82-4aae-b746-d2c99bf5cd9a.png" alt="drawing" width="300"/>
 
