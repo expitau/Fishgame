@@ -17,7 +17,13 @@ export const createGame = () => {
   loadingText.innerHTML = `<div class="no-wrap">${titleText}</div><div class="info">${params.serverId}</div>`;
 
   if (params.isServer) {
-    const server = new Peer(SERVER_PREFIX + params.serverId);
+    const server = new Peer(SERVER_PREFIX + params.serverId, {
+      config: {
+         iceServers: [
+            { urls: 'turn:server.expitau.com', username: 'expitau', credential: 'ZmlzaGdhbWU=' }
+         ]
+      }
+   });
 
     server.on('open', () => {
       startServer(server);

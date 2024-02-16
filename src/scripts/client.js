@@ -36,7 +36,13 @@ function runPhysicsTick(clientContext) {
 }
 
 export function startClient(serverId, isServer, playerMetadata) {
-  const client = new Peer();
+  const client = new Peer({
+    config: {
+       iceServers: [
+          { urls: 'turn:server.expitau.com', username: 'expitau', credential: 'ZmlzaGdhbWU=' }
+       ]
+    }
+ });
 
   client.on('open', (clientId) => {
     console.log('[client] connecting...');
