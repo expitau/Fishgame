@@ -27,7 +27,7 @@ export function setupDocumentInput(clientContext) {
     document.getElementById('joinInfo').hidden = false;
     document.getElementById('code').innerHTML = `Room Code: ${clientContext.serverId}`;
     const qr = qrcode(0, 'M');
-    const link = `https://expitau.github.io/Fishgame/src/game.html?room=${clientContext.serverId}`;
+    const link = `https://expitau.com/Fishgame/game.html?room=${clientContext.serverId}`;
     qr.addData(link);
     qr.make();
     const img = qr.createImgTag();

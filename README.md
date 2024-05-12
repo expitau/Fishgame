@@ -10,9 +10,9 @@ Developed collaboratively by [@Reumarks](https://github.com/reumarks) and [@expi
 
 ## Hosting a Game
 
-Create a new game by going to [expitau.github.io/Fishgame](https://expitau.github.io/Fishgame) and clicking `HOST`.
+Create a new game by going to [expitau.com/Fishgame](https://expitau.com/Fishgame) and clicking `HOST`.
 
-Others can join by going to the [expitau.github.io/Fishgame](https://expitau.github.io/Fishgame) and typing in the 
+Others can join by going to the [expitau.com/Fishgame](https://expitau.com/Fishgame) and typing in the 
 "Room Code" found in the Host's settings menu and clicking `JOIN`, or by scanning the QR code provided, to join the game.
 
 ## How to play
