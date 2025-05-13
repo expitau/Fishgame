@@ -35,12 +35,20 @@ function runPhysicsTick(clientContext) {
   }
 }
 
-export function startClient(serverId, isServer, playerMetadata) {
+export async function startClient(serverId, isServer, playerMetadata) {
+  const response = 
+  await fetch("https://qinqii.metered.live/api/v1/turn/credentials?apiKey=4e8a7e31bc4d677c43f8d794ff581ad2dc3e");
+
+  // Saving the response in the iceServers array
+  const iceServers = await response.json();
+  console.log("[client] Using ice servers: ", iceServers)
+
   const client = new Peer({
     config: {
-       iceServers: [
-          { urls: 'turn:server.expitau.com', username: 'expitau', credential: 'ZmlzaGdhbWU=' }
-       ]
+       iceServers: iceServers,
+      //  iceServers: [
+      //     { urls: 'turn:server.expitau.com', username: 'expitau', credential: 'ZmlzaGdhbWU=' }
+      //  ]
     }
  });
 

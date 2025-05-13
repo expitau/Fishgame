@@ -4,7 +4,7 @@ import { SERVER_PREFIX } from './types.js';
 import { getParamData } from './params.js';
 /* global Peer */
 
-export const createGame = () => {
+export async function createGame() {
   const params = getParamData();
 
   if (params.serverId === undefined || params.serverId === '') {
@@ -17,11 +17,19 @@ export const createGame = () => {
   loadingText.innerHTML = `<div class="no-wrap">${titleText}</div><div class="info">${params.serverId}</div>`;
 
   if (params.isServer) {
+    const response = 
+    await fetch("https://qinqii.metered.live/api/v1/turn/credentials?apiKey=4e8a7e31bc4d677c43f8d794ff581ad2dc3e");
+  
+    // Saving the response in the iceServers array
+    const iceServers = await response.json();
+    console.log("[server] Using ice servers: ", iceServers)
+
     const server = new Peer(SERVER_PREFIX + params.serverId, {
       config: {
-         iceServers: [
-            { urls: 'turn:server.expitau.com', username: 'expitau', credential: 'ZmlzaGdhbWU=' }
-         ]
+         iceServers: iceServers,
+        //  iceServers: [
+        //     { urls: 'turn:server.expitau.com', username: 'expitau', credential: 'ZmlzaGdhbWU=' }
+        //  ]
       }
    });
 
